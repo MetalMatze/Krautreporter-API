@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateAuthorsTable extends Migration {
@@ -17,8 +16,9 @@ class CreateAuthorsTable extends Migration {
             $table->integer('id')->unsigend();
             $table->string('name');
             $table->string('title');
+            $table->string('url');
             $table->string('image');
-            $table->text('biography');
+            $table->text('biography')->nullable();
             $table->string('homepage')->nullable();
             $table->string('twitter')->nullable();
             $table->timestamps();
