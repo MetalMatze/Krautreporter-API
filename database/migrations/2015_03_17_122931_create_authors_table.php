@@ -14,7 +14,7 @@ class CreateAuthorsTable extends Migration {
     {
         Schema::create('authors', function($table)
         {
-            $table->integer('id');
+            $table->integer('id')->unsigend();
             $table->string('name');
             $table->string('title');
             $table->string('image');
