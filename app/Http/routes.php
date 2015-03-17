@@ -1,5 +1,8 @@
 <?php
 
+use GuzzleHttp\Client;
+use Symfony\Component\DomCrawler\Crawler;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -11,4 +14,22 @@
 |
 */
 
-Route::get('/', 'WelcomeController@index');
+Route::get('/', function() {
+    $client = new Client();
+
+    $response = $client->get('https://krautreporter.de/');
+    $responseBodyString = $response->getBody()->getContents();
+
+    $crawler = new Crawler($responseBodyString);
+
+    // $register = $crawler->filter('a#registration-link span');
+    // dd(trim($register->text()));
+
+    $authors = $crawler->filter('#author-list-tab li a');
+
+    dd(trim($authors->html()));
+
+    foreach ($authors as $index => $author) {
+        dd($author->children());
+    }
+});
