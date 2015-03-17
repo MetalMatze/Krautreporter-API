@@ -1,7 +1,6 @@
 <?php
 
-use GuzzleHttp\Client;
-use Symfony\Component\DomCrawler\Crawler;
+use App\Author;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,21 +14,13 @@ use Symfony\Component\DomCrawler\Crawler;
 */
 
 Route::get('/', function() {
-    $client = new Client();
+    return 'hallo';
+});
 
-    $response = $client->get('https://krautreporter.de/');
-    $responseBodyString = $response->getBody()->getContents();
+Route::get('authors', function() {
+    return Author::all();
+});
 
-    $crawler = new Crawler($responseBodyString);
-
-    // $register = $crawler->filter('a#registration-link span');
-    // dd(trim($register->text()));
-
-    $authors = $crawler->filter('#author-list-tab li a');
-
-    dd(trim($authors->html()));
-
-    foreach ($authors as $index => $author) {
-        dd($author->children());
-    }
+Route::get('authors/{id}', function($id) {
+    return Author::find($id);
 });
