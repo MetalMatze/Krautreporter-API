@@ -4,6 +4,7 @@ use App\Article;
 use App\Author;
 use Goutte\Client;
 use Illuminate\Console\Command;
+use RuntimeException;
 use Symfony\Component\DomCrawler\Crawler;
 
 class SyncArticles extends Command {
@@ -23,13 +24,22 @@ class SyncArticles extends Command {
     protected $description = 'Sync all articles from krautreporter.de.';
 
     /**
+     * @var Client
+     */
+    protected $client;
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Client $client)
     {
         parent::__construct();
+        $this->client = $client;
+
+        $this->lastUrl = null;
+        $this->all_index = 0;
     }
 
     /**
@@ -39,13 +49,24 @@ class SyncArticles extends Command {
      */
     public function fire()
     {
-        $client = new Client();
+        $this->sync_articles();
+    }
 
-        $crawler = $client->request('GET', 'http://krautreporter.de');
+    private function sync_articles($url = null)
+    {
+        if($url == null)
+        {
+            $url = 'https://krautreporter.de';
+            $filter = '#article-list-tab li';
+        }
+        else {
+            $filter = 'li';
+        }
 
-        $nav = $crawler->filter('#article-list-tab li');
+        $crawler = $this->client->request('GET', $url);
 
-        $nav->each(function(Crawler $node, $index) {
+        $nodes = $crawler->filter($filter);
+        $nodes->each(function(Crawler $node, $index) {
             $a = $node->filter('a');
 
             $article_url = $a->attr('href');
@@ -54,6 +75,10 @@ class SyncArticles extends Command {
             if(count($matches) >= 2)
             {
                 $article_id = (int) $matches[1];
+            }
+            else
+            {
+                throw new RuntimeException();
             }
 
             $article_author = utf8_decode($a->filter('.meta')->text());
@@ -69,16 +94,33 @@ class SyncArticles extends Command {
             }
 
             $article = Article::firstOrNew(['id' => $article_id]);
-            $article->order = $index;
+            $article->order = $this->all_index + $index;
             $article->title = $article_title;
             $article->url = $article_url;
             $article->morgenpost = $article_morgenpost;
 
             $author = Author::where('name', '=', $article_author)->first();
-            $article->author()->associate($author);
+            if($author != null)
+            {
+                $article->author()->associate($author);
+            }
+            else
+            {
+                $this->error(sprintf('Unable to find author with name: %s', $article_author));
+            }
 
             $article->save();
+
+            $this->lastUrl = $article->url;
         });
+
+        if($nodes->count() > 0)
+        {
+            $this->all_index += $nodes->count();
+            $this->comment($this->lastUrl);
+            $url = sprintf('https://krautreporter.de/articles%s/load_more_navigation_items', $this->lastUrl);
+            $this->sync_articles($url);
+        }
     }
 
     /**
