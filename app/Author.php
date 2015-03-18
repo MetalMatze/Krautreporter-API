@@ -26,4 +26,8 @@ class Author extends Model {
         'media-links'
     ];
 
+    public function articles()
+    {
+        return $this->hasMany('App\Article');
+    }
 }
