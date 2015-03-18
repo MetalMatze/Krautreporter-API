@@ -103,13 +103,12 @@ class SyncArticles extends Command {
             if($author != null)
             {
                 $article->author()->associate($author);
+                $article->save();
             }
             else
             {
                 $this->error(sprintf('Unable to find author with name: %s', $article_author));
             }
-
-            $article->save();
 
             $this->lastUrl = $article->url;
         });
@@ -119,7 +118,13 @@ class SyncArticles extends Command {
             $this->all_index += $nodes->count();
             $this->comment($this->lastUrl);
             $url = sprintf('https://krautreporter.de/articles%s/load_more_navigation_items', $this->lastUrl);
+
             $this->sync_articles($url);
+        }
+        else
+        {
+            $articleCount = Article::all()->count();
+            $this->info(sprintf('Now there are %d articles.', $articleCount));
         }
     }
 
