@@ -49,11 +49,13 @@ class SyncAuthors extends Command {
 
         $authors = $crawler->filter('#author-list-tab li');
 
+        $this->info(sprintf('Found %d authors, start parsing and saving to db.', count($authors)));
+
         $authors->each(function(Crawler $node) {
 
             $anchor = $node->filter('a');
 
-            $author_url = $anchor->attr('href');
+            $author_url = utf8_decode($anchor->attr('href'));
 
             preg_match('/\/(\d*)/', $author_url, $matches);
             if(count($matches) >= 2)
@@ -62,6 +64,7 @@ class SyncAuthors extends Command {
             }
 
             $author = Author::firstOrNew(['id' => $author_id]);
+            $author->url = $author_url;
 
             $anchorText = trim($anchor->text());
 
@@ -69,12 +72,12 @@ class SyncAuthors extends Command {
 
             if(count($matches) >= 2)
             {
-                $author->name = $matches[1];
+                $author->name = utf8_decode($matches[1]);
             }
 
             if (count($matches) >= 4)
             {
-                $author->title = $matches[3];
+                $author->title = utf8_decode($matches[3]);
             }
 
             $image = $anchor->filter('img');
@@ -83,7 +86,7 @@ class SyncAuthors extends Command {
             preg_match('/(.*) 50w, (.*) 100w/', $imageUrls, $matches);
             if(count($matches) == 3)
             {
-                $author->image = $matches[2];
+                $author->image = utf8_decode($matches[2]);
             }
 
             $author->save();

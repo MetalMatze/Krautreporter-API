@@ -13,8 +13,7 @@ class Author extends Model {
         'url',
         'image',
         'biography',
-        'homepage',
-        'twitter'
+        'media-links'
     ];
 
     protected $visible = [
@@ -24,8 +23,7 @@ class Author extends Model {
         'url',
         'image',
         'biography',
-        'homepage',
-        'twitter'
+        'media-links'
     ];
 
 }

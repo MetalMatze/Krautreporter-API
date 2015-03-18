@@ -19,10 +19,9 @@ class CreateAuthorsTable extends Migration {
             $table->string('url');
             $table->string('image');
             $table->text('biography')->nullable();
-            $table->string('homepage')->nullable();
-            $table->string('twitter')->nullable();
+            $table->text('media-links')->nullable();
             $table->timestamps();
-            
+
             $table->primary('id');
         });
     }
