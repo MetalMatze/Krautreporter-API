@@ -13,7 +13,7 @@ class CreateArticlesTable extends Migration {
     {
         Schema::create('articles', function($table)
         {
-            $table->integer('id')->unsigned();
+            $table->increments('id');
             $table->integer('order')->unsigend();
             $table->string('title');
             $table->timestamp('date');
@@ -24,8 +24,6 @@ class CreateArticlesTable extends Migration {
             $table->text('content');
             $table->integer('author_id')->unsigned();
             $table->timestamps();
-
-            $table->primary('id');
         });
     }
 

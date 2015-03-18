@@ -13,7 +13,7 @@ class CreateAuthorsTable extends Migration {
     {
         Schema::create('authors', function($table)
         {
-            $table->integer('id')->unsigend();
+            $table->increments('id');
             $table->string('name');
             $table->string('title');
             $table->string('url');
@@ -21,8 +21,6 @@ class CreateAuthorsTable extends Migration {
             $table->text('biography')->nullable();
             $table->text('media-links')->nullable();
             $table->timestamps();
-
-            $table->primary('id');
         });
     }
 
