@@ -11,6 +11,7 @@ class Kernel extends ConsoleKernel {
 	 * @var array
 	 */
 	protected $commands = [
+		'App\Console\Commands\Sync',
 		'App\Console\Commands\SyncAuthors',
 		'App\Console\Commands\SyncArticles',
 	];
