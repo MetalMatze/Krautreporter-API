@@ -1,10 +1,8 @@
 <?php namespace App\Console\Commands;
 
 use App\Author;
-use GuzzleHttp\Client;
+use Goutte\Client;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\DomCrawler\Crawler;
 
 class SyncAuthors extends Command {
@@ -21,7 +19,7 @@ class SyncAuthors extends Command {
      *
      * @var string
      */
-    protected $description = 'Synchronize (create, update) all authors from krautreporter website.';
+    protected $description = 'Sync all authors from krautreporter.de.';
 
     /**
      * Create a new command instance.
@@ -42,10 +40,7 @@ class SyncAuthors extends Command {
     {
         $client = new Client();
 
-        $response = $client->get('https://krautreporter.de/');
-        $responseBodyString = $response->getBody()->getContents();
-
-        $crawler = new Crawler($responseBodyString);
+        $crawler = $client->request('GET', 'http://krautreporter.de');
 
         $authors = $crawler->filter('#author-list-tab li');
 
