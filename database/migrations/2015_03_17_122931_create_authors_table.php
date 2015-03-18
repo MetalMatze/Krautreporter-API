@@ -19,7 +19,7 @@ class CreateAuthorsTable extends Migration {
             $table->string('url');
             $table->string('image');
             $table->text('biography')->nullable();
-            $table->text('media-links')->nullable();
+            $table->text('socialmedia')->nullable();
             $table->timestamps();
         });
     }
