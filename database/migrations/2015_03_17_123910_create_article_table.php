@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateArticleTable extends Migration {
+class CreateArticlesTable extends Migration {
 
     /**
      * Run the migrations.
@@ -17,8 +17,9 @@ class CreateArticleTable extends Migration {
             $table->integer('id')->unsigned();
             $table->string('title');
             $table->timestamp('date');
+            $table->boolean('morgenpost');
+            $table->string('url');
             $table->string('image');
-            $table->string('link');
             $table->text('excerpt');
             $table->text('content');
             $table->integer('author_id')->unsigned();
