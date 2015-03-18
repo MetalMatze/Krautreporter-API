@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateArticlesTable extends Migration {
@@ -15,6 +14,7 @@ class CreateArticlesTable extends Migration {
         Schema::create('articles', function($table)
         {
             $table->integer('id')->unsigned();
+            $table->integer('order')->unsigend();
             $table->string('title');
             $table->timestamp('date');
             $table->boolean('morgenpost');
