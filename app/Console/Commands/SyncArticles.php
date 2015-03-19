@@ -2,6 +2,7 @@
 
 use App\Article;
 use App\Author;
+use App\Crawl;
 use Goutte\Client;
 use Illuminate\Console\Command;
 use RuntimeException;
@@ -104,6 +105,11 @@ class SyncArticles extends Command {
             {
                 $article->author()->associate($author);
                 $article->save();
+
+                if($article->crawl == null) {
+                    $crawl = new Crawl();
+                    $article->crawl()->save($crawl);
+                }
             }
             else
             {
