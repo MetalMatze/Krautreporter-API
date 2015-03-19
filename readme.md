@@ -1,7 +1,6 @@
 Krautreporter-API
 ====================
 [![Author](http://img.shields.io/badge/author-@MetalMatze-blue.svg?style=flat-square)](https://twitter.com/MetalMatze)
-[![Source Code](http://img.shields.io/badge/source-MetalMatze/Krautreporter-API-blue.svg?style=flat-square)](https://github.com/MetalMatze/Krautreporter-API)
 [![Latest Version](https://img.shields.io/github/release/MetalMatze/Krautreporter-API.svg?style=flat-square)](https://github.com/MetalMatze/Krautreporter-API/releases)
 [![Software License](https://img.shields.io/badge/license-GPLv2-blue.svg?style=flat-square)](https://github.com/MetalMatze/Krautreporter-API/blob/master/LICENSE)
 [![Build Status](https://img.shields.io/travis/MetalMatze/Krautreporter-API/master.svg?style=flat-square)](https://travis-ci.org/MetalMatze/Krautreporter-API)
