@@ -16,7 +16,7 @@ class CreateArticlesTable extends Migration {
             $table->increments('id');
             $table->integer('order')->unsigend();
             $table->string('title');
-            $table->timestamp('date');
+            $table->date('date');
             $table->boolean('morgenpost');
             $table->string('url');
             $table->string('image');
