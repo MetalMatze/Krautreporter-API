@@ -34,4 +34,9 @@ class Article extends Model {
         return $this->belongsTo('App\Author');
     }
 
+    public function crawl()
+    {
+        return $this->morphOne('App\Crawl', 'crawlable');
+    }
+
 }
