@@ -1,8 +1,5 @@
 <?php
 
-use App\Article;
-use App\Author;
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -18,14 +15,8 @@ Route::get('/', function() {
     return 'hallo';
 });
 
-Route::get('authors', function() {
-    return Author::all();
-});
+Route::get('authors', 'AuthorsController@index');
+Route::get('authors/{id}', 'AuthorsController@show');
 
-Route::get('authors/{id}', function($id) {
-    return Author::find($id);
-});
-
-Route::get('articles', function() {
-    return Article::orderBy('order', 'asc')->get();
-});
+Route::get('articles', 'ArticlesController@index');
+Route::get('articles/{id}', 'ArticlesController@show');
