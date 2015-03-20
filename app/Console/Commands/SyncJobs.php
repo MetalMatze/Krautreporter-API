@@ -47,6 +47,8 @@ class SyncJobs extends Command {
         {
             Queue::push(new CrawlAuthor($job->crawlable));
         }
+
+        $this->info(sprintf('Added %d jobs to queue'));
     }
 
     /**
