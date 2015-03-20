@@ -32,7 +32,7 @@ class ArticlesController extends Controller {
      */
     public function index()
     {
-        $articles = Article::orderBy('order', 'asc')->get();
+        $articles = Article::orderBy('order', 'desc')->get();
 
         $resource = new Collection($articles, $this->articleTransformer);
 
