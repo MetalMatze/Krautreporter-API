@@ -30,4 +30,10 @@ class Author extends Model {
     {
         return $this->hasMany('App\Article');
     }
+
+    public function crawl()
+    {
+        return $this->morphOne('App\Crawl', 'crawlable');
+    }
+
 }

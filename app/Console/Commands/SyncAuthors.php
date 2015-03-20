@@ -1,6 +1,7 @@
 <?php namespace App\Console\Commands;
 
 use App\Author;
+use App\Crawl;
 use Goutte\Client;
 use Illuminate\Console\Command;
 use Symfony\Component\DomCrawler\Crawler;
@@ -85,6 +86,11 @@ class SyncAuthors extends Command {
             }
 
             $author->save();
+
+            if($author->crawl == null) {
+                $crawl = new Crawl();
+                $author->crawl()->save($crawl);
+            }
         });
 
     }
