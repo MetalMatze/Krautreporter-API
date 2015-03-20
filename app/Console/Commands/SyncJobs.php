@@ -39,16 +39,16 @@ class SyncJobs extends Command {
      */
     public function fire()
     {
-        $jobs = Crawl::where('next_crawl', '<', DB::raw('NOW()'))
+        $authorJobs = Crawl::where('next_crawl', '<', DB::raw('NOW()'))
                         ->where('crawlable_type', '=', 'App\Author')
                         ->get();
 
-        foreach($jobs as $job)
+        foreach($authorJobs as $job)
         {
             Queue::push(new CrawlAuthor($job->crawlable));
         }
 
-        $this->info(sprintf('Added %d jobs to queue', count($jobs)));
+        $this->info(sprintf('Added %d jobs to queue', count($authorJobs)));
     }
 
     /**
