@@ -3,6 +3,7 @@
 use App\Commands\CrawlAuthor;
 use App\Crawl;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 
 class SyncJobs extends Command {
@@ -38,7 +39,7 @@ class SyncJobs extends Command {
      */
     public function fire()
     {
-        $jobs = Crawl::where('next_crawl', '<', 'NOW()')
+        $jobs = Crawl::where('next_crawl', '<', DB::raw('NOW()'))
                         ->where('crawlable_type', '=', 'App\Author')
                         ->get();
 
