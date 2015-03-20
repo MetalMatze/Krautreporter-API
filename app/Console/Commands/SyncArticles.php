@@ -30,6 +30,13 @@ class SyncArticles extends Command {
     protected $client;
 
     /**
+     * Array of all parsed articles to later persist in the database
+     *
+     * @var array
+     */
+    private $articles;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -38,9 +45,7 @@ class SyncArticles extends Command {
     {
         parent::__construct();
         $this->client = $client;
-
-        $this->lastUrl = null;
-        $this->all_index = 0;
+        $this->articles = [];
     }
 
     /**
@@ -50,7 +55,9 @@ class SyncArticles extends Command {
      */
     public function fire()
     {
+        $this->comment('Begin syncing articles');
         $this->sync_articles();
+        $this->save_articles();
     }
 
     private function sync_articles($url = null)
@@ -68,70 +75,44 @@ class SyncArticles extends Command {
 
         $nodes = $crawler->filter($filter);
         $nodes->each(function(Crawler $node, $index) {
-            $a = $node->filter('a');
-
-            $article_url = $a->attr('href');
-
-            preg_match('/\/(\d*)/', $article_url, $matches);
-            if(count($matches) >= 2)
-            {
-                $article_id = (int) $matches[1];
-            }
-            else
-            {
-                throw new RuntimeException();
-            }
-
-            $article_author = utf8_decode($a->filter('.meta')->text());
-            $article_title = $a->filter('.item__title')->text();
-
-            if (preg_match('/^(Morgenpost:)/', $article_title) == 1)
-            {
-                $article_morgenpost = true;
-            }
-            else
-            {
-                $article_morgenpost = false;
-            }
-
-            $article = Article::firstOrNew(['id' => $article_id]);
-            $article->order = $this->all_index + $index;
-            $article->title = $article_title;
-            $article->url = $article_url;
-            $article->morgenpost = $article_morgenpost;
-
-            $author = Author::where('name', '=', $article_author)->first();
-            if($author != null)
-            {
-                $article->author()->associate($author);
-                $article->save();
-
-                if($article->crawl == null) {
-                    $crawl = new Crawl();
-                    $article->crawl()->save($crawl);
-                }
-            }
-            else
-            {
-                $this->error(sprintf('Unable to find author with name: %s', $article_author));
-            }
-
-            $this->lastUrl = $article->url;
+            $this->parseArticle($node, $index);
         });
 
         if($nodes->count() > 0)
         {
-            $this->all_index += $nodes->count();
-            $this->comment($this->lastUrl);
-            $url = sprintf('https://krautreporter.de/articles%s/load_more_navigation_items', $this->lastUrl);
+            $this->comment(count($this->articles));
 
+            $lastArticle = $this->articles[count($this->articles) - 1];
+            $url = sprintf('https://krautreporter.de/articles%s/load_more_navigation_items', $lastArticle['url']);
             $this->sync_articles($url);
         }
         else
         {
-            $articleCount = Article::all()->count();
-            $this->info(sprintf('Now there are %d articles.', $articleCount));
+            $this->info(sprintf('Synced %d articles.', count($this->articles)));
         }
+    }
+
+    public function parseArticle(Crawler $node)
+    {
+        $article = [];
+
+        $a = $node->filter('a');
+
+        $article['url'] = $a->attr('href');
+
+        preg_match('/\/(\d*)/', $article['url'], $matches);
+        if(count($matches) >= 2)
+        {
+            $article['id'] = (int) $matches[1];
+        }
+        else
+        {
+            throw new RuntimeException('Failed to parse id from ' . $article['url']);
+        }
+        $article['author'] = utf8_decode($a->filter('.meta')->text());
+        $article['title'] = $a->filter('.item__title')->text();
+
+        array_push($this->articles, $article);
     }
 
     /**
@@ -152,6 +133,35 @@ class SyncArticles extends Command {
     protected function getOptions()
     {
         return [];
+    }
+
+    private function save_articles()
+    {
+        $articles = array_reverse($this->articles);
+
+        foreach($articles as $index => $article) {
+            $articleModel = Article::firstOrNew(['id' => $article['id']]);
+
+            $articleModel->order = $index;
+            $articleModel->title = $article['title'];
+            $articleModel->url = $article['url'];
+
+            $author = Author::where('name', '=', $article['author'])->first();
+
+            if($author == null)
+            {
+                $this->comment('No author found for article ' . $article['url']);
+                continue;
+            }
+
+            $articleModel->author()->associate($author);
+            $articleModel->save();
+
+            if($articleModel->crawl == null)
+            {
+                $articleModel->crawl()->save(new Crawl());
+            }
+        }
     }
 
 }
