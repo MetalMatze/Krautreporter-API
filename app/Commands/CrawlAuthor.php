@@ -43,6 +43,11 @@ class CrawlAuthor extends Command implements SelfHandling, ShouldBeQueued {
         {
             $this->author->biography = trim($node->filter('.author__bio')->text());
 
+            if($this->author->biography == '')
+            {
+                $this->author->biography = null;
+            }
+
             try
             {
                 $this->author->socialmedia = trim($node->filter('#author-page--media-links')->html());
