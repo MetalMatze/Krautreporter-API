@@ -14,7 +14,6 @@ class StatusController extends Controller {
      */
     public function index()
     {
-        dd(Carbon::now());
         $nextAuthorCrawls = Crawl::where('crawlable_type', '=', 'App\Author')
                                 ->orderBy('next_crawl', 'asc')
                                 ->limit(10)
