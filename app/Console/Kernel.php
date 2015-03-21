@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel {
 	 */
 	protected function schedule(Schedule $schedule)
 	{
-		$schedule->command('sync:authors')->everyFiveMinutes();
+		$schedule->command('sync:authors && php artisan sync:articles && php artisan sync:jobs')->everyFiveMinutes();
 	}
 
 }
