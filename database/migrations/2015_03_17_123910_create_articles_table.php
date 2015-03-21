@@ -16,12 +16,13 @@ class CreateArticlesTable extends Migration {
             $table->increments('id');
             $table->integer('order')->unsigend();
             $table->string('title');
+            $table->string('headline');
             $table->date('date');
             $table->boolean('morgenpost');
             $table->string('url');
-            $table->string('image');
-            $table->text('excerpt');
-            $table->text('content');
+            $table->string('image')->nullable();
+            $table->text('excerpt')->nullable();
+            $table->text('content')->nullable();
             $table->integer('author_id')->unsigned();
             $table->timestamps();
         });
