@@ -20,3 +20,5 @@ Route::get('authors/{id}', 'AuthorsController@show');
 
 Route::get('articles', 'ArticlesController@index');
 Route::get('articles/{id}', 'ArticlesController@show');
+
+Route::get('status', 'StatusController@index');
