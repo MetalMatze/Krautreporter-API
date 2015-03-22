@@ -16,6 +16,8 @@ class AuthorTransformer extends TransformerAbstract {
             'image' => $author->image,
             'biography' => $author->biography,
             'socialmedia' => $author->socialmedia,
+            'created_at' => $author->created_at->format(\DateTime::ISO8601),
+            'updated_at' => $author->updated_at->format(\DateTime::ISO8601),
         ];
     }
 

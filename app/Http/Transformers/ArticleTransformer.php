@@ -11,13 +11,16 @@ class ArticleTransformer extends TransformerAbstract {
         return [
             'id' => $article->id,
             'title' => $article->title,
+            'headline' => $article->headline,
             'date' => $article->date,
             'morgenpost' => (bool) $article->morgenpost,
             'url' => $article->url,
             'image' => $article->image,
             'excerpt' => $article->excerpt,
-            'contect' => $article->content,
-            'author' => $article->author_id
+            'content' => $article->content,
+            'author' => $article->author_id,
+            'created_at' => $article->created_at->format(\DateTime::ISO8601),
+            'updated_at' => $article->updated_at->format(\DateTime::ISO8601),
         ];
     }
 

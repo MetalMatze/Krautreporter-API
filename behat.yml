@@ -1,0 +1,14 @@
+default:
+  autoload:
+    '': %paths.base%/tests/features/bootstrap
+  suites:
+    default:
+      paths: [ %paths.base%/tests/features ]
+      contexts:
+        - FeatureContext:
+           - http://localhost:8000/
+  extensions:
+    Laracasts\Behat:
+    Behat\MinkExtension:
+      default_session: laravel
+      laravel: ~
