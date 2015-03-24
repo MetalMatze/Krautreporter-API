@@ -10,6 +10,7 @@ class ArticleTransformer extends TransformerAbstract {
     {
         return [
             'id' => $article->id,
+            'order' => $article->order,
             'title' => $article->title,
             'headline' => $article->headline,
             'date' => $article->date,
