@@ -112,6 +112,15 @@ class SyncArticles extends Command {
         $article['author'] = utf8_decode($a->filter('.meta')->text());
         $article['title'] = $a->filter('.item__title')->text();
 
+        if(preg_match('/^Morgenpost:/', $article['title']))
+        {
+            $article['morgenpost'] = true;
+        }
+        else
+        {
+            $article['morgenpost'] = false;
+        }
+
         array_push($this->articles, $article);
     }
 
@@ -145,6 +154,7 @@ class SyncArticles extends Command {
             $articleModel->order = $index;
             $articleModel->title = $article['title'];
             $articleModel->url = $article['url'];
+            $articleModel->morgenpost = $article['morgenpost'];
 
             $author = Author::where('name', '=', $article['author'])->first();
 
