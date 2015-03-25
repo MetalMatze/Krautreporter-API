@@ -26,7 +26,6 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
      */
     public function __construct(Article $article)
     {
-        //
         $this->article = $article;
     }
 
@@ -38,31 +37,45 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
     public function handle()
     {
         $client = new Client();
+        $client->followRedirects(false);
 
         $crawler = $client->request('GET', 'https://krautreporter.de' . $this->article->url);
 
-        $articleNode = $crawler->filter('main article.article.article--full')->eq(1);
-        $articleHeaderNode = $articleNode->filter('header.article__header');
-        $articleContentNode = $articleNode->filter('.article__content');
-
-        $articleDateText = $articleHeaderNode->filter('h2.meta')->text();
-
-        $this->article->headline = $articleHeaderNode->filter('h1.article__title')->text();
-        $this->article->date = Carbon::createFromFormat('d.m.Y', $articleDateText);
-
-        $articleImageNode = $articleHeaderNode->filter('.media__img img');
-
-        if($articleImageNode->count() > 0)
+        if($client->getResponse()->getStatus() == 200)
         {
-            $this->article->image = $articleImageNode->attr('src');
+            if($this->article->trashed())
+            {
+                $this->article->restore();
+            }
+
+            $articleNode = $crawler->filter('main article.article.article--full')->eq(1);
+            $articleHeaderNode = $articleNode->filter('header.article__header');
+            $articleContentNode = $articleNode->filter('.article__content');
+
+            $articleDateText = $articleHeaderNode->filter('h2.meta')->text();
+
+            $this->article->headline = $articleHeaderNode->filter('h1.article__title')->text();
+            $this->article->date = Carbon::createFromFormat('d.m.Y', $articleDateText);
+
+            $articleImageNode = $articleHeaderNode->filter('.media__img img');
+
+            if($articleImageNode->count() > 0)
+            {
+                $this->article->image = $articleImageNode->attr('src');
+            }
+
+            $this->article->excerpt = trim($articleContentNode->filter('h2.gamma')->text());
+            $this->article->content = trim($articleContentNode->html());
+
+            $this->article->save();
+
+            $this->calculateNextCrawlDate();
         }
-
-        $this->article->excerpt = trim($articleContentNode->filter('h2.gamma')->text());
-        $this->article->content = trim($articleContentNode->html());
-
-        $this->article->save();
-
-        $this->calculateNextCrawlDate();
+        else
+        {
+            $this->article->crawl->delete();
+            $this->article->delete();
+        }
     }
 
     private function calculateNextCrawlDate()
