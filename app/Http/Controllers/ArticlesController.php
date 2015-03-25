@@ -49,6 +49,10 @@ class ArticlesController extends Controller {
     {
         $article = Article::find($id);
 
+        if($article == null) {
+            abort(404);
+        }
+
         $resource = new Item($article, $this->articleTransformer);
 
         return $this->fractal->createData($resource)->toArray();

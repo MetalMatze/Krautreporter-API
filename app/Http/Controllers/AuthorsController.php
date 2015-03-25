@@ -54,6 +54,10 @@ class AuthorsController extends Controller {
     {
         $author = Author::find($id);
 
+        if($author == null) {
+            abort(404);
+        }
+
         $resource = new Item($author, $this->authorTransformer);
 
         return $this->fractal->createData($resource)->toArray();
