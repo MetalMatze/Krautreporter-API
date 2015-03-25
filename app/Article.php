@@ -17,18 +17,6 @@ class Article extends Model {
         'content'
     ];
 
-    protected $visible = [
-        'id',
-        'title',
-        'date',
-        'morgenpost',
-        'url',
-        'image',
-        'excerpt',
-        'content',
-        'author_id'
-    ];
-
     public function author()
     {
         return $this->belongsTo('App\Author');

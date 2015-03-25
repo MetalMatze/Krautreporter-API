@@ -16,16 +16,6 @@ class Author extends Model {
         'media-links'
     ];
 
-    protected $visible = [
-        'id',
-        'name',
-        'title',
-        'url',
-        'image',
-        'biography',
-        'media-links'
-    ];
-
     public function articles()
     {
         return $this->hasMany('App\Article');
