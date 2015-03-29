@@ -3,6 +3,7 @@
 use App\Article;
 use App\Commands\Command;
 
+use App\Image;
 use Carbon\Carbon;
 use Goutte\Client;
 use Illuminate\Queue\SerializesModels;
@@ -61,7 +62,44 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
 
             if($articleImageNode->count() > 0)
             {
-                $this->article->image = $articleImageNode->attr('src');
+                $widths = $articleImageNode->attr("srcset");
+                preg_match("/(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w/", $widths, $matches);
+
+                foreach($matches as $index => $match)
+                {
+                    if($index == 0) {
+                        continue;
+                    }
+
+                    switch($index) {
+                        case 1:
+                            $width = 300;
+                            break;
+                        case 2:
+                            $width = 600;
+                            break;
+                        case 3:
+                            $width = 1000;
+                            break;
+                        case 4:
+                            $width = 2000;
+                            break;
+                    }
+
+                    $image = Image::where('imageable_type', '=', 'App\Article')
+                            ->where('imageable_id', '=', $this->article->id)
+                            ->where('width', '=', $width)
+                            ->first();
+
+                    if($image == null) {
+                        $image = new Image();
+                    }
+
+                    $image->src = $match;
+                    $image->width = $width;
+
+                    $this->article->images()->save($image);
+                }
             }
 
             $this->article->excerpt = trim($articleContentNode->filter('h2.gamma')->text());
