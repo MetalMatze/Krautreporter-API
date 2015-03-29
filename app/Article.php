@@ -27,6 +27,11 @@ class Article extends Model {
         return $this->belongsTo('App\Author');
     }
 
+    public function images()
+    {
+        return $this->morphMany('App\Image', 'imageable');
+    }
+
     public function crawl()
     {
         return $this->morphOne('App\Crawl', 'crawlable');
