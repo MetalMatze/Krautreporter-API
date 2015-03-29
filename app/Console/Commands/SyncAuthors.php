@@ -2,6 +2,7 @@
 
 use App\Author;
 use App\Crawl;
+use App\Image;
 use Goutte\Client;
 use Illuminate\Console\Command;
 use Symfony\Component\DomCrawler\Crawler;
@@ -62,19 +63,13 @@ class SyncAuthors extends Command {
             $author = Author::firstOrNew(['id' => $author_id]);
             $author->url = $author_url;
 
-            $anchorText = trim($anchor->text());
+            $author->name = $anchor->filter('.author__name')->text();
 
-            preg_match('/(.*)(\n(.*))?/', $anchorText, $matches);
-
-            if(count($matches) >= 2)
+            try
             {
-                $author->name = utf8_decode($matches[1]);
+                $author->title = $anchor->filter('.item__title')->text();
             }
-
-            if (count($matches) >= 4)
-            {
-                $author->title = utf8_decode($matches[3]);
-            }
+            catch(\InvalidArgumentException $e) {}
 
             $image = $anchor->filter('img');
             $imageUrls = $image->attr('srcset');
@@ -82,7 +77,21 @@ class SyncAuthors extends Command {
             preg_match('/(.*) 50w, (.*) 100w/', $imageUrls, $matches);
             if(count($matches) == 3)
             {
-                $author->image = utf8_decode($matches[2]);
+                foreach($matches as $index => $match) {
+                    if($index == 0) {
+                        continue;
+                    }
+
+                    $image = Image::firstOrCreate([
+                        'imageable_id' => $author->id,
+                        'imageable_type' => 'App\Author',
+                        'width' => $index == 1 ? 130 : 260
+                    ]);
+
+                    $image->src = $match;
+
+                    $author->images()->save($image);
+                }
             }
 
             $author->save();
