@@ -1,6 +1,7 @@
 <?php namespace App\Commands;
 
 use App\Author;
+use App\Image;
 use Carbon\Carbon;
 use Goutte\Client;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -55,6 +56,27 @@ class CrawlAuthor extends Command implements SelfHandling, ShouldBeQueued {
             catch(\InvalidArgumentException $e) {}
 
             $this->author->save();
+
+            $imageUrls = $node->filter('h2.author--large img')->attr('srcset');
+            preg_match('/(.*) 170w, (.*) 340w/', $imageUrls, $matches);
+            if(count($matches) == 3)
+            {
+                foreach($matches as $index => $match) {
+                    if($index == 0) {
+                        continue;
+                    }
+
+                    $image = Image::firstOrCreate([
+                        'imageable_id' => $this->author->id,
+                        'imageable_type' => 'App\Author',
+                        'width' => $index == 1 ? 170 : 340
+                    ]);
+
+                    $image->src = $match;
+
+                    $this->author->images()->save($image);
+                }
+            }
 
             $crawl = $this->author->crawl;
             $crawl->next_crawl = Carbon::now()->addDay();
