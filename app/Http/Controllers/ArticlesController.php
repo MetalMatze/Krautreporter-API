@@ -3,6 +3,8 @@
 use App\Article;
 use App\Http\Requests;
 use App\Http\Transformers\ArticleTransformer;
+use App\Http\Transformers\ImageTransformer;
+use App\Image;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -32,7 +34,7 @@ class ArticlesController extends Controller {
      */
     public function index()
     {
-        $articles = Article::orderBy('order', 'desc')->paginate(20);
+        $articles = Article::with('images')->orderBy('order', 'desc')->paginate(20);
 
         $resource = new Collection($articles, $this->articleTransformer);
 
@@ -47,7 +49,7 @@ class ArticlesController extends Controller {
      */
     public function show($id)
     {
-        $article = Article::find($id);
+        $article = Article::with('images')->find($id);
 
         if($article == null) {
             abort(404);
