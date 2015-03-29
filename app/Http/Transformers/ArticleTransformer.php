@@ -22,7 +22,7 @@ class ArticleTransformer extends TransformerAbstract {
             'order' => $article->order,
             'title' => $article->title,
             'headline' => $article->headline,
-            'date' => $article->date,
+            'date' => $article->date->format(\DateTime::ISO8601),
             'morgenpost' => (bool) $article->morgenpost,
             'url' => $article->url,
             'excerpt' => $article->excerpt,

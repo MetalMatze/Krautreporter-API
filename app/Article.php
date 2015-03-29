@@ -9,7 +9,7 @@ class Article extends Model {
 
     protected $table = 'articles';
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['date', 'deleted_at'];
 
     protected $fillable = [
         'id',
