@@ -13,6 +13,13 @@ class Image extends Model {
      */
     public $timestamps = false;
 
+    protected $fillable = [
+        'imageable_id',
+        'imageable_type',
+        'width',
+        'src'
+    ];
+
     public function imageable()
     {
         return $this->morphTo();
