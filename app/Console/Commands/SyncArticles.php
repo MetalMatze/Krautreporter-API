@@ -109,7 +109,7 @@ class SyncArticles extends Command {
         {
             throw new RuntimeException('Failed to parse id from ' . $article['url']);
         }
-        $article['author'] = utf8_decode($a->filter('.meta')->text());
+        $article['author'] = $a->filter('.meta')->text();
         $article['title'] = $a->filter('.item__title')->text();
 
         if(preg_match('/^Morgenpost:/', $article['title']))
