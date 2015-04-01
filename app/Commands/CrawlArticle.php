@@ -142,8 +142,6 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
             $nextCrawl = Carbon::now()->addHours(2);
         }
 
-        Log::info(sprintf('Article %s is crawled again in %s', $this->article->url, $nextCrawl->diffForHumans()));
-
         $crawl = $this->article->crawl;
         $crawl->next_crawl = $nextCrawl;
 
