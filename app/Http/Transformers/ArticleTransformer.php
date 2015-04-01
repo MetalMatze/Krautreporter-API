@@ -24,6 +24,7 @@ class ArticleTransformer extends TransformerAbstract {
             'headline' => $article->headline,
             'date' => $article->date->format(\DateTime::ISO8601),
             'morgenpost' => (bool) $article->morgenpost,
+            'preview' => (bool) $article->preview,
             'url' => $article->url,
             'excerpt' => $article->excerpt,
             'content' => $article->content,
