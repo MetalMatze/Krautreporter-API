@@ -49,6 +49,26 @@ class SyncArticles extends Command {
     }
 
     /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [];
+    }
+
+    /**
      * Execute the console command.
      *
      * @return mixed
@@ -99,49 +119,54 @@ class SyncArticles extends Command {
         $a = $node->filter('a');
 
         $article['url'] = $a->attr('href');
-
-        preg_match('/\/(\d*)/', $article['url'], $matches);
-        if(count($matches) >= 2)
-        {
-            $article['id'] = (int) $matches[1];
-        }
-        else
-        {
-            throw new RuntimeException('Failed to parse id from ' . $article['url']);
-        }
+        $article['id'] = $this->parseId($article['url']);
         $article['author'] = $a->filter('.meta')->text();
         $article['title'] = $a->filter('.item__title')->text();
-
-        if(preg_match('/^Morgenpost:/', $article['title']))
-        {
-            $article['morgenpost'] = true;
-        }
-        else
-        {
-            $article['morgenpost'] = false;
-        }
+        $article['morgenpost'] = $this->isMorgenpost($article['title']);
+        $article['preview'] = $this->isPreview($a);
 
         array_push($this->articles, $article);
     }
 
     /**
-     * Get the console command arguments.
-     *
-     * @return array
+     * @param $title
+     * @return mixed
      */
-    protected function getArguments()
+    private function isMorgenpost($title)
     {
-        return [];
+        if (preg_match('/^Morgenpost:/', $title)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Get the console command options.
-     *
-     * @return array
+     * @param $url
+     * @param $matches
+     * @return mixed
      */
-    protected function getOptions()
+    private function parseId($url)
     {
-        return [];
+        preg_match('/\/(\d*)/', $url, $matches);
+        if (count($matches) >= 2) {
+            return (int) $matches[1];
+        } else {
+            throw new RuntimeException('Failed to parse id from ' . $url);
+        }
+    }
+
+    private function isPreview(Crawler $a)
+    {
+        try
+        {
+            if($a->filter('img')->count() == 1) {
+                return true;
+            }
+        }
+        catch(\InvalidArgumentException $e) {}
+
+        return false;
     }
 
     private function save_articles()
@@ -155,6 +180,7 @@ class SyncArticles extends Command {
             $articleModel->title = $article['title'];
             $articleModel->url = $article['url'];
             $articleModel->morgenpost = $article['morgenpost'];
+            $articleModel->preview = $article['preview'];
 
             $author = Author::where('name', '=', $article['author'])->first();
 
