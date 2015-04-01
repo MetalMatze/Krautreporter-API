@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
 
@@ -103,7 +104,13 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
             }
 
             $this->article->excerpt = trim($articleContentNode->filter('h2.gamma')->text());
-            $this->article->content = trim($articleContentNode->html());
+
+            $articleNode->filter('.article__content h2.gamma')->each(function(Crawler $crawler) {
+                $node = $crawler->getNode(0);
+                $node->parentNode->removeChild($node);
+            });
+
+            $this->article->content = trim($articleNode->filter('.article__content')->html());
 
             $this->article->save();
 
