@@ -3,15 +3,14 @@
 use App\Article;
 use App\Http\Requests;
 use App\Http\Transformers\ArticleTransformer;
-use App\Http\Transformers\ImageTransformer;
-use App\Image;
 use ErrorException;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 
-class ArticlesController extends Controller {
+class ArticlesController extends Controller
+{
 
     /**
      * @var Manager
@@ -38,12 +37,13 @@ class ArticlesController extends Controller {
     {
         $articles = Article::with('images')->orderBy('order', 'desc');
 
-        if (Input::has('olderthan')) {
+        if (Request::has('olderthan')) {
             try {
-                $article = Article::find((int)Input::get('olderthan'));
+                $article = Article::find((int)Request::get('olderthan'));
 
                 $articles = $articles->where('order', '<', $article->order);
-            } catch (ErrorException $e) {}
+            } catch (ErrorException $e) {
+            }
         }
 
         $articles = $articles->take(20)->get();
@@ -56,14 +56,14 @@ class ArticlesController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function show($id)
     {
         $article = Article::with('images')->find($id);
 
-        if($article == null) {
+        if ($article == null) {
             abort(404);
         }
 
