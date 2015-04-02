@@ -5,6 +5,8 @@ use App\Http\Requests;
 use App\Http\Transformers\ArticleTransformer;
 use App\Http\Transformers\ImageTransformer;
 use App\Image;
+use ErrorException;
+use Illuminate\Support\Facades\Input;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -34,7 +36,17 @@ class ArticlesController extends Controller {
      */
     public function index()
     {
-        $articles = Article::with('images')->orderBy('order', 'desc')->paginate(20);
+        $articles = Article::with('images')->orderBy('order', 'desc');
+
+        if (Input::has('olderthan')) {
+            try {
+                $article = Article::find((int)Input::get('olderthan'));
+
+                $articles = $articles->where('order', '<', $article->order);
+            } catch (ErrorException $e) {}
+        }
+
+        $articles = $articles->take(20)->get();
 
         $resource = new Collection($articles, $this->articleTransformer);
 
