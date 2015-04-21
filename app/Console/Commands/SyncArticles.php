@@ -174,7 +174,12 @@ class SyncArticles extends Command {
         $articles = array_reverse($this->articles);
 
         foreach($articles as $index => $article) {
-            $articleModel = Article::firstOrNew(['id' => $article['id']])->withTrashed()->first();
+            $articleModel = Article::withTrashed()->where('id', '=', $article['id'])->first();
+
+            if($articleModel == null) {
+                $articleModel = new Article();
+                $articleModel->id = $article['id'];
+            }
 
             $articleModel->order = $index;
             $articleModel->title = $article['title'];
