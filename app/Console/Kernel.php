@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel {
 		'App\Console\Commands\SyncAuthors',
 		'App\Console\Commands\SyncArticles',
 		'App\Console\Commands\SyncJobs',
+		'App\Console\Commands\DatabaseDump',
+		'App\Console\Commands\DatabaseBackup',
 	];
 
 	/**
