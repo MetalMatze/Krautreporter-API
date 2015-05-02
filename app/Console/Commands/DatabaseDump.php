@@ -1,12 +1,11 @@
 <?php namespace App\Console\Commands;
 
-use Carbon\Carbon;
+use App\Helpers\DatabaseMaintenance;
 use Ifsnop\Mysqldump\Mysqldump;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
-class DatabaseDump extends Command {
+class DatabaseDump extends Command
+{
 
     /**
      * The console command name.
@@ -23,6 +22,11 @@ class DatabaseDump extends Command {
     protected $description = 'Create a dump of the database.';
 
     /**
+     * @var Mysqldump
+     */
+    private $dumper;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -30,6 +34,8 @@ class DatabaseDump extends Command {
     public function __construct()
     {
         parent::__construct();
+
+        $this->dumper = new Mysqldump(env('DB_DATABASE'), env('DB_USERNAME'), env('DB_PASSWORD'));
     }
 
     /**
@@ -39,21 +45,18 @@ class DatabaseDump extends Command {
      */
     public function fire()
     {
-        $this->comment(sprintf("Creating database dump for %s", env('DB_DATABASE')));
+        $this->comment('Creating database');
 
-        try
-        {
-            $date = Carbon::now()->format('Y-m-d');
-            $name = sprintf("%s-%s.sql", env('DB_DATABASE'), $date);
+        try {
+            $name = DatabaseMaintenance::getBackupName();
+            $path = storage_path("app/$name");
 
-            $dump = new Mysqldump(env('DB_DATABASE'), env('DB_USERNAME'), env('DB_PASSWORD'));
-            $dump->start(sprintf("storage/app/%s", $name));
-        }
-        catch (\Exception $e)
-        {
+            $this->dumper->start($path);
+
+            $this->comment("$path was dumped.");
+        } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
-
     }
 
     /**
