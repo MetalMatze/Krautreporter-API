@@ -48,6 +48,12 @@ return [
 			'root'   => storage_path().'/app',
 		],
 
+		'dropbox' => [
+			'driver' => 'dropbox',
+			'token' => env('DROPBOX_ACCESSTOKEN'),
+			'app' => env('DROPBOX_APPNAME'),
+		],
+
 		's3' => [
 			'driver' => 's3',
 			'key'    => 'your-key',

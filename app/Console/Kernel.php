@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel {
 		'App\Console\Commands\SyncAuthors',
 		'App\Console\Commands\SyncArticles',
 		'App\Console\Commands\SyncJobs',
+		'App\Console\Commands\DatabaseDump',
+		'App\Console\Commands\DatabaseBackup',
 	];
 
 	/**
@@ -26,6 +28,7 @@ class Kernel extends ConsoleKernel {
 	protected function schedule(Schedule $schedule)
 	{
 		$schedule->command('sync:authors && php artisan sync:articles && php artisan sync:jobs')->everyFiveMinutes();
+		$schedule->command('db:dump && php artisan db:backup')->daily();
 	}
 
 }

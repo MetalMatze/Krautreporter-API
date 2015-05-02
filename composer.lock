@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3478326230c6b82e0c26ae2232e0d4a4",
+    "hash": "9a3a161cc7ce6fea897c4003dee31430",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -223,6 +223,45 @@
             "time": "2014-12-20 21:24:13"
         },
         {
+            "name": "dropbox/dropbox-sdk",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dropbox/dropbox-sdk-php.git",
+                "reference": "138bfec02f042fa6a4b384c0ae7ebe92ad122bbd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dropbox/dropbox-sdk-php/zipball/138bfec02f042fa6a4b384c0ae7ebe92ad122bbd",
+                "reference": "138bfec02f042fa6a4b384c0ae7ebe92ad122bbd",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">= 5.3"
+            },
+            "require-dev": {
+                "apigen/apigen": "2.8.2",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "2.0.0RC3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Dropbox": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Dropbox SDK for PHP",
+            "keywords": [
+                "dropbox"
+            ],
+            "time": "2015-02-23 20:51:29"
+        },
+        {
             "name": "fabpot/goutte",
             "version": "v2.0.3",
             "source": {
@@ -429,6 +468,58 @@
                 "stream"
             ],
             "time": "2014-10-12 19:18:40"
+        },
+        {
+            "name": "ifsnop/mysqldump-php",
+            "version": "v1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ifsnop/mysqldump-php.git",
+                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/1ef0dc4032eb21d1372819b65eff49719a3127fd",
+                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "squizlabs/php_codesniffer": "1.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ifsnop\\": "src/Ifsnop/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Diego Torres",
+                    "homepage": "https://github.com/ifsnop",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is a php version of linux's mysqldump in terminal \"$ mysqldump -u username -p...\"",
+            "homepage": "https://github.com/ifsnop/mysqldump-php",
+            "keywords": [
+                "backup",
+                "database",
+                "dump",
+                "export",
+                "mysql",
+                "mysqldump",
+                "pdo",
+                "sqlite"
+            ],
+            "time": "2015-02-05 16:56:40"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -824,6 +915,53 @@
                 "storage"
             ],
             "time": "2015-03-10 11:04:14"
+        },
+        {
+            "name": "league/flysystem-dropbox",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/flysystem-dropbox.git",
+                "reference": "2f464a6a80c0dcc2113a8cc636ca9d4a0fc26617"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/flysystem-dropbox/zipball/2f464a6a80c0dcc2113a8cc636ca9d4a0fc26617",
+                "reference": "2f464a6a80c0dcc2113a8cc636ca9d4a0fc26617",
+                "shasum": ""
+            },
+            "require": {
+                "dropbox/dropbox-sdk": "~1.1",
+                "league/flysystem": "~1.0",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "0.9.*",
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Flysystem\\Dropbox\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Frank de Jonge",
+                    "email": "info@frenky.net"
+                }
+            ],
+            "description": "Flysystem adapter for Dropbox",
+            "time": "2015-01-21 22:19:57"
         },
         {
             "name": "league/fractal",
