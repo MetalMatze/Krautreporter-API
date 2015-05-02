@@ -1,0 +1,3 @@
+#!/bin/bash
+
+envoy run deploy --dir=~/web/krautreporter.metalmatze.de
