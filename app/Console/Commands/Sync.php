@@ -39,7 +39,7 @@ class Sync extends Command {
     public function fire()
     {
         Artisan::call('sync:authors');
-		Artisan::call('sync:articles');
+        Artisan::call('sync:articles');
     }
 
     /**
