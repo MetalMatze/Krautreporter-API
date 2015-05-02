@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel {
 	protected function schedule(Schedule $schedule)
 	{
 		$schedule->command('sync:authors && php artisan sync:articles && php artisan sync:jobs')->everyFiveMinutes();
+		$schedule->command('db:dump && php artisan db:backup')->daily();
 	}
 
 }
