@@ -1,9 +1,8 @@
 <?php namespace App\Console\Commands;
 
-use Storage;
+use App\Commands\BackupDatabase;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Support\Facades\Bus;
 
 class DatabaseBackup extends Command {
 
@@ -38,7 +37,9 @@ class DatabaseBackup extends Command {
      */
     public function fire()
     {
-        Storage::disk('dropbox');
+        Bus::dispatch(
+            new BackupDatabase()
+        );
     }
 
     /**
