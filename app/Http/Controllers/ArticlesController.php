@@ -1,10 +1,8 @@
 <?php namespace App\Http\Controllers;
 
-use App\Article;
 use App\Http\Requests;
 use App\Http\Transformers\ArticleTransformer;
 use App\Krautreporter\Articles\ArticleRepository;
-use ErrorException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Request;
 use League\Fractal\Manager;
