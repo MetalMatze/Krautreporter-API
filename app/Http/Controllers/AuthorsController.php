@@ -1,14 +1,20 @@
 <?php namespace App\Http\Controllers;
 
-use App\Author;
 use App\Http\Requests;
 use App\Http\Transformers\AuthorTransformer;
+use App\Krautreporter\Authors\AuthorRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 
 class AuthorsController extends Controller {
+
+    /**
+     * @var AuthorRepository
+     */
+    protected $repository;
 
     /**
      * @var Manager
@@ -21,11 +27,13 @@ class AuthorsController extends Controller {
     protected $authorTransformer;
 
     /**
+     * @param AuthorRepository $repository
      * @param Manager $fractal
      * @param AuthorTransformer $authorTransformer
      */
-    function __construct(Manager $fractal, AuthorTransformer $authorTransformer)
+    function __construct(AuthorRepository $repository, Manager $fractal, AuthorTransformer $authorTransformer)
     {
+        $this->repository = $repository;
         $this->fractal = $fractal;
         $this->authorTransformer = $authorTransformer;
     }
@@ -37,7 +45,7 @@ class AuthorsController extends Controller {
      */
     public function index()
     {
-        $authors = Author::all();
+        $authors = $this->repository->all();
 
         $resource = new Collection($authors, $this->authorTransformer);
 
@@ -52,9 +60,9 @@ class AuthorsController extends Controller {
      */
     public function show($id)
     {
-        $author = Author::find($id);
-
-        if($author == null) {
+        try {
+            $author = $this->repository->find($id);
+        } catch (ModelNotFoundException $e) {
             abort(404);
         }
 
