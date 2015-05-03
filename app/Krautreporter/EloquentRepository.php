@@ -2,6 +2,7 @@
 namespace App\Krautreporter;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 abstract class EloquentRepository implements Repository
 {
@@ -24,10 +25,11 @@ abstract class EloquentRepository implements Repository
     /**
      * @param $id
      * @return \Illuminate\Support\Collection|null|static
+     * @throws ModelNotFoundException
      */
     public function find($id)
     {
-        return $this->model->find($id);
+        return $this->model->findOrFail($id);
     }
 
 

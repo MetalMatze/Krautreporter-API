@@ -37,7 +37,7 @@ class EloquentRepositoryTest extends TestCase
 
     public function testFind()
     {
-        $this->model->shouldReceive('find')->once()->with(123)->andReturn($this->model);
+        $this->model->shouldReceive('findOrFail')->once()->with(123)->andReturn($this->model);
 
         $returned = $this->repository->find(123);
 
