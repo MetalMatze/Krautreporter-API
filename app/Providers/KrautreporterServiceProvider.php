@@ -25,6 +25,10 @@ class KrautreporterServiceProvider extends ServiceProvider {
             'App\Krautreporter\Articles\ArticleRepository',
             'App\Krautreporter\Articles\ArticleEloquentRepository'
         );
+        $this->app->bind(
+            'App\Krautreporter\Authors\AuthorRepository',
+            'App\Krautreporter\Authors\AuthorEloquentRepository'
+        );
     }
 
 }
