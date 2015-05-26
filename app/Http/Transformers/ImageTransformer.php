@@ -12,7 +12,7 @@ class ImageTransformer extends TransformerAbstract {
         return [
             'id' => $image->id,
             'width' => $image->width,
-            'src' => getenv("URL_KRAUTREPORTER") . $image->src
+            'src' => $image->src
         ];
     }
 
