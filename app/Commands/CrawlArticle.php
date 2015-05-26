@@ -57,6 +57,32 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
 
             $articleImageNode = $articleHeaderNode->filter('.media__img img');
 
+            if ($articleHeaderNode->filter('figure.media--fullwidth')->count() > 0) {
+                $youtubeId = $articleHeaderNode->filter('figure.media--fullwidth div')->attr('data-video-id');
+
+                $thumbnails = [
+                    ['src' => "https://img.youtube.com/vi/$youtubeId/mqdefault.jpg", 'width' => 300],
+                    ['src' => "https://img.youtube.com/vi/$youtubeId/sddefault.jpg", 'width' => 600],
+                    ['src' => "https://img.youtube.com/vi/$youtubeId/maxresdefault.jpg", 'width' => 2000],
+                ];
+
+                foreach ($thumbnails as $thumbnail) {
+                    $image = Image::where('imageable_type', '=', 'App\Article')
+                        ->where('imageable_id', '=', $this->article->id)
+                        ->where('src', '=', $thumbnail['src'])
+                        ->first();
+
+                    if ($image == null) {
+                        $image = new Image();
+                    }
+
+                    $image->src = $thumbnail['src'];
+                    $image->width = $thumbnail['width'];
+
+                    $this->article->images()->save($image);
+                }
+            }
+
             if ($articleImageNode->count() > 0) {
                 $widths = $articleImageNode->attr("srcset");
                 preg_match("/(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w/", $widths, $matches);
@@ -90,7 +116,7 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
                         $image = new Image();
                     }
 
-                    $image->src = $match;
+                    $image->src = getenv("URL_KRAUTREPORTER") . $match;
                     $image->width = $width;
 
                     $this->article->images()->save($image);
@@ -109,6 +135,7 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
             $this->article->save();
 
             $this->calculateNextCrawlDate();
+
         } else {
             $this->article->crawl->delete();
             $this->article->delete();
