@@ -7,7 +7,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 
-class SyncJobs extends Command {
+class SyncJobs extends Command
+{
 
     /**
      * The console command name.
@@ -41,24 +42,22 @@ class SyncJobs extends Command {
     public function fire()
     {
         $authorJobs = Crawl::where('next_crawl', '<', DB::raw('NOW()'))
-                        ->where('crawlable_type', '=', 'App\Author')
-                        ->orderBy('next_crawl', 'asc')
-                        ->orderBy('crawlable_id', 'desc')
-                        ->get();
+            ->where('crawlable_type', '=', 'App\Author')
+            ->orderBy('next_crawl', 'asc')
+            ->orderBy('crawlable_id', 'desc')
+            ->get();
 
-        foreach($authorJobs as $job)
-        {
+        foreach ($authorJobs as $job) {
             Queue::push(new CrawlAuthor($job->crawlable));
         }
 
         $articlesJobs = Crawl::where('next_crawl', '<', DB::raw('NOW()'))
-                                ->where('crawlable_type', '=', 'App\Article')
-                                ->orderBy('next_crawl', 'asc')
-                                ->orderBy('crawlable_id', 'desc')
-                                ->get();
+            ->where('crawlable_type', '=', 'App\Article')
+            ->orderBy('next_crawl', 'asc')
+            ->orderBy('crawlable_id', 'desc')
+            ->get();
 
-        foreach($articlesJobs as $job)
-        {
+        foreach ($articlesJobs as $job) {
             Queue::push(new CrawlArticle($job->crawlable));
         }
 

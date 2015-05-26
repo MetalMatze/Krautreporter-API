@@ -1,20 +1,18 @@
 <?php namespace App\Commands;
 
 use App\Article;
-use App\Commands\Command;
-
 use App\Image;
 use Carbon\Carbon;
 use Goutte\Client;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
-
+class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
+{
     use InteractsWithQueue, SerializesModels;
     /**
      * @var Article
@@ -43,10 +41,8 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
 
         $crawler = $client->request('GET', 'https://krautreporter.de' . $this->article->url);
 
-        if($client->getResponse()->getStatus() == 200)
-        {
-            if($this->article->trashed())
-            {
+        if ($client->getResponse()->getStatus() == 200) {
+            if ($this->article->trashed()) {
                 $this->article->restore();
             }
 
@@ -61,18 +57,16 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
 
             $articleImageNode = $articleHeaderNode->filter('.media__img img');
 
-            if($articleImageNode->count() > 0)
-            {
+            if ($articleImageNode->count() > 0) {
                 $widths = $articleImageNode->attr("srcset");
                 preg_match("/(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w/", $widths, $matches);
 
-                foreach($matches as $index => $match)
-                {
-                    if($index == 0) {
+                foreach ($matches as $index => $match) {
+                    if ($index == 0) {
                         continue;
                     }
 
-                    switch($index) {
+                    switch ($index) {
                         case 1:
                             $width = 300;
                             break;
@@ -88,11 +82,11 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
                     }
 
                     $image = Image::where('imageable_type', '=', 'App\Article')
-                            ->where('imageable_id', '=', $this->article->id)
-                            ->where('width', '=', $width)
-                            ->first();
+                        ->where('imageable_id', '=', $this->article->id)
+                        ->where('width', '=', $width)
+                        ->first();
 
-                    if($image == null) {
+                    if ($image == null) {
                         $image = new Image();
                     }
 
@@ -105,7 +99,7 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
 
             $this->article->excerpt = trim($articleContentNode->filter('h2.gamma')->text());
 
-            $articleNode->filter('.article__content h2.gamma')->each(function(Crawler $crawler) {
+            $articleNode->filter('.article__content h2.gamma')->each(function (Crawler $crawler) {
                 $node = $crawler->getNode(0);
                 $node->parentNode->removeChild($node);
             });
@@ -115,9 +109,7 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
             $this->article->save();
 
             $this->calculateNextCrawlDate();
-        }
-        else
-        {
+        } else {
             $this->article->crawl->delete();
             $this->article->delete();
         }
@@ -125,20 +117,13 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
 
     private function calculateNextCrawlDate()
     {
-        if(Carbon::now()->diffInMonths($this->article->date) > 0)
-        {
+        if (Carbon::now()->diffInMonths($this->article->date) > 0) {
             $nextCrawl = Carbon::now()->addDays(3);
-        }
-        elseif(Carbon::now()->diffInWeeks($this->article->date) > 0)
-        {
+        } elseif (Carbon::now()->diffInWeeks($this->article->date) > 0) {
             $nextCrawl = Carbon::now()->addDay();
-        }
-        elseif(Carbon::now()->diffInDays($this->article->date) > 0)
-        {
+        } elseif (Carbon::now()->diffInDays($this->article->date) > 0) {
             $nextCrawl = Carbon::now()->addHours(6);
-        }
-        else
-        {
+        } else {
             $nextCrawl = Carbon::now()->addHours(2);
         }
 
@@ -146,7 +131,5 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued {
         $crawl->next_crawl = $nextCrawl;
 
         $this->article->crawl()->save($crawl);
-
     }
-
 }
