@@ -8,7 +8,7 @@
         throw new Exception('--dir must be specified');
     }
 
-    $branch      = isset($branch) ? $branch : 'develop';
+    $branch      = isset($branch) ? $branch : 'master';
     $repo_name   = array_pop(explode('/', $repo));
     $repo        = 'https://codeload.github.com/' . $repo . '/zip/' . $branch;
     $release_dir = $dir . '/releases';
