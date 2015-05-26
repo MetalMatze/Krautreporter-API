@@ -1,7 +1,7 @@
 @servers(['production' => 'metalmatze.de'])
 
 @setup
-    $repo = 'MetalMatze/Krautreporter-API';
+    $repo = 'Krautreporter/API';
 
     if ( ! isset($dir) )
     {
@@ -9,8 +9,6 @@
     }
 
     $branch      = isset($branch) ? $branch : 'master';
-    $repo_name   = array_pop(explode('/', $repo));
-    $repo        = 'https://codeload.github.com/' . $repo . '/zip/' . $branch;
     $release_dir = $dir . '/releases';
     $current_dir = $dir . '/current';
     $release     = date('YmdHis');
@@ -32,22 +30,17 @@
     # Make the release dir
     mkdir {{ $release }};
 
-    # Download the zip
-    echo 'Fetching zip';
-    curl -s -o /tmp/release.zip {{ $repo }};
-
-    # Extract the zip
-    echo 'Extracting zip';
-    unzip  -qq /tmp/release.zip "{{ $repo_name }}-{{ $branch }}/*" -d /tmp/{{ $release }};
+    echo 'Cloning repo';
+    git clone --depth=1 gitlab@gitlab.metalmatze.de:{{ $repo }}.git /tmp/{{ $release }};
 
     # Move the release files
     echo 'Moving release files';
-    cd /tmp/{{ $release }}/{{ $repo_name }}-{{ $branch }};
+    cd /tmp/{{ $release }}/;
     mv * .[^.]* {{ $release_dir }}/{{ $release }}/;
 
     # Purge temporary files
     echo 'Purging temporary files';
-    rm -rf /tmp/release.zip /tmp/{{ $release }};
+    rm -rf /tmp/{{ $release }};
 @endtask
 
 @task('composer')
