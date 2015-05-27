@@ -102,6 +102,7 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
         $thumbnails = [
             new Thumbnail("https://img.youtube.com/vi/$id/mqdefault.jpg", 300),
             new Thumbnail("https://img.youtube.com/vi/$id/sddefault.jpg", 600),
+            new Thumbnail("https://img.youtube.com/vi/$id/maxresdefault.jpg", 1000),
             new Thumbnail("https://img.youtube.com/vi/$id/maxresdefault.jpg", 2000),
         ];
 
