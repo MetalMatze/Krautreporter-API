@@ -72,7 +72,7 @@ class CrawlAuthor extends Command implements SelfHandling, ShouldBeQueued {
                         'width' => $index == 1 ? 170 : 340
                     ]);
 
-                    $image->src = $match;
+                    $image->src = getenv('URL_KRAUTREPORTER') . $match;
 
                     $this->author->images()->save($image);
                 }
