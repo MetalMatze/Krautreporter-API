@@ -8,7 +8,6 @@ use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
@@ -55,72 +54,24 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
             $this->article->headline = $articleHeaderNode->filter('h1.article__title')->text();
             $this->article->date = Carbon::createFromFormat('d.m.Y', $articleDateText);
 
-            $articleImageNode = $articleHeaderNode->filter('.media__img img');
+            $articleVideoNode = $articleHeaderNode->filter('figure.media.media--fullwidth .ratio-container');
 
-            if ($articleHeaderNode->filter('figure.media--fullwidth')->count() > 0) {
-                $youtubeId = $articleHeaderNode->filter('figure.media--fullwidth div')->attr('data-video-id');
+            if ($articleVideoNode->count() > 0) {
+                $youtubePath = $articleVideoNode->attr('data-youtube-url');
+                $vimeoPath = $articleVideoNode->attr('data-vimeo-url');
 
-                $thumbnails = [
-                    ['src' => "https://img.youtube.com/vi/$youtubeId/mqdefault.jpg", 'width' => 300],
-                    ['src' => "https://img.youtube.com/vi/$youtubeId/sddefault.jpg", 'width' => 600],
-                    ['src' => "https://img.youtube.com/vi/$youtubeId/maxresdefault.jpg", 'width' => 2000],
-                ];
+                if ($youtubePath != null) {
+                    $this->parseYouTube($youtubePath);
+                }
 
-                foreach ($thumbnails as $thumbnail) {
-                    $image = Image::where('imageable_type', '=', 'App\Article')
-                        ->where('imageable_id', '=', $this->article->id)
-                        ->where('src', '=', $thumbnail['src'])
-                        ->first();
-
-                    if ($image == null) {
-                        $image = new Image();
-                    }
-
-                    $image->src = $thumbnail['src'];
-                    $image->width = $thumbnail['width'];
-
-                    $this->article->images()->save($image);
+                if ($vimeoPath != null) {
+                    $this->parseVimeo($vimeoPath);
                 }
             }
 
+            $articleImageNode = $articleHeaderNode->filter('.media__img img');
             if ($articleImageNode->count() > 0) {
-                $widths = $articleImageNode->attr("srcset");
-                preg_match("/(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w/", $widths, $matches);
-
-                foreach ($matches as $index => $match) {
-                    if ($index == 0) {
-                        continue;
-                    }
-
-                    switch ($index) {
-                        case 1:
-                            $width = 300;
-                            break;
-                        case 2:
-                            $width = 600;
-                            break;
-                        case 3:
-                            $width = 1000;
-                            break;
-                        case 4:
-                            $width = 2000;
-                            break;
-                    }
-
-                    $image = Image::where('imageable_type', '=', 'App\Article')
-                        ->where('imageable_id', '=', $this->article->id)
-                        ->where('width', '=', $width)
-                        ->first();
-
-                    if ($image == null) {
-                        $image = new Image();
-                    }
-
-                    $image->src = getenv("URL_KRAUTREPORTER") . $match;
-                    $image->width = $width;
-
-                    $this->article->images()->save($image);
-                }
+                $this->parseImages($articleImageNode);
             }
 
             $this->article->excerpt = trim($articleContentNode->filter('h2.gamma')->text());
@@ -142,6 +93,101 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
         }
     }
 
+    private function parseYouTube($youtubeID)
+    {
+        $url = parse_url($youtubeID);
+        $id = explode('/', $url['path']);
+        $id = $id[2];
+
+        $thumbnails = [
+            new Thumbnail("https://img.youtube.com/vi/$id/mqdefault.jpg", 300),
+            new Thumbnail("https://img.youtube.com/vi/$id/sddefault.jpg", 600),
+            new Thumbnail("https://img.youtube.com/vi/$id/maxresdefault.jpg", 2000),
+        ];
+
+        $this->saveThumbnails($thumbnails);
+    }
+
+    private function parseImages($articleImageNode)
+    {
+        $widths = $articleImageNode->attr("srcset");
+        preg_match("/(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w/", $widths, $matches);
+
+        $thumbnails = [];
+        foreach ($matches as $index => $match) {
+            if ($index == 0) {
+                continue;
+            }
+
+            switch ($index) {
+                case 1:
+                    $width = 300;
+                    break;
+                case 2:
+                    $width = 600;
+                    break;
+                case 3:
+                    $width = 1000;
+                    break;
+                case 4:
+                    $width = 2000;
+                    break;
+            }
+
+            $thumbnails[] = new Thumbnail(getenv("URL_KRAUTREPORTER") . $match, $width);
+        }
+
+        $this->saveThumbnails($thumbnails);
+    }
+
+    private function parseVimeo($vimeoPath)
+    {
+        $url = parse_url($vimeoPath);
+        $id = explode('/', $url['path']);
+        $id = $id[2];
+
+        $thumbnails = [];
+        for ($i = 1; $i <= 4; $i++) {
+            switch ($i) {
+                case 1:
+                    $width = 300;
+                    break;
+                case 2:
+                    $width = 600;
+                    break;
+                case 3:
+                    $width = 1000;
+                    break;
+                case 4:
+                    $width = 2000;
+                    break;
+            }
+
+            $thumbnails[] = new Thumbnail(sprintf("https://i.vimeocdn.com/video/%s_%s.jpg", $id, $width), $width);
+        }
+
+        $this->saveThumbnails($thumbnails);
+    }
+
+    public function saveThumbnails(array $thumbnails)
+    {
+        foreach ($thumbnails as $thumbnail) {
+            $image = Image::where('imageable_type', '=', 'App\Article')
+                ->where('imageable_id', '=', $this->article->id)
+                ->where('width', '=', $thumbnail->getWidth())
+                ->first();
+
+            if ($image == null) {
+                $image = new Image();
+            }
+
+            $image->src = $thumbnail->getSrc();
+            $image->width = $thumbnail->getWidth();
+
+            $this->article->images()->save($image);
+        }
+    }
+
     private function calculateNextCrawlDate()
     {
         if (Carbon::now()->diffInMonths($this->article->date) > 0) {
@@ -158,5 +204,33 @@ class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
         $crawl->next_crawl = $nextCrawl;
 
         $this->article->crawl()->save($crawl);
+    }
+}
+
+class Thumbnail
+{
+    private $src;
+    private $width;
+
+    public function __construct($src, $width)
+    {
+        $this->src = $src;
+        $this->width = (int)$width;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSrc()
+    {
+        return $this->src;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWidth()
+    {
+        return $this->width;
     }
 }
