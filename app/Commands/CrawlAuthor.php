@@ -10,8 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CrawlAuthor extends Command implements SelfHandling, ShouldBeQueued {
-
+class CrawlAuthor extends Command implements SelfHandling, ShouldBeQueued
+{
     use InteractsWithQueue, SerializesModels;
 
     /**
@@ -40,29 +40,25 @@ class CrawlAuthor extends Command implements SelfHandling, ShouldBeQueued {
 
         $crawler = $client->request('GET', 'https://krautreporter.de' . $this->author->url);
 
-        $crawler->filter('header.article__header')->each(function(Crawler $node)
-        {
+        $crawler->filter('header.article__header')->each(function (Crawler $node) {
             $this->author->biography = trim($node->filter('.author__bio')->text());
 
-            if($this->author->biography == '')
-            {
+            if ($this->author->biography == '') {
                 $this->author->biography = null;
             }
 
-            try
-            {
+            try {
                 $this->author->socialmedia = trim($node->filter('#author-page--media-links')->html());
+            } catch (\InvalidArgumentException $e) {
             }
-            catch(\InvalidArgumentException $e) {}
 
             $this->author->save();
 
             $imageUrls = $node->filter('h2.author--large img')->attr('srcset');
             preg_match('/(.*) 170w, (.*) 340w/', $imageUrls, $matches);
-            if(count($matches) == 3)
-            {
-                foreach($matches as $index => $match) {
-                    if($index == 0) {
+            if (count($matches) == 3) {
+                foreach ($matches as $index => $match) {
+                    if ($index == 0) {
                         continue;
                     }
 
@@ -85,5 +81,4 @@ class CrawlAuthor extends Command implements SelfHandling, ShouldBeQueued {
         });
 
     }
-
 }
