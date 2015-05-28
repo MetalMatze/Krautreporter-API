@@ -108,7 +108,7 @@ class SyncAuthors extends Command {
                         'width' => $index == 1 ? 130 : 260
                     ]);
 
-                    $image->src = $match;
+                    $image->src = getenv('URL_KRAUTREPORTER') . $match;
 
                     $author->images()->save($image);
                 }
