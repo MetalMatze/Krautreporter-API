@@ -3,12 +3,14 @@
 use App\Article;
 use App\Author;
 use App\Crawl;
+use Carbon\Carbon;
 use Goutte\Client;
 use Illuminate\Console\Command;
 use RuntimeException;
 use Symfony\Component\DomCrawler\Crawler;
 
-class SyncArticles extends Command {
+class SyncArticles extends Command
+{
 
     /**
      * The console command name.
@@ -76,38 +78,33 @@ class SyncArticles extends Command {
     public function fire()
     {
         $this->comment('Begin syncing articles');
-        $this->sync_articles();
-        $this->save_articles();
+        $this->syncArticles();
+        $this->saveArticles();
     }
 
-    private function sync_articles($url = null)
+    private function syncArticles($url = null)
     {
-        if($url == null)
-        {
+        if ($url == null) {
             $url = 'https://krautreporter.de';
             $filter = '#article-list-tab li';
-        }
-        else {
+        } else {
             $filter = 'li';
         }
 
         $crawler = $this->client->request('GET', $url);
 
         $nodes = $crawler->filter($filter);
-        $nodes->each(function(Crawler $node, $index) {
+        $nodes->each(function (Crawler $node, $index) {
             $this->parseArticle($node, $index);
         });
 
-        if($nodes->count() > 0)
-        {
+        if ($nodes->count() > 0) {
             $this->comment(count($this->articles));
 
             $lastArticle = $this->articles[count($this->articles) - 1];
             $url = sprintf('https://krautreporter.de/articles%s/load_more_navigation_items', $lastArticle['url']);
-            $this->sync_articles($url);
-        }
-        else
-        {
+            $this->syncArticles($url);
+        } else {
             $this->info(sprintf('Synced %d articles.', count($this->articles)));
         }
     }
@@ -150,7 +147,7 @@ class SyncArticles extends Command {
     {
         preg_match('/\/(\d*)/', $url, $matches);
         if (count($matches) >= 2) {
-            return (int) $matches[1];
+            return (int)$matches[1];
         } else {
             throw new RuntimeException('Failed to parse id from ' . $url);
         }
@@ -158,25 +155,24 @@ class SyncArticles extends Command {
 
     private function isPreview(Crawler $a)
     {
-        try
-        {
-            if($a->filter('img')->count() == 1) {
+        try {
+            if ($a->filter('img')->count() == 1) {
                 return true;
             }
+        } catch (\InvalidArgumentException $e) {
         }
-        catch(\InvalidArgumentException $e) {}
 
         return false;
     }
 
-    private function save_articles()
+    private function saveArticles()
     {
         $articles = array_reverse($this->articles);
 
-        foreach($articles as $index => $article) {
+        foreach ($articles as $index => $article) {
             $articleModel = Article::withTrashed()->where('id', '=', $article['id'])->first();
 
-            if($articleModel == null) {
+            if ($articleModel == null) {
                 $articleModel = new Article();
                 $articleModel->id = $article['id'];
             }
@@ -189,8 +185,7 @@ class SyncArticles extends Command {
 
             $author = Author::where('name', '=', $article['author'])->first();
 
-            if($author == null)
-            {
+            if ($author == null) {
                 $this->comment('No author found for article ' . $article['url']);
                 continue;
             }
@@ -198,11 +193,9 @@ class SyncArticles extends Command {
             $articleModel->author()->associate($author);
             $articleModel->save();
 
-            if($articleModel->crawl == null)
-            {
+            if ($articleModel->crawl == null) {
                 $articleModel->crawl()->save(new Crawl());
             }
         }
     }
-
 }
