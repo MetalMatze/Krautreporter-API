@@ -1,7 +1,7 @@
 @servers(['production' => 'metalmatze.de'])
 
 @setup
-    $repo = 'Krautreporter/API';
+    $repo = 'MetalMatze/Krautreporter-API';
 
     if ( ! isset($dir) )
     {
@@ -31,7 +31,7 @@
     mkdir {{ $release }};
 
     echo 'Cloning repo';
-    git clone --depth=1 gitlab@gitlab.metalmatze.de:{{ $repo }}.git /tmp/{{ $release }};
+    git clone --depth=1 git@github.com:{{ $repo }}.git /tmp/{{ $release }};
 
     # Move the release files
     echo 'Moving release files';
