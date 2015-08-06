@@ -9,7 +9,7 @@
     @foreach($crawls as $crawl)
         <tr>
             <td>{{ $crawl->crawlable->url }}</td>
-            <td>{{ $crawl->next_crawl }}</td>
+            <td>{{ (new \Carbon\Carbon($crawl->next_crawl))->diffForHumans() }}</td>
         </tr>
     @endforeach
     </tbody>
