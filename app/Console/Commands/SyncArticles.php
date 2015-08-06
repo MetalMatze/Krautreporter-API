@@ -175,9 +175,9 @@ class SyncArticles extends Command
             if ($articleModel == null) {
                 $articleModel = new Article();
                 $articleModel->id = $article['id'];
+                $articleModel->date = Carbon::now();
             }
 
-            $articleModel->date = Carbon::now();
             $articleModel->order = $index;
             $articleModel->title = $article['title'];
             $articleModel->url = $article['url'];
