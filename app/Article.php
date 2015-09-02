@@ -1,10 +1,12 @@
-<?php namespace App;
+<?php
+
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Article extends Model {
-
+class Article extends Model
+{
     use SoftDeletes;
 
     protected $table = 'articles';
@@ -36,5 +38,4 @@ class Article extends Model {
     {
         return $this->morphOne('App\Crawl', 'crawlable');
     }
-
 }
