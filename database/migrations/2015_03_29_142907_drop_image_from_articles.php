@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class DropImageFromArticles extends Migration {
-
+class DropImageFromArticles extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,7 +12,7 @@ class DropImageFromArticles extends Migration {
      */
     public function up()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->dropColumn('image');
         });
     }
@@ -25,9 +24,8 @@ class DropImageFromArticles extends Migration {
      */
     public function down()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->string('image')->nullable();
         });
     }
-
 }

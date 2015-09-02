@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddPreviewFieldToArticles extends Migration {
-
+class AddPreviewFieldToArticles extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,7 +11,7 @@ class AddPreviewFieldToArticles extends Migration {
      */
     public function up()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->boolean('preview')->default(false)->after('morgenpost');
         });
     }
@@ -24,9 +23,8 @@ class AddPreviewFieldToArticles extends Migration {
      */
     public function down()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->dropColumn('preview');
         });
     }
-
 }
