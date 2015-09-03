@@ -1,4 +1,6 @@
-<?php namespace App\Console\Commands;
+<?php
+
+namespace App\Console\Commands;
 
 use App\Author;
 use App\Crawl;
@@ -7,8 +9,8 @@ use Goutte\Client;
 use Illuminate\Console\Command;
 use Symfony\Component\DomCrawler\Crawler;
 
-class SyncAuthors extends Command {
-
+class SyncAuthors extends Command
+{
     /**
      * The console command name.
      *
@@ -68,16 +70,15 @@ class SyncAuthors extends Command {
 
         $this->info(sprintf('Found %d authors, start parsing and saving to db.', count($authors)));
 
-        $authors->each(function(Crawler $node) {
+        $authors->each(function (Crawler $node) {
 
             $anchor = $node->filter('a');
 
             $author_url = utf8_decode($anchor->attr('href'));
 
             preg_match('/\/(\d*)/', $author_url, $matches);
-            if(count($matches) >= 2)
-            {
-                $author_id = (int) $matches[1];
+            if (count($matches) >= 2) {
+                $author_id = (int)$matches[1];
             }
 
             $author = Author::firstOrNew(['id' => $author_id]);
@@ -85,20 +86,18 @@ class SyncAuthors extends Command {
 
             $author->name = $anchor->filter('.author__name')->text();
 
-            try
-            {
+            try {
                 $author->title = $anchor->filter('.item__title')->text();
+            } catch (\InvalidArgumentException $e) {
             }
-            catch(\InvalidArgumentException $e) {}
 
             $image = $anchor->filter('img');
             $imageUrls = $image->attr('srcset');
 
             preg_match('/(.*) 50w, (.*) 100w/', $imageUrls, $matches);
-            if(count($matches) == 3)
-            {
-                foreach($matches as $index => $match) {
-                    if($index == 0) {
+            if (count($matches) == 3) {
+                foreach ($matches as $index => $match) {
+                    if ($index == 0) {
                         continue;
                     }
 
@@ -116,12 +115,11 @@ class SyncAuthors extends Command {
 
             $author->save();
 
-            if($author->crawl == null) {
+            if ($author->crawl == null) {
                 $crawl = new Crawl();
                 $author->crawl()->save($crawl);
             }
         });
 
     }
-
 }

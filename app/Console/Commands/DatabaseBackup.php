@@ -1,11 +1,13 @@
-<?php namespace App\Console\Commands;
+<?php
 
-use App\Commands\BackupDatabase;
+namespace App\Console\Commands;
+
+//use App\Commands\BackupDatabase;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
 
-class DatabaseBackup extends Command {
-
+class DatabaseBackup extends Command
+{
     /**
      * The console command name.
      *
@@ -61,5 +63,4 @@ class DatabaseBackup extends Command {
     {
         return [];
     }
-
 }

@@ -11,7 +11,6 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class SyncArticles extends Command
 {
-
     /**
      * The console command name.
      *

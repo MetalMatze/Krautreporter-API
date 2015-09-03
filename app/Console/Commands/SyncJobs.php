@@ -1,7 +1,9 @@
-<?php namespace App\Console\Commands;
+<?php
 
-use App\Commands\CrawlArticle;
-use App\Commands\CrawlAuthor;
+namespace App\Console\Commands;
+
+//use App\Commands\CrawlArticle;
+//use App\Commands\CrawlAuthor;
 use App\Crawl;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -9,7 +11,6 @@ use Illuminate\Support\Facades\Queue;
 
 class SyncJobs extends Command
 {
-
     /**
      * The console command name.
      *
@@ -83,5 +84,4 @@ class SyncJobs extends Command
     {
         return [];
     }
-
 }
