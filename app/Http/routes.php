@@ -12,5 +12,13 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return 'hallo';
 });
+
+Route::get('authors', 'AuthorsController@index');
+Route::get('authors/{id}', 'AuthorsController@show');
+
+Route::get('articles', 'ArticlesController@index');
+Route::get('articles/{id}', 'ArticlesController@show');
+
+Route::get('status', 'StatusController@index');
