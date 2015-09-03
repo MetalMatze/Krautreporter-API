@@ -1,16 +1,17 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Transformers\AuthorTransformer;
 use App\Krautreporter\Authors\AuthorRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Response;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 
-class AuthorsController extends Controller {
-
+class AuthorsController extends Controller
+{
     /**
      * @var AuthorRepository
      */
@@ -31,7 +32,7 @@ class AuthorsController extends Controller {
      * @param Manager $fractal
      * @param AuthorTransformer $authorTransformer
      */
-    function __construct(AuthorRepository $repository, Manager $fractal, AuthorTransformer $authorTransformer)
+    public function __construct(AuthorRepository $repository, Manager $fractal, AuthorTransformer $authorTransformer)
     {
         $this->repository = $repository;
         $this->fractal = $fractal;
@@ -41,7 +42,7 @@ class AuthorsController extends Controller {
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return array
      */
     public function index()
     {
@@ -55,8 +56,8 @@ class AuthorsController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param  int $id
+     * @return array
      */
     public function show($id)
     {
@@ -70,5 +71,4 @@ class AuthorsController extends Controller {
 
         return $this->fractal->createData($resource)->toArray();
     }
-
 }

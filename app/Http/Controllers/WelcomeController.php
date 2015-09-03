@@ -1,7 +1,11 @@
-<?php namespace App\Http\Controllers;
+<?php
 
-class WelcomeController extends Controller {
+namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Response;
+
+class WelcomeController extends Controller
+{
     /*
     |--------------------------------------------------------------------------
     | Welcome Controller
@@ -32,5 +36,4 @@ class WelcomeController extends Controller {
     {
         return view('welcome');
     }
-
 }

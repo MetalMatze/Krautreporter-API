@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Transformers\ArticleTransformer;
@@ -36,7 +38,7 @@ class ArticlesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return array
      */
     public function index()
     {
@@ -63,7 +65,7 @@ class ArticlesController extends Controller
      * Display the specified resource.
      *
      * @param  int $id
-     * @return Response
+     * @return array
      */
     public function show($id)
     {
@@ -77,5 +79,4 @@ class ArticlesController extends Controller
 
         return $this->fractal->createData($resource)->toArray();
     }
-
 }
