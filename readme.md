@@ -5,6 +5,15 @@ Krautreporter-API
 [![Software License](https://img.shields.io/badge/license-GPLv2-blue.svg?style=flat-square)](https://github.com/MetalMatze/Krautreporter-API/blob/master/LICENSE)
 [![Build Status](https://img.shields.io/travis/MetalMatze/Krautreporter-API/master.svg?style=flat-square)](https://travis-ci.org/MetalMatze/Krautreporter-API)
 
+This is a RESTful API written in Laravel PHP for Krautreporter apps.
+
+One app is an Android app created by [MetalMatze](https://github.com/MetalMatze).  
+Check it out on github: [MetalMatze/Krautreporter](https://github.com/MetalMatze/Krautreporter)
+
+The other app is an iOS app create by [mindogo GmbH](https://github.com/mindogo).  
+Check it out on github: [mindogo/Krautreporter-iOS](https://github.com/mindogo/Krautreporter-iOS)
+
+
 ## Installation
 
 1. Clone this repository to your local machine.
@@ -32,6 +41,6 @@ This queue worker will listen for new jobs in the database and execute them one 
 
 Great! Your database should be able stay up to date with the newest data.
 
-### License
+## License
 
 Krautreporter-API is open-source software licensed under the [GPLv2](LICENSE)
