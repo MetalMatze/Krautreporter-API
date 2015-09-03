@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Http\Transformers;
 
 use App\Article;
 use League\Fractal\TransformerAbstract;
 
-class ArticleTransformer extends TransformerAbstract {
-
+class ArticleTransformer extends TransformerAbstract
+{
     protected $availableIncludes = [
         'author',
         'images'
@@ -23,8 +24,8 @@ class ArticleTransformer extends TransformerAbstract {
             'title' => $article->title,
             'headline' => $article->headline,
             'date' => $article->date->format(\DateTime::ISO8601),
-            'morgenpost' => (bool) $article->morgenpost,
-            'preview' => (bool) $article->preview,
+            'morgenpost' => (bool)$article->morgenpost,
+            'preview' => (bool)$article->preview,
             'url' => getenv("URL_KRAUTREPORTER") . $article->url,
             'excerpt' => $article->excerpt,
             'content' => $article->content,
@@ -47,5 +48,4 @@ class ArticleTransformer extends TransformerAbstract {
 
         return $this->collection($images, new ImageTransformer());
     }
-
 }

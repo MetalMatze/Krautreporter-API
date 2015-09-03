@@ -1,12 +1,12 @@
 <?php
+
 namespace App\Http\Transformers;
 
 use App\Image;
 use League\Fractal\TransformerAbstract;
 
-class ImageTransformer extends TransformerAbstract {
-
-
+class ImageTransformer extends TransformerAbstract
+{
     public function transform(Image $image)
     {
         return [
@@ -15,5 +15,4 @@ class ImageTransformer extends TransformerAbstract {
             'src' => $image->src
         ];
     }
-
 }
