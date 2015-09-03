@@ -10,6 +10,8 @@ class Crawl extends Model
 
     public $timestamps = false;
 
+    protected $dates = ['next_crawl'];
+
     public function crawlable()
     {
         return $this->morphTo();

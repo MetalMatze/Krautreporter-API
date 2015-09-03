@@ -27,3 +27,5 @@ $api->version('v1', function ($api) {
     $api->get('articles', 'App\Http\Controllers\ArticlesController@index');
     $api->get('articles/{id}', 'App\Http\Controllers\ArticlesController@show');
 });
+
+Route::get('crawls', 'CrawlsController@index');
