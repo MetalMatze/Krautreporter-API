@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-//use App\Helpers\DatabaseMaintenance;
+use App\Helpers\DatabaseMaintenance;
 use Ifsnop\Mysqldump\Mysqldump;
 use Illuminate\Console\Command;
 

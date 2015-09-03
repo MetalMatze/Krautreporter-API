@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-//use App\Commands\BackupDatabase;
+use App\Jobs\BackupDatabaseJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
 
@@ -40,7 +40,7 @@ class DatabaseBackup extends Command
     public function fire()
     {
         Bus::dispatch(
-            new BackupDatabase()
+            new BackupDatabaseJob()
         );
     }
 
