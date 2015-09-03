@@ -11,11 +11,32 @@
 |
 */
 
-$factory->define(App\User::class, function (Faker\Generator $faker) {
+use Faker\Generator;
+
+$factory->define(App\Author::class, function (Generator $faker) {
     return [
         'name' => $faker->name,
-        'email' => $faker->email,
-        'password' => bcrypt(str_random(10)),
-        'remember_token' => str_random(10),
+        'title' => $faker->sentence(3),
+        'url' => '/' . $faker->slug(6),
+        'biography' => $faker->realText(176),
+        'socialmedia' => $faker->text(166),
+        'created_at' => $faker->dateTimeThisYear,
+        'updated_at' => $faker->dateTimeThisMonth
+    ];
+});
+
+$factory->define(App\Article::class, function (Generator $faker) {
+    return [
+        'order' => 0,
+        'title' => $faker->sentence(6),
+        'headline' => $faker->sentence(4),
+        'date' => $faker->date('Y-m-d'),
+        'morgenpost' => false,
+        'preview' => $faker->boolean(23),
+        'url' => $faker->slug(),
+        'excerpt' => $faker->text(217),
+        'content' => $faker->realText(18233),
+        'created_at' => $faker->dateTimeThisYear,
+        'updated_at' => $faker->dateTimeThisMonth
     ];
 });
