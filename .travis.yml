@@ -5,16 +5,27 @@ php:
   - 5.6
   - nightly
 
+services:
+  - mysql
+
 cache:
   directories:
     - vendor
 
 before_script:
+  - mysql -e 'create database krautreporter;'
+  - cp .env.travis-ci .env
   - travis_retry composer self-update
   - travis_retry composer install --prefer-source --no-interaction --dev
   - chmod -R 777 storage/
+  - php artisan key:generate
+  - php artisan migrate --force --seed --no-interaction
+  - php artisan serve &
+  - sleep 5 # give artisan serve time to start
+
 script:
   - php vendor/bin/phpunit
+  - php vendor/bin/behat
 
 after_failure:
   - cat app/storage/logs/laravel.log
