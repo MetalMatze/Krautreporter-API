@@ -1,9 +1,11 @@
-<?php namespace App;
+<?php
+
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Author extends Model {
-
+class Author extends Model
+{
     protected $table = 'authors';
 
     protected $fillable = [
@@ -30,5 +32,4 @@ class Author extends Model {
     {
         return $this->morphOne('App\Crawl', 'crawlable');
     }
-
 }

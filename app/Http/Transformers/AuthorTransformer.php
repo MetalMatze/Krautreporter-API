@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Http\Transformers;
 
 use App\Author;
 use League\Fractal\TransformerAbstract;
 
-class AuthorTransformer extends TransformerAbstract {
-
+class AuthorTransformer extends TransformerAbstract
+{
     protected $availableIncludes = [
         'images'
     ];
@@ -17,7 +18,7 @@ class AuthorTransformer extends TransformerAbstract {
     public function transform(Author $author)
     {
         return [
-            'id' => (int) $author->id,
+            'id' => (int)$author->id,
             'name' => $author->name,
             'title' => $author->title,
             'url' => getenv("URL_KRAUTREPORTER") . $author->url,
@@ -34,5 +35,4 @@ class AuthorTransformer extends TransformerAbstract {
 
         return $this->collection($images, new ImageTransformer());
     }
-
 }

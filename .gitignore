@@ -1,4 +1,6 @@
 /bootstrap/cache/services.json
 /vendor
 /node_modules
+Homestead.yaml
+Homestead.json
 .env

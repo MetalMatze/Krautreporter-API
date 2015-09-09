@@ -1,20 +1,21 @@
-<?php namespace App\Commands;
+<?php
+
+namespace App\Jobs;
 
 use App\Helpers\DatabaseMaintenance;
 use Exception;
 use Illuminate\Contracts\Bus\SelfHandling;
-use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Support\Facades\Storage;
 
-class BackupDatabase extends Command implements SelfHandling
+class BackupDatabaseJob extends Job implements SelfHandling
 {
-    private $dropboxDisk;
     private $localDisk;
+    private $dropboxDisk;
 
     /**
-     * Create a new command instance.
+     * Create a new job instance.
      *
-     * @param Factory $storage
+     * @return void
      */
     public function __construct()
     {
@@ -23,7 +24,7 @@ class BackupDatabase extends Command implements SelfHandling
     }
 
     /**
-     * Execute the command.
+     * Execute the job.
      *
      * @return void
      */
@@ -65,5 +66,4 @@ class BackupDatabase extends Command implements SelfHandling
             throw new Exception('Could not write backup');
         }
     }
-
 }

@@ -1,13 +1,15 @@
-<?php namespace App\Providers;
+<?php
 
-use Storage;
-use League\Flysystem\Filesystem;
+namespace App\Providers;
+
 use Dropbox\Client as DropboxClient;
-use League\Flysystem\Dropbox\DropboxAdapter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
+use League\Flysystem\Dropbox\DropboxAdapter;
+use League\Flysystem\Filesystem;
 
-class DropboxFilesystemServiceProvider extends ServiceProvider {
-
+class DropboxFilesystemServiceProvider extends ServiceProvider
+{
     /**
      * Bootstrap the application services.
      *
@@ -15,8 +17,7 @@ class DropboxFilesystemServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
-        Storage::extend('dropbox', function($app, $config)
-        {
+        Storage::extend('dropbox', function ($app, $config) {
             $client = new DropboxClient($config['token'], $config['app']);
 
             return new Filesystem(new DropboxAdapter($client));
@@ -32,5 +33,4 @@ class DropboxFilesystemServiceProvider extends ServiceProvider {
     {
         //
     }
-
 }

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class AddSoftdeletinToArticles extends Migration {
-
+class AddSoftdeletinToArticles extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,7 +12,7 @@ class AddSoftdeletinToArticles extends Migration {
      */
     public function up()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->softDeletes();
         });
     }
@@ -25,9 +24,8 @@ class AddSoftdeletinToArticles extends Migration {
      */
     public function down()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->dropSoftDeletes();
         });
     }
-
 }

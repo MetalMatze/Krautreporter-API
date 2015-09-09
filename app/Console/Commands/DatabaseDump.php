@@ -1,4 +1,6 @@
-<?php namespace App\Console\Commands;
+<?php
+
+namespace App\Console\Commands;
 
 use App\Helpers\DatabaseMaintenance;
 use Ifsnop\Mysqldump\Mysqldump;
@@ -6,7 +8,6 @@ use Illuminate\Console\Command;
 
 class DatabaseDump extends Command
 {
-
     /**
      * The console command name.
      *
@@ -78,5 +79,4 @@ class DatabaseDump extends Command
     {
         return [];
     }
-
 }

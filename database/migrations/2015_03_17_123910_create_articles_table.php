@@ -2,7 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class CreateArticlesTable extends Migration {
+class CreateArticlesTable extends Migration
+{
 
     /**
      * Run the migrations.
@@ -11,8 +12,7 @@ class CreateArticlesTable extends Migration {
      */
     public function up()
     {
-        Schema::create('articles', function($table)
-        {
+        Schema::create('articles', function ($table) {
             $table->increments('id');
             $table->integer('order')->unsigend();
             $table->string('title');
@@ -37,5 +37,4 @@ class CreateArticlesTable extends Migration {
     {
         Schema::drop('articles');
     }
-
 }

@@ -2,7 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAuthorsTable extends Migration {
+class CreateAuthorsTable extends Migration
+{
 
     /**
      * Run the migrations.
@@ -11,8 +12,7 @@ class CreateAuthorsTable extends Migration {
      */
     public function up()
     {
-        Schema::create('authors', function($table)
-        {
+        Schema::create('authors', function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->string('title');
@@ -33,5 +33,4 @@ class CreateAuthorsTable extends Migration {
     {
         Schema::drop('authors');
     }
-
 }

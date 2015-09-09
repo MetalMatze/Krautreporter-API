@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class DropImageFromAuthors extends Migration {
-
+class DropImageFromAuthors extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,7 +11,7 @@ class DropImageFromAuthors extends Migration {
      */
     public function up()
     {
-        Schema::table('authors', function($table) {
+        Schema::table('authors', function ($table) {
             $table->dropColumn('image');
         });
     }
@@ -24,9 +23,8 @@ class DropImageFromAuthors extends Migration {
      */
     public function down()
     {
-        Schema::table('authors', function($table) {
+        Schema::table('authors', function ($table) {
             $table->string('image')->nullable();
         });
     }
-
 }

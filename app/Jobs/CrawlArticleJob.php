@@ -1,16 +1,18 @@
-<?php namespace App\Commands;
+<?php
+
+namespace App\Jobs;
 
 use App\Article;
 use App\Image;
 use Carbon\Carbon;
 use Goutte\Client;
 use Illuminate\Contracts\Bus\SelfHandling;
-use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CrawlArticle extends Command implements SelfHandling, ShouldBeQueued
+class CrawlArticleJob extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
     /**
