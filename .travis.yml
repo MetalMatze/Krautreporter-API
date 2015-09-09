@@ -8,10 +8,6 @@ php:
 services:
   - mysql
 
-cache:
-  directories:
-    - vendor
-
 before_script:
   - mysql -e 'create database krautreporter;'
   - cp .env.travis-ci .env
