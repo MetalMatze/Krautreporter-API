@@ -16,7 +16,7 @@ before_script:
   - mysql -e 'create database krautreporter;'
   - cp .env.travis-ci .env
   - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction --dev
+  - travis_retry composer install --prefer-source --no-interaction
   - chmod -R 777 storage/
   - php artisan key:generate
   - php artisan migrate --force --seed --no-interaction
