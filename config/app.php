@@ -146,6 +146,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\KrautreporterServiceProvider::class,
         App\Providers\DropboxFilesystemServiceProvider::class,
+        Dingo\Api\Provider\LaravelServiceProvider::class,
 
     ],
 
@@ -195,6 +196,9 @@ return [
         'URL'       => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View'      => Illuminate\Support\Facades\View::class,
+
+        'API'       => Dingo\Api\Facade\API::class,
+//        'Route'     => Dingo\Api\Facade\Route::class,
 
     ],
 

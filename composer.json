@@ -7,10 +7,10 @@
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
-        "league/fractal": "0.11.*",
         "ifsnop/mysqldump-php": "~1.5",
         "fabpot/goutte": "~2.0",
-        "league/flysystem-dropbox": "~1.0"
+        "league/flysystem-dropbox": "~1.0",
+        "dingo/api": "1.0.x@dev"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
