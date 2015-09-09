@@ -133,7 +133,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             case 404:
                 $this->iGetAResponse(404);
                 $this->thePropertyIsAIntegerEqualling('status_code', 404);
-                $this->thePropertyEquals('message', is_null($message) ? 'Not Found' : $message);
+                $this->thePropertyEquals('message', is_null($message) ? '404 Not Found' : $message);
                 break;
             case 422:
                 $this->iGetAResponse(422);
