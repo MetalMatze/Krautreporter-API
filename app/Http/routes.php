@@ -20,7 +20,6 @@ Route::get('status', 'StatusController@index');
 
 $api = app('Dingo\Api\Routing\Router');
 
-
 $api->version('v1', function ($api) {
     $api->get('authors', 'App\Http\Controllers\AuthorsController@index');
     $api->get('authors/{id}', 'App\Http\Controllers\AuthorsController@show');

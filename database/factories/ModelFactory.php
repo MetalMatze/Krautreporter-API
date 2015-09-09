@@ -33,7 +33,7 @@ $factory->define(App\Article::class, function (Generator $faker) {
         'date' => $faker->date('Y-m-d'),
         'morgenpost' => false,
         'preview' => $faker->boolean(23),
-        'url' => $faker->slug(),
+        'url' => '/' . $faker->slug(),
         'excerpt' => $faker->text(217),
         'content' => $faker->realText(18233),
         'created_at' => $faker->dateTimeThisYear,
