@@ -72,7 +72,7 @@ class ArticlesController extends Controller
         try {
             $article = $this->repository->find($id);
         } catch (ModelNotFoundException $e) {
-            abort(404, 'Article not found.');
+            abort(404);
         }
 
         $resource = new Item($article, $this->articleTransformer);
