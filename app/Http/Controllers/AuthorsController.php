@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Http\Transformers\AuthorTransformer;
 use App\Krautreporter\Authors\AuthorRepository;
+use Dingo\Api\Routing\Helpers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 
 class AuthorsController extends Controller
 {
+    use Helpers;
+
     /**
      * @var AuthorRepository
      */
@@ -48,9 +49,7 @@ class AuthorsController extends Controller
     {
         $authors = $this->repository->all();
 
-        $resource = new Collection($authors, $this->authorTransformer);
-
-        return $this->fractal->createData($resource)->toArray();
+        return $this->response()->collection($authors, $this->authorTransformer);
     }
 
     /**
@@ -67,8 +66,6 @@ class AuthorsController extends Controller
             abort(404);
         }
 
-        $resource = new Item($author, $this->authorTransformer);
-
-        return $this->fractal->createData($resource)->toArray();
+        return $this->response()->item($author, $this->authorTransformer);
     }
 }
