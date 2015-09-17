@@ -4,8 +4,6 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode;
-use Behat\Gherkin\Node\TableNode;
-use Behat\MinkExtension\Context\MinkContext;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Message\Response;
@@ -13,7 +11,7 @@ use GuzzleHttp\Message\Response;
 /**
  * Defines application features from the specific context.
  */
-class FeatureContext extends MinkContext implements Context, SnippetAcceptingContext
+class FeatureContext implements Context, SnippetAcceptingContext
 {
     /**
      * @var Client
@@ -51,6 +49,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
      * Every scenario gets its own context instance.
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
+     * @param $url
      */
     public function __construct($url)
     {
@@ -60,6 +59,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * @When /^I request "(GET|PUT|POST|DELETE)" "([^"]*)"$/
+     * @param $method
+     * @param $resource
      */
     public function iRequest($method, $resource)
     {
@@ -68,21 +69,16 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
         $this->resource = $resource;
 
-        if($this->requestPayload != null)
-        {
+        if ($this->requestPayload != null) {
             $options = array_merge($options, ['body' => $this->requestPayload]);
         }
 
-        try
-        {
+        try {
             $this->response = $this->client->$method($resource, $options);
-        }
-        catch(BadResponseException $e)
-        {
+        } catch (BadResponseException $e) {
             $response = $e->getResponse();
 
-            if($response == null)
-            {
+            if ($response == null) {
                 throw $e;
             }
 
@@ -92,29 +88,29 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * @Then /^I get a "(\d+)" response$/
+     * @param $statusCode
      */
     public function iGetAResponse($statusCode)
     {
         $contentType = $this->response->getHeader('Content-Type');
-        if($contentType === 'application/json')
-        {
+        if ($contentType === 'application/json') {
             $body = $this->response->getBody();
-        }
-        else
-        {
-            $body = 'Output is '.$contentType.', which is not JSON and is therefore scary. Run the request manually.';
+        } else {
+            $body = 'Output is ' . $contentType . ', which is not JSON and is therefore scary. ' .
+                'Run the request manually.';
         }
 
-        PHPUnit_Framework_Assert::assertSame((int) $statusCode, (int) $this->response->getStatusCode(), $body);
+        PHPUnit_Framework_Assert::assertSame((int)$statusCode, (int)$this->response->getStatusCode(), $body);
     }
 
     /**
      * @Then /^I get a "(\d+)" error response$/
+     * @param $status_code
+     * @param null $message
      */
     public function iGetAErrorResponse($status_code, $message = null)
     {
-        switch($status_code)
-        {
+        switch ($status_code) {
             case 400:
                 $this->iGetAResponse(400);
                 $this->thePropertyIsAIntegerEqualling('status_code', 400);
@@ -123,7 +119,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             case 401:
                 $this->iGetAResponse(401);
                 $this->thePropertyIsAIntegerEqualling('status_code', 401);
-                $this->thePropertyEquals('message', is_null($message) ? 'Failed to authenticate because of bad credentials or an invalid authorization header.' : $message);
+                $this->thePropertyEquals('message', is_null($message) ? 'Failed to authenticate because of ' .
+                    'bad credentials or an invalid authorization header.' : $message);
                 break;
             case 403:
                 $this->iGetAResponse(403);
@@ -133,7 +130,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             case 404:
                 $this->iGetAResponse(404);
                 $this->thePropertyIsAIntegerEqualling('status_code', 404);
-                $this->thePropertyEquals('message', is_null($message) ? 'Not Found' : $message);
+                $this->thePropertyEquals('message', is_null($message) ? '404 Not Found' : $message);
                 break;
             case 422:
                 $this->iGetAResponse(422);
@@ -149,6 +146,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * @Then /^I get a "(\d+)" error response with message "([^"]*)"$/
+     * @param $status_code
+     * @param $message
      */
     public function iGetAErrorResponseWithMessage($status_code, $message)
     {
@@ -157,6 +156,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * @Given /^the property "([^"]*)" equals "([^"]*)"$/
+     * @param $property
+     * @param $expectedValue
      */
     public function thePropertyEquals($property, $expectedValue)
     {
@@ -165,12 +166,13 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         PHPUnit_Framework_Assert::assertEquals(
             $actualValue,
             $expectedValue,
-            "Asserting the [$property] property in current scope equals [$expectedValue]: ".json_encode($payload)
+            "Asserting the [$property] property in current scope equals [$expectedValue]: " . json_encode($payload)
         );
     }
 
     /**
      * @Given /^the property "([^"]*)" exists$/
+     * @param $property
      */
     public function thePropertyExists($property)
     {
@@ -187,8 +189,10 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             PHPUnit_Framework_Assert::assertTrue(array_key_exists($property, $payload), $message);
         }
     }
+
     /**
      * @Given /^the property "([^"]*)" is absent$/
+     * @param $property
      */
     public function thePropertyIsAbsent($property)
     {
@@ -205,8 +209,10 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             PHPUnit_Framework_Assert::assertFalse(array_key_exists($property, $payload), $message);
         }
     }
+
     /**
      * @Given /^the property "([^"]*)" is an array$/
+     * @param $property
      */
     public function thePropertyIsAnArray($property)
     {
@@ -214,11 +220,14 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $actualValue = $this->arrayGet($payload, $property);
         PHPUnit_Framework_Assert::assertTrue(
             is_array($actualValue),
-            "Asserting the [$property] property in current scope [{$this->scope}] is an array: ".json_encode($payload)
+            "Asserting the [$property] property in current scope [{$this->scope}] " .
+            "is an array: " . json_encode($payload)
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" is an object$/
+     * @param $property
      */
     public function thePropertyIsAnObject($property)
     {
@@ -226,11 +235,14 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $actualValue = $this->arrayGet($payload, $property);
         PHPUnit_Framework_Assert::assertTrue(
             is_object($actualValue),
-            "Asserting the [$property] property in current scope [{$this->scope}] is an object: ".json_encode($payload)
+            "Asserting the [$property] property in current scope [{$this->scope}] " .
+            "is an object: " . json_encode($payload)
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" is an empty array$/
+     * @param $property
      */
     public function thePropertyIsAnEmptyArray($property)
     {
@@ -238,47 +250,50 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $scopePayload = $this->arrayGet($payload, $property);
         PHPUnit_Framework_Assert::assertTrue(
             is_array($scopePayload) and $scopePayload === [],
-            "Asserting the [$property] property in current scope [{$this->scope}] is an empty array: ".json_encode($payload)
+            "Asserting the [$property] property in current scope [{$this->scope}] " .
+            "is an empty array: " . json_encode($payload)
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" contains "(\d+)" items$/
+     * @param $property
+     * @param $count
      */
     public function thePropertyContainsItems($property, $count)
     {
         $payload = $this->getScopePayload();
         PHPUnit_Framework_Assert::assertCount(
-            (int) $count,
+            (int)$count,
             $this->arrayGet($payload, $property),
-            "Asserting the [$property] property contains [$count] items: ".json_encode($payload)
+            "Asserting the [$property] property contains [$count] items: " . json_encode($payload)
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" is an integer$/
+     * @param $property
      */
     public function thePropertyIsAnInteger($property)
     {
         $payload = $this->getScopePayload();
-        PHPUnit_Framework_Assert::isType(
-            'int',
-            $this->arrayGet($payload, $property),
-            "Asserting the [$property] property in current scope [{$this->scope}] is an integer: ".json_encode($payload)
-        );
+        PHPUnit_Framework_Assert::isType('int')->evaluate($this->arrayGet($payload, $property));
     }
+
     /**
      * @Given /^the property "([^"]*)" is a string$/
+     * @param $property
      */
     public function thePropertyIsAString($property)
     {
         $payload = $this->getScopePayload();
-        PHPUnit_Framework_Assert::isType(
-            'string',
-            $this->arrayGet($payload, $property),
-            "Asserting the [$property] property in current scope [{$this->scope}] is a string: ".json_encode($payload)
-        );
+        PHPUnit_Framework_Assert::isType('string')->evaluate($this->arrayGet($payload, $property));
     }
+
     /**
      * @Given /^the property "([^"]*)" is a string equalling "([^"]*)"$/
+     * @param $property
+     * @param $expectedValue
      */
     public function thePropertyIsAStringEqualling($property, $expectedValue)
     {
@@ -288,11 +303,14 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         PHPUnit_Framework_Assert::assertSame(
             $actualValue,
             $expectedValue,
-            "Asserting the [$property] property in current scope [{$this->scope}] is a string equalling [$expectedValue]."
+            "Asserting the [$property] property in current scope [{$this->scope}] " .
+            "is a string equalling [$expectedValue]."
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" is a boolean$/
+     * @param $property
      */
     public function thePropertyIsABoolean($property)
     {
@@ -302,25 +320,32 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             "Asserting the [$property] property in current scope [{$this->scope}] is a boolean."
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" is a boolean equalling "([^"]*)"$/
+     * @param $property
+     * @param $expectedValue
      */
     public function thePropertyIsABooleanEqualling($property, $expectedValue)
     {
         $payload = $this->getScopePayload();
         $actualValue = $this->arrayGet($payload, $property);
-        if (! in_array($expectedValue, ['true', 'false'])) {
+        if (!in_array($expectedValue, ['true', 'false'])) {
             throw new \InvalidArgumentException("Testing for booleans must be represented by [true] or [false].");
         }
         $this->thePropertyIsABoolean($property);
         PHPUnit_Framework_Assert::assertSame(
             $actualValue,
             $expectedValue == 'true',
-            "Asserting the [$property] property in current scope [{$this->scope}] is a boolean equalling [$expectedValue]."
+            "Asserting the [$property] property in current scope [{$this->scope}] " .
+            "is a boolean equalling [$expectedValue]."
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" is a integer equalling "([^"]*)"$/
+     * @param $property
+     * @param $expectedValue
      */
     public function thePropertyIsAIntegerEqualling($property, $expectedValue)
     {
@@ -329,18 +354,22 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $this->thePropertyIsAnInteger($property);
         PHPUnit_Framework_Assert::assertSame(
             $actualValue,
-            (int) $expectedValue,
-            "Asserting the [$property] property in current scope [{$this->scope}] is an integer equalling [$expectedValue]."
+            (int)$expectedValue,
+            "Asserting the [$property] property in current scope [{$this->scope}] " .
+            "is an integer equalling [$expectedValue]."
         );
     }
+
     /**
      * @Given /^the property "([^"]*)" is either:$/
+     * @param $property
+     * @param PyStringNode $options
      */
     public function thePropertyIsEither($property, PyStringNode $options)
     {
         $payload = $this->getScopePayload();
         $actualValue = $this->arrayGet($payload, $property);
-        $valid = explode("\n", (string) $options);
+        $valid = explode("\n", (string)$options);
         PHPUnit_Framework_Assert::assertTrue(
             in_array($actualValue, $valid),
             sprintf(
@@ -350,15 +379,30 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             )
         );
     }
+
+    /**
+     * @Given /^the property "([^"]*)" is a iso8601 date$/
+     * @param $property
+     */
+    public function thePropertyIsAIsodate($property)
+    {
+        $payload = $this->getScopePayload();
+        $actualValue = $this->arrayGet($payload, $property);
+        \Carbon\Carbon::createFromFormat(DateTime::ISO8601, $actualValue);
+    }
+
     /**
      * @Given /^the property "([^"]*)" has items where "([^"]*)" is sorted like "([^"]*)"$/
+     * @param $property
+     * @param $key
+     * @param $list
      */
     public function thePropertyHasItemsWhereIsSortedLike($property, $key, $list)
     {
         $payload = $this->getScopePayload();
         $actualArray = $this->arrayGet($payload, $property);
         $actualList = explode(',', $list);
-        foreach($actualArray as $index => $item) {
+        foreach ($actualArray as $index => $item) {
             PHPUnit_Framework_Assert::assertEquals(
                 $item->$key,
                 $actualList[$index]
@@ -368,13 +412,16 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * @Given /^I scope into the first property "([^"]*)"$/
+     * @param $scope
      */
     public function scopeIntoTheFirstProperty($scope)
     {
         $this->scope = "{$scope}.0";
     }
+
     /**
      * @Given /^I scope into the property "([^"]*)"$/
+     * @param $scope
      */
     public function scopeIntoTheProperty($scope)
     {
@@ -383,10 +430,11 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * @Given /^the properties exist:$/
+     * @param PyStringNode $propertiesString
      */
     public function thePropertiesExist(PyStringNode $propertiesString)
     {
-        foreach (explode("\n", (string) $propertiesString) as $property) {
+        foreach (explode("\n", (string)$propertiesString) as $property) {
             $this->thePropertyExists($property);
         }
     }
@@ -401,26 +449,27 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * Checks the response exists and returns it.
-     *
-     * @return  Response
+     * @return Response
+     * @throws Exception
      */
     protected function getResponse()
     {
-        if (! $this->response) {
+        if (!$this->response) {
             throw new Exception("You must first make a request to check a response.");
         }
+
         return $this->response;
     }
 
     /**
      * Return the response payload from the current response.
-     *
-     * @return  mixed
+     * @return mixed
+     * @throws Exception
      */
     protected function getResponsePayload()
     {
-        if (! $this->responsePayload) {
-            $json = json_decode($this->getResponse()->getBody(true));
+        if (!$this->responsePayload) {
+            $json = json_decode($this->getResponse()->getBody());
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $message = 'Failed to decode JSON body ';
                 switch (json_last_error()) {
@@ -447,6 +496,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             }
             $this->responsePayload = $json;
         }
+
         return $this->responsePayload;
     }
 
@@ -459,9 +509,10 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     protected function getScopePayload()
     {
         $payload = $this->getResponsePayload();
-        if (! $this->scope) {
+        if (!$this->scope) {
             return $payload;
         }
+
         return $this->arrayGet($payload, $this->scope);
     }
 
@@ -470,33 +521,31 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
      *
      * @copyright   Taylor Otwell
      * @link        http://laravel.com/docs/helpers
-     * @param       array   $array
-     * @param       string  $key
-     * @param       mixed   $default
-     * @return      mixed
+     * @param       array $array
+     * @param       string $key
+     * @return mixed
+     * @internal param mixed $default
      */
     protected function arrayGet($array, $key)
     {
         if (is_null($key)) {
             return $array;
         }
-        // if (isset($array[$key])) {
-        //     return $array[$key];
-        // }
+
         foreach (explode('.', $key) as $segment) {
             if (is_object($array)) {
-                if (! isset($array->{$segment})) {
-                    return;
+                if (!isset($array->{$segment})) {
+                    return [];
                 }
                 $array = $array->{$segment};
             } elseif (is_array($array)) {
-                if (! array_key_exists($segment, $array)) {
-                    return;
+                if (!array_key_exists($segment, $array)) {
+                    return [];
                 }
                 $array = $array[$segment];
             }
         }
+
         return $array;
     }
-
 }

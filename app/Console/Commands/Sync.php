@@ -1,12 +1,12 @@
-<?php namespace App\Console\Commands;
+<?php
+
+namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
-class Sync extends Command {
-
+class Sync extends Command
+{
     /**
      * The console command name.
      *
@@ -61,5 +61,4 @@ class Sync extends Command {
     {
         return [];
     }
-
 }

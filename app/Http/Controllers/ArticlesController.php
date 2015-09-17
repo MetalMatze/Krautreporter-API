@@ -1,16 +1,19 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Transformers\ArticleTransformer;
 use App\Krautreporter\Articles\ArticleRepository;
+use Dingo\Api\Routing\Helpers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Request;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 
 class ArticlesController extends Controller
 {
+    use Helpers;
+
     /**
      * @var ArticleRepository
      */
@@ -36,7 +39,7 @@ class ArticlesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return array
      */
     public function index()
     {
@@ -54,28 +57,23 @@ class ArticlesController extends Controller
             $articles = $this->repository->paginate();
         }
 
-        $resource = new Collection($articles, $this->articleTransformer);
-
-        return $this->fractal->createData($resource)->toArray();
+        return $this->response()->collection($articles, $this->articleTransformer);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int $id
-     * @return Response
+     * @return array
      */
     public function show($id)
     {
         try {
             $article = $this->repository->find($id);
         } catch (ModelNotFoundException $e) {
-            abort(404, 'Article not found.');
+            abort(404);
         }
 
-        $resource = new Item($article, $this->articleTransformer);
-
-        return $this->fractal->createData($resource)->toArray();
+        return $this->response()->item($article, $this->articleTransformer);
     }
-
 }

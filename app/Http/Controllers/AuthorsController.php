@@ -1,15 +1,17 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Transformers\AuthorTransformer;
 use App\Krautreporter\Authors\AuthorRepository;
+use Dingo\Api\Routing\Helpers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Response;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 
-class AuthorsController extends Controller {
+class AuthorsController extends Controller
+{
+    use Helpers;
 
     /**
      * @var AuthorRepository
@@ -31,7 +33,7 @@ class AuthorsController extends Controller {
      * @param Manager $fractal
      * @param AuthorTransformer $authorTransformer
      */
-    function __construct(AuthorRepository $repository, Manager $fractal, AuthorTransformer $authorTransformer)
+    public function __construct(AuthorRepository $repository, Manager $fractal, AuthorTransformer $authorTransformer)
     {
         $this->repository = $repository;
         $this->fractal = $fractal;
@@ -41,22 +43,20 @@ class AuthorsController extends Controller {
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return array
      */
     public function index()
     {
         $authors = $this->repository->all();
 
-        $resource = new Collection($authors, $this->authorTransformer);
-
-        return $this->fractal->createData($resource)->toArray();
+        return $this->response()->collection($authors, $this->authorTransformer);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param  int $id
+     * @return array
      */
     public function show($id)
     {
@@ -66,9 +66,6 @@ class AuthorsController extends Controller {
             abort(404);
         }
 
-        $resource = new Item($author, $this->authorTransformer);
-
-        return $this->fractal->createData($resource)->toArray();
+        return $this->response()->item($author, $this->authorTransformer);
     }
-
 }

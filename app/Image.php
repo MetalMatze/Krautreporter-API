@@ -1,9 +1,11 @@
-<?php namespace App;
+<?php
+
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Image extends Model {
-
+class Image extends Model
+{
     protected $table = 'images';
 
     /**
@@ -24,5 +26,4 @@ class Image extends Model {
     {
         return $this->morphTo();
     }
-
 }

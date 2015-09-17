@@ -1,15 +1,16 @@
-<?php namespace App\Console\Commands;
+<?php
 
-use App\Commands\CrawlArticle;
-use App\Commands\CrawlAuthor;
+namespace App\Console\Commands;
+
 use App\Crawl;
+use App\Jobs\CrawlArticleJob;
+use App\Jobs\CrawlAuthorJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 
 class SyncJobs extends Command
 {
-
     /**
      * The console command name.
      *
@@ -48,7 +49,7 @@ class SyncJobs extends Command
             ->get();
 
         foreach ($authorJobs as $job) {
-            Queue::push(new CrawlAuthor($job->crawlable));
+            Queue::push(new CrawlAuthorJob($job->crawlable));
         }
 
         $articlesJobs = Crawl::where('next_crawl', '<', DB::raw('NOW()'))
@@ -58,7 +59,7 @@ class SyncJobs extends Command
             ->get();
 
         foreach ($articlesJobs as $job) {
-            Queue::push(new CrawlArticle($job->crawlable));
+            Queue::push(new CrawlArticleJob($job->crawlable));
         }
 
         $this->info(sprintf('Added %d jobs to queue', count($authorJobs) + count($articlesJobs)));
@@ -83,5 +84,4 @@ class SyncJobs extends Command
     {
         return [];
     }
-
 }

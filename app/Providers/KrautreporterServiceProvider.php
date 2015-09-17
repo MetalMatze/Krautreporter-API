@@ -1,9 +1,11 @@
-<?php namespace App\Providers;
+<?php
+
+namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class KrautreporterServiceProvider extends ServiceProvider {
-
+class KrautreporterServiceProvider extends ServiceProvider
+{
     /**
      * Bootstrap the application services.
      *
@@ -30,5 +32,4 @@ class KrautreporterServiceProvider extends ServiceProvider {
             'App\Krautreporter\Authors\AuthorEloquentRepository'
         );
     }
-
 }

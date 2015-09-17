@@ -11,14 +11,19 @@
 |
 */
 
-Route::get('/', function() {
+
+Route::get('/', function () {
     return 'hallo';
 });
 
-Route::get('authors', 'AuthorsController@index');
-Route::get('authors/{id}', 'AuthorsController@show');
-
-Route::get('articles', 'ArticlesController@index');
-Route::get('articles/{id}', 'ArticlesController@show');
-
 Route::get('status', 'StatusController@index');
+
+$api = app('Dingo\Api\Routing\Router');
+
+$api->version('v1', function ($api) {
+    $api->get('authors', 'App\Http\Controllers\AuthorsController@index');
+    $api->get('authors/{id}', 'App\Http\Controllers\AuthorsController@show');
+
+    $api->get('articles', 'App\Http\Controllers\ArticlesController@index');
+    $api->get('articles/{id}', 'App\Http\Controllers\ArticlesController@show');
+});

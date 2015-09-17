@@ -1,9 +1,11 @@
-<?php namespace App;
+<?php
+
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Crawl extends Model {
-
+class Crawl extends Model
+{
     protected $table = 'crawls';
 
     public $timestamps = false;
@@ -12,5 +14,4 @@ class Crawl extends Model {
     {
         return $this->morphTo();
     }
-
 }

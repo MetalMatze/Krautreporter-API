@@ -3,8 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCrawlsTable extends Migration {
-
+class CreateCrawlsTable extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,7 +12,7 @@ class CreateCrawlsTable extends Migration {
      */
     public function up()
     {
-        Schema::create('crawls', function($table) {
+        Schema::create('crawls', function ($table) {
             $table->increments('id');
             $table->integer('crawlable_id')->unsinged();
             $table->string('crawlable_type');
@@ -29,5 +29,4 @@ class CreateCrawlsTable extends Migration {
     {
         Schema::drop('crawls');
     }
-
 }

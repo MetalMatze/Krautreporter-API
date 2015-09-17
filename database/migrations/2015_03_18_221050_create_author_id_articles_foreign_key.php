@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAuthorIdArticlesForeignKey extends Migration {
-
+class CreateAuthorIdArticlesForeignKey extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,7 +12,7 @@ class CreateAuthorIdArticlesForeignKey extends Migration {
      */
     public function up()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->foreign('author_id')->references('id')->on('authors');
         });
     }
@@ -25,9 +24,8 @@ class CreateAuthorIdArticlesForeignKey extends Migration {
      */
     public function down()
     {
-        Schema::table('articles', function($table) {
+        Schema::table('articles', function ($table) {
             $table->dropForeign('articles_author_id_foreign');
         });
     }
-
 }

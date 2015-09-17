@@ -1,11 +1,12 @@
-<?php namespace App\Http\Middleware;
+<?php
+
+namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\RedirectResponse;
 
-class RedirectIfAuthenticated {
-
+class RedirectIfAuthenticated
+{
     /**
      * The Guard implementation.
      *
@@ -33,12 +34,10 @@ class RedirectIfAuthenticated {
      */
     public function handle($request, Closure $next)
     {
-        if ($this->auth->check())
-        {
-            return new RedirectResponse(url('/home'));
+        if ($this->auth->check()) {
+            return redirect('/home');
         }
 
         return $next($request);
     }
-
 }

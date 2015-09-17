@@ -1,12 +1,13 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Crawl;
 use App\Http\Requests;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
-class StatusController extends Controller {
-
+class StatusController extends Controller
+{
     /**
      * Display a listing of the resource.
      *
@@ -15,19 +16,17 @@ class StatusController extends Controller {
     public function index()
     {
         $nextAuthorCrawls = Crawl::where('crawlable_type', '=', 'App\Author')
-                                ->orderBy('next_crawl', 'asc')
-                                ->limit(10)
-                                ->get();
+            ->orderBy('next_crawl', 'asc')
+            ->limit(10)
+            ->get();
 
         $nextArticleCrawls = Crawl::where('crawlable_type', '=', 'App\Article')
-                                ->orderBy('next_crawl', 'asc')
-                                ->limit(10)
-                                ->get();
-
+            ->orderBy('next_crawl', 'asc')
+            ->limit(10)
+            ->get();
 
         return view('status')
-                    ->with('nextAuthorCrawls', $nextAuthorCrawls)
-                    ->with('nextArticleCrawls', $nextArticleCrawls);
+            ->with('nextAuthorCrawls', $nextAuthorCrawls)
+            ->with('nextArticleCrawls', $nextArticleCrawls);
     }
-
 }

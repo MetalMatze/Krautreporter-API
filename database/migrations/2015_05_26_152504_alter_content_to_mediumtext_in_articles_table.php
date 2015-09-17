@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class AlterContentToMediumtextInArticlesTable extends Migration {
-
+class AlterContentToMediumtextInArticlesTable extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -23,5 +23,4 @@ class AlterContentToMediumtextInArticlesTable extends Migration {
     {
         DB::statement('ALTER TABLE articles MODIFY content TEXT');
     }
-
 }
