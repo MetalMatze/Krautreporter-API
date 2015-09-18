@@ -2,9 +2,12 @@
 
 namespace App\Http\Transformers;
 
+use App\Article;
+use App\Author;
 use App\Crawl;
+use League\Fractal\TransformerAbstract;
 
-class CrawlTransformer
+class CrawlTransformer extends TransformerAbstract
 {
     protected $availableIncludes = [
         'crawlable'
@@ -26,6 +29,12 @@ class CrawlTransformer
     {
         $crawlable = $crawl->crawlable;
 
-        return $this->item($crawlable, new AuthorTransformer());
+        if ($crawlable instanceof Author) {
+            return $this->item($crawlable, new AuthorTransformer());
+        }
+
+        if ($crawlable instanceof Article) {
+            return $this->item($crawlable, new ArticleTransformer());
+        }
     }
 }
