@@ -48,6 +48,12 @@ return [
             'root'   => storage_path('app'),
         ],
 
+        'dropbox' => [
+            'driver' => 'dropbox',
+            'token' => env('DROPBOX_ACCESSTOKEN'),
+            'app' => env('DROPBOX_APPNAME'),
+        ],
+
         'ftp' => [
             'driver'   => 'ftp',
             'host'     => 'ftp.example.com',
