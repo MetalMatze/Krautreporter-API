@@ -42,7 +42,7 @@ class CrawlsController extends Controller
      */
     public function index()
     {
-        $crawls = Crawl::with('crawlable')->get();
+        $crawls = Crawl::with('crawlable')->orderBy('next_crawl')->take(20)->get();
 
         return $this->response()->collection($crawls, $this->crawlTransformer);
     }
