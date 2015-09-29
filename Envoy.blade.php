@@ -17,6 +17,7 @@
 @macro('deploy', ['on' => 'production'])
     fetch
     composer
+    elixir
     symlinks
     permissions
     migrate
@@ -49,6 +50,12 @@
     /usr/local/bin/composer install --prefer-dist --no-scripts;
     php artisan clear-compiled --env=production;
     php artisan optimize --env=production;
+@endtask
+
+@task('elixir')
+    cd {{ $release_dir }}/{{ $release }};
+    npm install
+    gulp --production
 @endtask
 
 @task('symlinks')
