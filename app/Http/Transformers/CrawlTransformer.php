@@ -19,9 +19,16 @@ class CrawlTransformer extends TransformerAbstract
 
     public function transform(Crawl $crawl)
     {
+        if ($crawl->crawlable_type == Author::class) {
+            $crawlable_type = 'author';
+        } else {
+            $crawlable_type = 'article';
+        }
+
         return [
             'id' => (int)$crawl->id,
             'next_crawl' => $crawl->next_crawl->format(\DateTime::ISO8601),
+            'crawlable_type' => $crawlable_type,
         ];
     }
 
@@ -34,7 +41,7 @@ class CrawlTransformer extends TransformerAbstract
         }
 
         if ($crawlable instanceof Article) {
-            return $this->item($crawlable, new ArticleTransformer());
+            return $this->item($crawlable, new ArticleIncludeTransformer());
         }
     }
 }
