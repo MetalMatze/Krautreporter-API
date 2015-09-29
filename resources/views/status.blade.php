@@ -1,6 +1,8 @@
 @extends('layouts.master')
 
 @section('content')
-    @include('crawls._table', ['crawls' => $nextAuthorCrawls])
-    @include('crawls._table', ['crawls' => $nextArticleCrawls])
+    <h3>Status</h3>
+
+    <h4>Next crawls</h4>
+    <div id="status"></div>
 @stop

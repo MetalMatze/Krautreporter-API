@@ -4,7 +4,12 @@
     "gulp": "^3.8.8"
   },
   "dependencies": {
+    "bootstrap": "^3.3.5",
+    "bootstrap-sass": "^3.0.0",
     "laravel-elixir": "^3.0.0",
-    "bootstrap-sass": "^3.0.0"
+    "moment": "^2.10.6",
+    "react": "^0.13.3",
+    "react-bootstrap": "^0.25.2",
+    "superagent": "^1.4.0"
   }
 }

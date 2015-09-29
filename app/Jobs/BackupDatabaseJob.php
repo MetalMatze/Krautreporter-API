@@ -14,8 +14,6 @@ class BackupDatabaseJob extends Job implements SelfHandling
 
     /**
      * Create a new job instance.
-     *
-     * @return void
      */
     public function __construct()
     {
