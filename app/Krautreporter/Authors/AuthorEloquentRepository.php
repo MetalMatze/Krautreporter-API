@@ -16,4 +16,8 @@ class AuthorEloquentRepository extends EloquentRepository implements AuthorRepos
         $this->model = $author;
     }
 
+    public function all(array $fields = ['*'])
+    {
+        return $this->model->orderBy('order', 'desc')->get($fields);
+    }
 }
