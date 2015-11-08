@@ -113,23 +113,23 @@ class FeatureContext implements Context, SnippetAcceptingContext
         switch ($status_code) {
             case 400:
                 $this->iGetAResponse(400);
-                $this->thePropertyIsAIntegerEqualling('status_code', 400);
+                $this->thePropertyIsAnIntegerEqualling('status_code', 400);
                 $this->thePropertyEquals('message', is_null($message) ? 'Bad Request' : $message);
                 break;
             case 401:
                 $this->iGetAResponse(401);
-                $this->thePropertyIsAIntegerEqualling('status_code', 401);
+                $this->thePropertyIsAnIntegerEqualling('status_code', 401);
                 $this->thePropertyEquals('message', is_null($message) ? 'Failed to authenticate because of ' .
                     'bad credentials or an invalid authorization header.' : $message);
                 break;
             case 403:
                 $this->iGetAResponse(403);
-                $this->thePropertyIsAIntegerEqualling('status_code', 403);
+                $this->thePropertyIsAnIntegerEqualling('status_code', 403);
                 $this->thePropertyEquals('message', is_null($message) ? 'Forbidden' : $message);
                 break;
             case 404:
                 $this->iGetAResponse(404);
-                $this->thePropertyIsAIntegerEqualling('status_code', 404);
+                $this->thePropertyIsAnIntegerEqualling('status_code', 404);
                 $this->thePropertyEquals('message', is_null($message) ? '404 Not Found' : $message);
                 break;
             case 422:
@@ -343,11 +343,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given /^the property "([^"]*)" is a integer equalling "([^"]*)"$/
+     * @Given /^the property "([^"]*)" is an integer equalling "([^"]*)"$/
      * @param $property
      * @param $expectedValue
      */
-    public function thePropertyIsAIntegerEqualling($property, $expectedValue)
+    public function thePropertyIsAnIntegerEqualling($property, $expectedValue)
     {
         $payload = $this->getScopePayload();
         $actualValue = $this->arrayGet($payload, $property);
