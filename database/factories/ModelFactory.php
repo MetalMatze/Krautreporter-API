@@ -15,6 +15,7 @@ use Faker\Generator;
 
 $factory->define(App\Author::class, function (Generator $faker) {
     return [
+        'order' => $faker->numberBetween(1, 10),
         'name' => $faker->name,
         'title' => $faker->sentence(3),
         'url' => '/' . $faker->slug(6),
