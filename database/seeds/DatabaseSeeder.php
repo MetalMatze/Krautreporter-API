@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         factory(Author::class)->times(10)->create();
 
         DB::beginTransaction();
-        foreach (range(0, 100) as $index) {
+        foreach (range(0, 99) as $index) {
             $article = factory(Article::class)->make();
             $article->author()->associate(Author::all()->random(1));
             $article->order = $index;
