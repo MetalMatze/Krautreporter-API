@@ -5,8 +5,8 @@ Feature: Test the articles endpoints
     Then I get a "200" response
     And the property "data" contains "20" items
     And I scope into the first property "data"
-    And the property "id" is an integer equalling "101"
-    And the property "order" is an integer equalling "100"
+    And the property "id" is an integer
+    And the property "order" is an integer equalling "99"
     And the property "title" is a string
     And the property "headline" is a string
     And the property "date" is a iso8601 date

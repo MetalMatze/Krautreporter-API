@@ -5,7 +5,8 @@ Feature: Test the authors endpoints
     Then I get a "200" response
     And the property "data" contains "10" items
     And I scope into the first property "data"
-    And the property "id" is an integer equalling "1"
+    And the property "id" is an integer
+    And the property "order" is an integer equalling "9"
     And the property "name" is a string
     And the property "title" is a string
     And the property "url" is a string
@@ -23,6 +24,7 @@ Feature: Test the authors endpoints
     Then I get a "200" response
     And I scope into the property "data"
     And the property "id" is an integer equalling "5"
+    And the property "order" is an integer equalling "4"
     And the property "name" is a string
     And the property "title" is a string
     And the property "url" is a string
