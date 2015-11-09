@@ -70,7 +70,7 @@ class SyncAuthors extends Command
 
         $this->info(sprintf('Found %d authors, start parsing and saving to db.', count($authors)));
 
-        $authors->each(function (Crawler $node) {
+        $authors->each(function (Crawler $node, $index) use ($authors) {
 
             $anchor = $node->filter('a');
 
@@ -84,6 +84,7 @@ class SyncAuthors extends Command
             $author = Author::firstOrNew(['id' => $author_id]);
             $author->url = $author_url;
 
+            $author->order = (count($authors) - $index) - 1;
             $author->name = $anchor->filter('.author__name')->text();
 
             try {

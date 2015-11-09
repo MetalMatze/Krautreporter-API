@@ -19,6 +19,7 @@ class AuthorTransformer extends TransformerAbstract
     {
         return [
             'id' => (int)$author->id,
+            'order' => $author->order,
             'name' => $author->name,
             'title' => $author->title,
             'url' => getenv("URL_KRAUTREPORTER") . $author->url,

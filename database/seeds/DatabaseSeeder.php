@@ -17,10 +17,16 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        factory(Author::class)->times(10)->create();
+        DB::beginTransaction();
+        foreach (range(0, 9) as $index) {
+            $author = factory(Author::class)->make();
+            $author->order = $index;
+            $author->save();
+        }
+        DB::commit();
 
         DB::beginTransaction();
-        foreach (range(0, 100) as $index) {
+        foreach (range(0, 99) as $index) {
             $article = factory(Article::class)->make();
             $article->author()->associate(Author::all()->random(1));
             $article->order = $index;
