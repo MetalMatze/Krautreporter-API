@@ -15,7 +15,6 @@ use Faker\Generator;
 
 $factory->define(App\Author::class, function (Generator $faker) {
     return [
-        'order' => $faker->numberBetween(1, 10),
         'name' => $faker->name,
         'title' => $faker->sentence(3),
         'url' => '/' . $faker->slug(6),
@@ -28,7 +27,6 @@ $factory->define(App\Author::class, function (Generator $faker) {
 
 $factory->define(App\Article::class, function (Generator $faker) {
     return [
-        'order' => 0,
         'title' => $faker->sentence(6),
         'headline' => $faker->sentence(4),
         'date' => $faker->date('Y-m-d'),
