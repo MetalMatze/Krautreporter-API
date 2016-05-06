@@ -1,0 +1,24 @@
+package main
+
+import (
+	"github.com/MetalMatze/gollection"
+)
+
+func GetConfig() gollection.Config {
+	return gollection.Config{
+		AppConfig: gollection.AppConfig{
+			Name:  "Kraureporter-API",
+			Usage: "RESTful json API which crawls krautreporter.de and serves its content ",
+			Host:  gollection.GetEnv("APP_HOST", "localhost"),
+			Port:  gollection.GetEnvInt("APP_PORT", 1234),
+		},
+		DBConfig: gollection.DBConfig{
+			Dialect:  gollection.GetEnv("DB_DIALECT", "postgres"), // postgers, mysql or sqlite3
+			Host:     gollection.GetEnv("DB_HOST", "localhost"),
+			Port:     gollection.GetEnvInt("DB_PORT", 5432),
+			Database: gollection.GetEnv("DB_DATABASE", "postgres"),
+			Username: gollection.GetEnv("DB_USERNAME", "postgres"),
+			Password: gollection.GetEnv("DB_PASSWORD", "postgres"),
+		},
+	}
+}
