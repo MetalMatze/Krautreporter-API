@@ -3,12 +3,20 @@ package cli
 import (
 	"log"
 
-	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
+	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/service"
 	"github.com/codegangsta/cli"
 )
 
-func CrawlCommand(authorInteractor interactor.AuthorInteractor, articleInteractor interactor.ArticleInteractor) cli.Command {
+type AuthorInteractor interface {
+	SaveAll(authors []entity.Author) error
+}
+
+type ArticleInteractor interface {
+	SaveAll(authors []entity.Article) error
+}
+
+func CrawlCommand(authorInteractor AuthorInteractor, articleInteractor ArticleInteractor) cli.Command {
 	return cli.Command{
 		Name:  "crawl",
 		Usage: "Display an inspiring quote",
@@ -32,7 +40,7 @@ func CrawlCommand(authorInteractor interactor.AuthorInteractor, articleInteracto
 	}
 }
 
-func crawlAuthor(authorInteractor interactor.AuthorInteractor) {
+func crawlAuthor(authorInteractor AuthorInteractor) {
 	authors, err := service.CrawlAuthor()
 	if err != nil {
 		log.Fatal(err)
@@ -43,7 +51,7 @@ func crawlAuthor(authorInteractor interactor.AuthorInteractor) {
 	}
 }
 
-func crawlArticle(articlesInteractor interactor.ArticleInteractor) {
+func crawlArticle(articlesInteractor ArticleInteractor) {
 	articles, err := service.CrawlArticles()
 	if err != nil {
 		log.Fatal(err)
