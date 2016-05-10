@@ -2,10 +2,10 @@ package repository
 
 import (
 	"errors"
-
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"log"
 	"strings"
+
+	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 )
 
 var ErrArticleNotFound = errors.New("Article not found")

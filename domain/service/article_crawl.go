@@ -2,10 +2,10 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 
-	"fmt"
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/PuerkitoBio/goquery"
 )

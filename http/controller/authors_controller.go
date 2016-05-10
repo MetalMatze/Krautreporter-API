@@ -11,7 +11,6 @@ import (
 
 type AuthorInteractor interface {
 	GetAll() ([]*entity.Author, error)
-	SaveAll(authors []entity.Author) error
 	FindByID(id int) (*entity.Author, error)
 }
 
