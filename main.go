@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/MetalMatze/Krautreporter-API/commands"
+	"github.com/MetalMatze/Krautreporter-API/cli"
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
 	"github.com/MetalMatze/Krautreporter-API/domain/repository"
@@ -27,8 +27,8 @@ func main() {
 
 	gollection.DB.AutoMigrate(entity.Author{}, entity.Article{})
 
-	gollection.AddCommands(commands.CrawlCommand(authorInteractor, articlesInteractor))
 	gollection.AddRoutes(http.Routes(authorInteractor))
+	gollection.AddCommands(cli.CrawlCommand(authorInteractor, articlesInteractor))
 
 	if err := gollection.Run(); err != nil {
 		log.Fatal(err)
