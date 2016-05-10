@@ -27,8 +27,8 @@ func main() {
 
 	gollection.DB.AutoMigrate(entity.Author{}, entity.Article{})
 
-	gollection.AddRoutes(http.Routes(authorInteractor))
 	gollection.AddCommands(cli.CrawlCommand(authorInteractor, articlesInteractor))
+	gollection.AddRoutes(http.Routes(authorInteractor, articlesInteractor))
 
 	if err := gollection.Run(); err != nil {
 		log.Fatal(err)
