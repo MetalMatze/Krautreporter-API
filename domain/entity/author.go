@@ -3,8 +3,8 @@ package entity
 import "time"
 
 type AuthorRepository interface {
-	Find() ([]Author, error)
-	FindByID(int) (Author, error)
+	Find() ([]*Author, error)
+	FindByID(int) (*Author, error)
 	SaveAll([]Author) error
 }
 
