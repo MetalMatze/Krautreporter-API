@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/MetalMatze/Krautreporter-API/commands"
+	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
 	"github.com/MetalMatze/Krautreporter-API/domain/repository"
 	"github.com/MetalMatze/Krautreporter-API/http"
@@ -18,10 +19,15 @@ func main() {
 	gollection.AddDB(database.Postgres(config))
 
 	authorInteractor := interactor.AuthorInteractor{
-		AuthorRepository: repository.NewGormAuthorsRepository(gollection.DB),
+		AuthorRepository: repository.GormAuthorRepository{DB: gollection.DB},
+	}
+	articlesInteractor := interactor.ArticleInteractor{
+		ArticleRepository: repository.GormArticleRepository{DB: gollection.DB},
 	}
 
-	gollection.AddCommands(commands.CrawlCommand(authorInteractor))
+	gollection.DB.AutoMigrate(entity.Author{}, entity.Article{})
+
+	gollection.AddCommands(commands.CrawlCommand(authorInteractor, articlesInteractor))
 	gollection.AddRoutes(http.Routes(authorInteractor))
 
 	if err := gollection.Run(); err != nil {
