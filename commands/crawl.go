@@ -2,48 +2,54 @@ package commands
 
 import (
 	"log"
-	"regexp"
-	"strconv"
-	"strings"
 
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
-	"github.com/PuerkitoBio/goquery"
+	"github.com/MetalMatze/Krautreporter-API/domain/service"
 	"github.com/codegangsta/cli"
 )
 
-func CrawlCommand(authorInteractor interactor.AuthorInteractor) cli.Command {
+func CrawlCommand(authorInteractor interactor.AuthorInteractor, articleInteractor interactor.ArticleInteractor) cli.Command {
 	return cli.Command{
 		Name:  "crawl",
 		Usage: "Display an inspiring quote",
+		Action: func(c *cli.Context) {
+			crawlAuthor(authorInteractor)
+			crawlArticle(articleInteractor)
+		},
 		Subcommands: []cli.Command{{
 			Name:  "authors",
 			Usage: "Crawl all authors from krautreporter.de",
-			Action: func(context *cli.Context) {
-				doc, err := goquery.NewDocument("https://krautreporter.de")
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				authorNodes := doc.Find("#author-list-tab li a")
-				log.Printf("Found %d authors, start parsing and saving", authorNodes.Length())
-
-				authors := []entity.Author{}
-
-				idRegex := regexp.MustCompile(`\/(\d*)--`)
-				authorNodes.Each(func(i int, s *goquery.Selection) {
-					author := entity.Author{}
-					author.URL, _ = s.Attr("href")
-					author.ID, _ = strconv.Atoi(idRegex.FindStringSubmatch(author.URL)[1])
-					author.Ordering = authorNodes.Length() - i - 1
-					author.Name = strings.TrimSpace(s.Find(".author__name").Text())
-					author.Title = s.Find(".item__title").Text()
-
-					authors = append(authors, author)
-				})
-
-				authorInteractor.SaveAll(authors)
+			Action: func(c *cli.Context) {
+				crawlAuthor(authorInteractor)
+			},
+		}, {
+			Name:  "articles",
+			Usage: "Crawl all articles from krautreporter.de",
+			Action: func(c *cli.Context) {
+				crawlArticle(articleInteractor)
 			},
 		}},
+	}
+}
+
+func crawlAuthor(authorInteractor interactor.AuthorInteractor) {
+	authors, err := service.CrawlAuthor()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := authorInteractor.SaveAll(authors); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func crawlArticle(articlesInteractor interactor.ArticleInteractor) {
+	articles, err := service.CrawlArticles()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := articlesInteractor.SaveAll(articles); err != nil {
+		log.Fatal(err)
 	}
 }
