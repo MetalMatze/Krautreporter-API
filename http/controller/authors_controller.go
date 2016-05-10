@@ -1,19 +1,25 @@
-package controllers
+package controller
 
 import (
 	"net/http"
 	"strconv"
 
-	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
+	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/repository"
 	"github.com/gin-gonic/gin"
 )
 
-type Controller struct {
-	AuthorInteractor interactor.AuthorInteractor
+type AuthorInteractor interface {
+	GetAll() ([]*entity.Author, error)
+	SaveAll(authors []entity.Author) error
+	FindByID(id int) (*entity.Author, error)
 }
 
-func (controller *Controller) GetAuthors(c *gin.Context) {
+type AuthorsController struct {
+	AuthorInteractor AuthorInteractor
+}
+
+func (controller *AuthorsController) GetAuthors(c *gin.Context) {
 	authors, err := controller.AuthorInteractor.GetAll()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -23,7 +29,7 @@ func (controller *Controller) GetAuthors(c *gin.Context) {
 	c.JSON(200, authors)
 }
 
-func (controller *Controller) GetAuthor(c *gin.Context) {
+func (controller *AuthorsController) GetAuthor(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
