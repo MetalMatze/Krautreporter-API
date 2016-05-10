@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
+	"github.com/MetalMatze/Krautreporter-API/domain/repository"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +32,12 @@ func (controller *Controller) GetAuthor(c *gin.Context) {
 
 	author, err := controller.AuthorInteractor.FindByID(id)
 	if err != nil {
+		if err == repository.ErrAuthorNotFound {
+			status := http.StatusNotFound
+			c.JSON(status, gin.H{"message": http.StatusText(status), "status_code": status})
+			return
+		}
+
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
