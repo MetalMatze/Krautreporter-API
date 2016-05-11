@@ -5,10 +5,12 @@ import (
 )
 
 func GetConfig() gollection.Config {
+	gollection.LoadEnv(".env") // Loads env variables from .env, but doesn't override if already set
+
 	return gollection.Config{
 		AppConfig: gollection.AppConfig{
 			Name:  "Kraureporter-API",
-			Usage: "RESTful json API which crawls krautreporter.de and serves its content ",
+			Usage: "RESTful json API which crawls krautreporter.de and serves its content",
 			Host:  gollection.GetEnv("APP_HOST", "localhost"),
 			Port:  gollection.GetEnvInt("APP_PORT", 1234),
 			Env:   gollection.GetEnv("APP_ENV", "production"), // local, testing, production
