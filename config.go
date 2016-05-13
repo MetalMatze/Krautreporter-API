@@ -4,6 +4,7 @@ import (
 	"github.com/MetalMatze/gollection"
 )
 
+// GetConfig returns the gollection configuration
 func GetConfig() gollection.Config {
 	gollection.LoadEnv(".env") // Loads env variables from .env, but doesn't override if already set
 
@@ -13,7 +14,7 @@ func GetConfig() gollection.Config {
 			Usage: "RESTful json API which crawls krautreporter.de and serves its content",
 			Host:  gollection.GetEnv("APP_HOST", "localhost"),
 			Port:  gollection.GetEnvInt("APP_PORT", 1234),
-			Env:   gollection.GetEnv("APP_ENV", "production"), // local, testing, production
+			Debug:   gollection.GetEnvBool("APP_DEBUG", false),
 		},
 		DBConfig: gollection.DBConfig{
 			Dialect:  gollection.GetEnv("DB_DIALECT", "postgres"), // postgres, mysql or sqlite3
