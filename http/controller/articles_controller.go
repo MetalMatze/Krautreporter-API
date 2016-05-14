@@ -15,18 +15,16 @@ type ArticlesController struct {
 	ArticleInteractor ArticleInteractor
 }
 
-func (c *ArticlesController) GetArticle(req router.Request, res router.Response) {
+func (c *ArticlesController) GetArticle(req router.Request, res router.Response) error {
 	id, err := strconv.Atoi(req.Param("id"))
 	if err != nil {
-		res.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
 	article, err := c.ArticleInteractor.FindByID(id)
 	if err != nil {
-		res.AbortWithStatus(http.StatusNotFound)
-		return
+		return res.AbortWithStatus(http.StatusNotFound)
 	}
 
-	res.JSON(http.StatusOK, article)
+	return res.JSON(http.StatusOK, article)
 }

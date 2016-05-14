@@ -19,34 +19,30 @@ type AuthorsController struct {
 	AuthorInteractor AuthorInteractor
 }
 
-func (c *AuthorsController) GetAuthors(req router.Request, res router.Response) {
+func (c *AuthorsController) GetAuthors(req router.Request, res router.Response) error {
 	authors, err := c.AuthorInteractor.GetAll()
 	if err != nil {
-		res.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	res.JSON(http.StatusOK, authors)
+	return res.JSON(http.StatusOK, authors)
 }
 
-func (c *AuthorsController) GetAuthor(req router.Request, res router.Response) {
+func (c *AuthorsController) GetAuthor(req router.Request, res router.Response) error {
 	id, err := strconv.Atoi(req.Param("id"))
 	if err != nil {
-		res.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
 	author, err := c.AuthorInteractor.FindByID(id)
 	if err != nil {
 		if err == repository.ErrAuthorNotFound {
 			status := http.StatusNotFound
-			res.JSON(status, gin.H{"message": http.StatusText(status), "status_code": status})
-			return
+			return res.JSON(status, gin.H{"message": http.StatusText(status), "status_code": status})
 		}
 
-		res.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	res.JSON(http.StatusOK, author)
+	return res.JSON(http.StatusOK, author)
 }
