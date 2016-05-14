@@ -14,7 +14,7 @@ func GetConfig() gollection.Config {
 			Usage: "RESTful json API which crawls krautreporter.de and serves its content",
 			Host:  gollection.GetEnv("APP_HOST", "localhost"),
 			Port:  gollection.GetEnvInt("APP_PORT", 1234),
-			Debug:   gollection.GetEnvBool("APP_DEBUG", false),
+			Debug: gollection.GetEnvBool("APP_DEBUG", false),
 		},
 		DBConfig: gollection.DBConfig{
 			Dialect:  gollection.GetEnv("DB_DIALECT", "postgres"), // postgres, mysql or sqlite3
