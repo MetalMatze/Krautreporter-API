@@ -1,11 +1,10 @@
 package controller
 
 import (
+	"github.com/MetalMatze/Krautreporter-API/domain/entity"
+	"github.com/MetalMatze/gollection/router"
 	"net/http"
 	"strconv"
-
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
-	"github.com/gin-gonic/gin"
 )
 
 type ArticleInteractor interface {
@@ -13,21 +12,21 @@ type ArticleInteractor interface {
 }
 
 type ArticlesController struct {
-	Interactor ArticleInteractor
+	ArticleInteractor ArticleInteractor
 }
 
-func (controller *ArticlesController) GetArticle(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+func (c *ArticlesController) GetArticle(req router.Request, res router.Response) {
+	id, err := strconv.Atoi(req.Param("id"))
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		res.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	article, err := controller.Interactor.FindByID(id)
+	article, err := c.ArticleInteractor.FindByID(id)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		res.AbortWithStatus(http.StatusNotFound)
 		return
 	}
 
-	c.JSON(http.StatusOK, article)
+	res.JSON(http.StatusOK, article)
 }

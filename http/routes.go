@@ -2,17 +2,19 @@ package http
 
 import (
 	"github.com/MetalMatze/Krautreporter-API/http/controller"
-	"github.com/gin-gonic/gin"
+	"github.com/MetalMatze/gollection/router"
 )
 
-func Routes(authorInteractor controller.AuthorInteractor, articleInteractor controller.ArticleInteractor) func(router *gin.Engine) {
-	return func(router *gin.Engine) {
+type KrautreporterRoutes struct {
+	ArticleInteractor controller.ArticleInteractor
+	AuthorInteractor  controller.AuthorInteractor
+}
 
-		authorsController := controller.AuthorsController{AuthorInteractor: authorInteractor}
-		router.GET("/authors", authorsController.GetAuthors)
-		router.GET("/authors/:id", authorsController.GetAuthor)
+func (kr KrautreporterRoutes) Routes(r router.Router) {
+	authorsController := controller.AuthorsController{AuthorInteractor: kr.AuthorInteractor}
+	r.GET("/authors", authorsController.GetAuthors)
+	r.GET("/authors/:id", authorsController.GetAuthor)
 
-		articlesController := controller.ArticlesController{Interactor: articleInteractor}
-		router.GET("/articles/:id", articlesController.GetArticle)
-	}
+	articlesController := controller.ArticlesController{ArticleInteractor: kr.ArticleInteractor}
+	r.GET("/articles/:id", articlesController.GetArticle)
 }
