@@ -61,7 +61,7 @@ func parseArticle(s *goquery.Selection) (entity.Article, error) {
 	}
 
 	preview := false
-	if s.Find("img").Length() > 1 {
+	if s.Find("img").Length() > 0 {
 		preview = true
 	}
 
