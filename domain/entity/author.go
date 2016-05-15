@@ -18,4 +18,6 @@ type Author struct {
 	SocialMedia string    `json:"social-media"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+
+	Images []Image `gorm:"polymorphic:Imageable;" json:"images"`
 }
