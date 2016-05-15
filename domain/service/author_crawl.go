@@ -11,6 +11,7 @@ import (
 )
 
 var IDRegex = regexp.MustCompile(`\/(\d*)--`)
+var SrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
 func CrawlAuthor() ([]entity.Author, error) {
 	doc, err := goquery.NewDocument("https://krautreporter.de")
@@ -29,6 +30,14 @@ func CrawlAuthor() ([]entity.Author, error) {
 		author.Ordering = authorNodes.Length() - i - 1
 		author.Name = strings.TrimSpace(s.Find(".author__name").Text())
 		author.Title = s.Find(".item__title").Text()
+
+		if srcset, exists := s.Find("img").Attr("srcset"); exists {
+			matches := SrcsetRegex.FindStringSubmatch(srcset)
+			if len(matches) == 3 {
+				author.Images = append(author.Images, entity.Image{Width: 50, Src: matches[1]})
+				author.Images = append(author.Images, entity.Image{Width: 100, Src: matches[2]})
+			}
+		}
 
 		authors = append(authors, author)
 	})

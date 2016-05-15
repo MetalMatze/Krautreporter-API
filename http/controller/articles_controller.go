@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
-	"github.com/MetalMatze/gollection/router"
 	"net/http"
 	"strconv"
+
+	"github.com/MetalMatze/Krautreporter-API/domain/entity"
+	"github.com/MetalMatze/gollection/router"
 )
 
 type ArticleInteractor interface {
