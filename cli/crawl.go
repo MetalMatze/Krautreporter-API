@@ -19,7 +19,7 @@ type ArticleInteractor interface {
 func CrawlCommand(authorInteractor AuthorInteractor, articleInteractor ArticleInteractor) cli.Command {
 	return cli.Command{
 		Name:  "crawl",
-		Usage: "Display an inspiring quote",
+		Usage: "Crawl krautreporter.de to get authors & articles",
 		Action: func(c *cli.Context) {
 			crawlAuthor(authorInteractor)
 			crawlArticle(articleInteractor)
