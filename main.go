@@ -13,10 +13,11 @@ import (
 )
 
 func main() {
-	config := GetConfig() // Get all env variables and populate the config with it
+	config := GetConfig()
 	g := gollection.New(config)
 
 	g.AddDB(database.Postgres(config))
+	g.AddRedis(gollection.NewRedis(config))
 
 	g.AddRouter(router.NewGin())
 
