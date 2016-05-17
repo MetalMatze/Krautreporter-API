@@ -3,6 +3,7 @@ package cli
 import (
 	"log"
 
+	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/service"
 	"github.com/codegangsta/cli"
@@ -16,25 +17,25 @@ type ArticleInteractor interface {
 	SaveAll(authors []entity.Article) error
 }
 
-func CrawlCommand(authorInteractor AuthorInteractor, articleInteractor ArticleInteractor) cli.Command {
+func CrawlCommand(kr *domain.Krautreporter) cli.Command {
 	return cli.Command{
 		Name:  "crawl",
 		Usage: "Crawl krautreporter.de to get authors & articles",
 		Action: func(c *cli.Context) {
-			crawlAuthor(authorInteractor)
-			crawlArticle(articleInteractor)
+			crawlAuthor(kr.AuthorInteractor)
+			crawlArticle(kr.ArticleInteractor)
 		},
 		Subcommands: []cli.Command{{
 			Name:  "authors",
 			Usage: "Crawl all authors from krautreporter.de",
 			Action: func(c *cli.Context) {
-				crawlAuthor(authorInteractor)
+				crawlAuthor(kr.AuthorInteractor)
 			},
 		}, {
 			Name:  "articles",
 			Usage: "Crawl all articles from krautreporter.de",
 			Action: func(c *cli.Context) {
-				crawlArticle(articleInteractor)
+				crawlArticle(kr.ArticleInteractor)
 			},
 		}},
 	}
