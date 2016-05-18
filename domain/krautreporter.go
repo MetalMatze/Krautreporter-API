@@ -15,7 +15,8 @@ func NewKrautreporter(g *gollection.Gollection) *Krautreporter {
 	return &Krautreporter{
 		AuthorInteractor: interactor.AuthorInteractor{
 			AuthorRepository: repository.GormAuthorRepository{
-				DB: g.DB,
+				Cache: g.Cache,
+				DB:    g.DB,
 			},
 		},
 		ArticleInteractor: interactor.ArticleInteractor{

@@ -6,11 +6,14 @@ import (
 	"strings"
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
+	"github.com/jinzhu/gorm"
 )
 
 var ErrArticleNotFound = errors.New("Article not found")
 
-type GormArticleRepository GormRepository
+type GormArticleRepository struct {
+	DB *gorm.DB
+}
 
 func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
 	var a entity.Article

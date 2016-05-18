@@ -7,6 +7,7 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/Krautreporter-API/http"
 	"github.com/MetalMatze/gollection"
+	"github.com/MetalMatze/gollection/cache"
 	"github.com/MetalMatze/gollection/database"
 	"github.com/MetalMatze/gollection/router"
 )
@@ -16,7 +17,8 @@ func main() {
 	g := gollection.New(config)
 
 	g.AddDB(database.Postgres(config))
-	g.AddRedis(gollection.NewRedis(config))
+	//g.AddRedis(gollection.NewRedis(config))
+	g.AddCache(cache.NewInMemory())
 	g.AddRouter(router.NewGin())
 
 	kr := domain.NewKrautreporter(g)
