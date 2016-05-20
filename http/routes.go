@@ -13,6 +13,7 @@ func Routes(kr *domain.Krautreporter) func(router.Router) {
 		r.GET("/authors/:id", authorsController.GetAuthor)
 
 		articlesController := controller.ArticlesController{ArticleInteractor: kr.ArticleInteractor}
+		r.GET("/articles", articlesController.GetArticles)
 		r.GET("/articles/:id", articlesController.GetArticle)
 	}
 }

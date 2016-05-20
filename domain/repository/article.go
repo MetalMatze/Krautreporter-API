@@ -15,6 +15,15 @@ type GormArticleRepository struct {
 	DB *gorm.DB
 }
 
+func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Article, error) {
+	var articles []*entity.Article
+	if result := r.DB.Where("id <= ?", id).Limit(number).Order("ordering desc").Find(&articles); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return articles, nil
+}
+
 func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
 	var a entity.Article
 	r.DB.First(&a, "id = ?", id)

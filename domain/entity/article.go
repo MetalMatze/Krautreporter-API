@@ -2,11 +2,6 @@ package entity
 
 import "time"
 
-type ArticleRepository interface {
-	SaveAll([]Article) error
-	FindByID(int) (*Article, error)
-}
-
 type Article struct {
 	ID        int       `json:"id"`
 	Ordering  int       `json:"order"`
@@ -22,5 +17,5 @@ type Article struct {
 
 	AuthorID int     `json:"author_id"`
 	Author   *Author `json:"-"`
-	Images   []Image `gorm:"polymorphic:Imageable;"`
+	Images   []Image `gorm:"polymorphic:Imageable;" json:"-"`
 }
