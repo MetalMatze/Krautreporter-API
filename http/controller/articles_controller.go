@@ -5,7 +5,9 @@ import (
 	"strconv"
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
+	"github.com/MetalMatze/Krautreporter-API/domain/repository"
 	"github.com/MetalMatze/gollection/router"
+	"github.com/gin-gonic/gin"
 )
 
 type ArticleInteractor interface {
@@ -18,7 +20,7 @@ type ArticlesController struct {
 }
 
 func (c *ArticlesController) GetArticles(req router.Request, res router.Response) error {
-	id := 123456789
+	id := repository.MaxArticleID
 	if req.Query("olderthan") != "" {
 		olderthan, err := strconv.Atoi(req.Query("olderthan"))
 		if err != nil {
@@ -29,6 +31,14 @@ func (c *ArticlesController) GetArticles(req router.Request, res router.Response
 
 	articles, err := c.ArticleInteractor.FindOlderThan(id, 20)
 	if err != nil {
+		if err == repository.ErrArticleNotFound {
+			status := http.StatusNotFound
+			return res.JSON(status, gin.H{
+				"message":     http.StatusText(status),
+				"status_code": status,
+			})
+		}
+
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 

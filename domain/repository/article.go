@@ -9,6 +9,8 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+const MaxArticleID int = 1234567890
+
 var ErrArticleNotFound = errors.New("Article not found")
 
 type GormArticleRepository struct {
@@ -16,8 +18,18 @@ type GormArticleRepository struct {
 }
 
 func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Article, error) {
+	ordering := MaxArticleID
+	if id != MaxArticleID {
+		a, err := r.FindByID(id)
+		if err != nil {
+			return nil, err
+		}
+
+		ordering = a.Ordering
+	}
+
 	var articles []*entity.Article
-	if result := r.DB.Where("id <= ?", id).Limit(number).Order("ordering desc").Find(&articles); result.Error != nil {
+	if result := r.DB.Where("ordering < ?", ordering).Limit(number).Order("ordering desc").Find(&articles); result.Error != nil {
 		return nil, result.Error
 	}
 
