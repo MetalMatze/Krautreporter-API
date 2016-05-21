@@ -20,7 +20,7 @@ func main() {
 
 	kr := domain.NewKrautreporter(g)
 
-	g.AddRoutes(http.Routes(kr))
+	g.AddRoutes(http.Routes(g, kr))
 	g.AddCommands(cli.CrawlCommand(kr))
 
 	if err := g.Run(); err != nil {

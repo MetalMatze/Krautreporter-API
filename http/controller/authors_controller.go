@@ -6,6 +6,7 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/repository"
+	"github.com/MetalMatze/gollection/log"
 	"github.com/MetalMatze/gollection/router"
 	"github.com/gin-gonic/gin"
 )
@@ -17,11 +18,13 @@ type AuthorInteractor interface {
 
 type AuthorsController struct {
 	AuthorInteractor AuthorInteractor
+	Log              log.Logger
 }
 
 func (c *AuthorsController) GetAuthors(req router.Request, res router.Response) error {
 	authors, err := c.AuthorInteractor.GetAll()
 	if err != nil {
+		c.Log.Info("Can't get all authors", "err", err.Error())
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
@@ -31,16 +34,19 @@ func (c *AuthorsController) GetAuthors(req router.Request, res router.Response) 
 func (c *AuthorsController) GetAuthor(req router.Request, res router.Response) error {
 	id, err := strconv.Atoi(req.Param("id"))
 	if err != nil {
+		c.Log.Info("Can't convert author id to int", "err", err.Error())
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
 	author, err := c.AuthorInteractor.FindByID(id)
 	if err != nil {
 		if err == repository.ErrAuthorNotFound {
+			c.Log.Debug("Can't find author", "id", id)
 			status := http.StatusNotFound
 			return res.JSON(status, gin.H{"message": http.StatusText(status), "status_code": status})
 		}
 
+		c.Log.Warn("Can't get author", "id", id, "err", err.Error())
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
