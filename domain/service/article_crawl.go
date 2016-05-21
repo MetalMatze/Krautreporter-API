@@ -8,6 +8,7 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/PuerkitoBio/goquery"
+	"strings"
 )
 
 const mainURL string = "https://krautreporter.de"
@@ -67,8 +68,8 @@ func parseArticle(s *goquery.Selection) (entity.Article, error) {
 
 	return entity.Article{
 		ID:      id,
-		URL:     url,
-		Title:   s.Find(".item__title").Text(),
+		URL:     strings.TrimSpace(url),
+		Title:   strings.TrimSpace(s.Find(".item__title").Text()),
 		Preview: preview,
 		Author: &entity.Author{
 			Name: s.Find(".meta").Text(),
