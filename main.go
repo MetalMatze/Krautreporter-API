@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/MetalMatze/Krautreporter-API/cli"
 	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/Krautreporter-API/http"
@@ -17,7 +15,6 @@ func main() {
 	g := gollection.New(config)
 
 	g.AddDB(database.Postgres(config))
-	//g.AddRedis(gollection.NewRedis(config))
 	g.AddCache(cache.NewInMemory())
 	g.AddRouter(router.NewGin())
 
@@ -27,6 +24,6 @@ func main() {
 	g.AddCommands(cli.CrawlCommand(kr))
 
 	if err := g.Run(); err != nil {
-		log.Fatal(err)
+		g.Log.Crit("gollection error", "err", err)
 	}
 }
