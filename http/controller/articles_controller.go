@@ -21,7 +21,7 @@ type ArticlesController struct {
 	Log               log.Logger
 }
 
-func (c *ArticlesController) GetArticles(req router.Request, res router.Response) error {
+func (c *ArticlesController) GetArticles(res router.Response, req router.Request) error {
 	id := repository.MaxArticleID
 	if req.Query("olderthan") != "" {
 		olderthan, err := strconv.Atoi(req.Query("olderthan"))
@@ -50,7 +50,7 @@ func (c *ArticlesController) GetArticles(req router.Request, res router.Response
 	return res.JSON(http.StatusOK, articles)
 }
 
-func (c *ArticlesController) GetArticle(req router.Request, res router.Response) error {
+func (c *ArticlesController) GetArticle(res router.Response, req router.Request) error {
 	id, err := strconv.Atoi(req.Param("id"))
 	if err != nil {
 		c.Log.Info("Can't convert article id to int", "err", err.Error())

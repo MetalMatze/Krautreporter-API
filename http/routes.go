@@ -11,7 +11,7 @@ import (
 
 func Routes(g *gollection.Gollection, kr *domain.Krautreporter) func(router.Router) {
 	return func(r router.Router) {
-		r.GET("/", func(req router.Request, res router.Response) error {
+		r.GET("/", func(res router.Response, req router.Request) error {
 			return res.String(http.StatusOK, "hi")
 		})
 

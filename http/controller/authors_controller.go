@@ -21,7 +21,7 @@ type AuthorsController struct {
 	Log              log.Logger
 }
 
-func (c *AuthorsController) GetAuthors(req router.Request, res router.Response) error {
+func (c *AuthorsController) GetAuthors(res router.Response, req router.Request) error {
 	authors, err := c.AuthorInteractor.GetAll()
 	if err != nil {
 		c.Log.Info("Can't get all authors", "err", err.Error())
@@ -31,7 +31,7 @@ func (c *AuthorsController) GetAuthors(req router.Request, res router.Response) 
 	return res.JSON(http.StatusOK, authors)
 }
 
-func (c *AuthorsController) GetAuthor(req router.Request, res router.Response) error {
+func (c *AuthorsController) GetAuthor(res router.Response, req router.Request) error {
 	id, err := strconv.Atoi(req.Param("id"))
 	if err != nil {
 		c.Log.Info("Can't convert author id to int", "err", err.Error())
