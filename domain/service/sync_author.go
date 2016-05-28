@@ -13,7 +13,7 @@ import (
 var IDRegex = regexp.MustCompile(`\/(\d*)--`)
 var SrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
-func CrawlAuthor() ([]entity.Author, error) {
+func SyncAuthor() ([]entity.Author, error) {
 	doc, err := goquery.NewDocument("https://krautreporter.de")
 	if err != nil {
 		return nil, err

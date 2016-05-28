@@ -14,7 +14,7 @@ import (
 const mainURL string = "https://krautreporter.de"
 const moreURL string = "https://krautreporter.de/articles%s/load_more_navigation_items"
 
-func CrawlArticles() ([]entity.Article, error) {
+func SyncArticles() ([]entity.Article, error) {
 	url := mainURL
 	articles := []entity.Article{}
 	for {

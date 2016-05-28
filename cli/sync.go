@@ -17,32 +17,32 @@ type ArticleInteractor interface {
 	SaveAll(authors []entity.Article) error
 }
 
-func CrawlCommand(kr *domain.Krautreporter) cli.Command {
+func SyncCommand(kr *domain.Krautreporter) cli.Command {
 	return cli.Command{
-		Name:  "crawl",
-		Usage: "Crawl krautreporter.de to get authors & articles",
+		Name:  "sync",
+		Usage: "Sync authors & article from krautreporter.de",
 		Action: func(c *cli.Context) {
-			crawlAuthor(kr.AuthorInteractor)
-			crawlArticle(kr.ArticleInteractor)
+			syncAuthor(kr.AuthorInteractor)
+			syncArticle(kr.ArticleInteractor)
 		},
 		Subcommands: []cli.Command{{
 			Name:  "authors",
-			Usage: "Crawl all authors from krautreporter.de",
+			Usage: "Sync all authors from krautreporter.de",
 			Action: func(c *cli.Context) {
-				crawlAuthor(kr.AuthorInteractor)
+				syncAuthor(kr.AuthorInteractor)
 			},
 		}, {
 			Name:  "articles",
-			Usage: "Crawl all articles from krautreporter.de",
+			Usage: "Sync all articles from krautreporter.de",
 			Action: func(c *cli.Context) {
-				crawlArticle(kr.ArticleInteractor)
+				syncArticle(kr.ArticleInteractor)
 			},
 		}},
 	}
 }
 
-func crawlAuthor(authorInteractor AuthorInteractor) {
-	authors, err := service.CrawlAuthor()
+func syncAuthor(authorInteractor AuthorInteractor) {
+	authors, err := service.SyncAuthor()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,8 +52,8 @@ func crawlAuthor(authorInteractor AuthorInteractor) {
 	}
 }
 
-func crawlArticle(articlesInteractor ArticleInteractor) {
-	articles, err := service.CrawlArticles()
+func syncArticle(articlesInteractor ArticleInteractor) {
+	articles, err := service.SyncArticles()
 	if err != nil {
 		log.Fatal(err)
 	}
