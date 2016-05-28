@@ -6,7 +6,7 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/service"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 type AuthorInteractor interface {
