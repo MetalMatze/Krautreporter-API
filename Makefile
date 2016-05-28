@@ -10,7 +10,7 @@ PACKAGES = $(shell go list ./... | grep -v /vendor/)
 all: deps build test
 
 clean:
-	go clean -i ./...
+	if [ -f app ] ; then rm -f app ; fi
 
 deps:
 	go get -u github.com/govend/govend
