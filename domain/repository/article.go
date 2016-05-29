@@ -7,6 +7,7 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 const MaxArticleID int = 1234567890
@@ -62,6 +63,7 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 		a.Author = nil
 
 		if _, err := r.FindByID(a.ID); err == ErrArticleNotFound {
+			a.Crawl = entity.Crawl{Next: time.Now()} // Create crawl if article is new
 			if result := tx.Create(&a); result.Error != nil {
 				return result.Error
 			}

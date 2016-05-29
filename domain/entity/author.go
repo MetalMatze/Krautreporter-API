@@ -9,7 +9,7 @@ type AuthorRepository interface {
 }
 
 type Author struct {
-	ID          int       `gorm:"primary_key" json:"id"`
+	ID          int       `json:"id"`
 	Ordering    int       `json:"order"`
 	Name        string    `json:"name"`
 	Title       string    `json:"title"`
@@ -20,4 +20,5 @@ type Author struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 
 	Images []Image `gorm:"polymorphic:Imageable;" json:"images"`
+	Crawl  Crawl   `gorm:"polymorphic:Crawlable;" json:"crawl"`
 }

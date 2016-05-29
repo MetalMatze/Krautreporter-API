@@ -52,6 +52,7 @@ func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
 	tx := r.DB.Begin()
 	for _, a := range authors {
 		if author, err := r.FindByID(a.ID); err == ErrAuthorNotFound {
+			a.Crawl = entity.Crawl{Next: time.Now()} // Create crawl if author is new
 			if result := tx.Create(&a); result.Error != nil {
 				return result.Error
 			}
