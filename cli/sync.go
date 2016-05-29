@@ -21,21 +21,24 @@ func SyncCommand(kr *domain.Krautreporter) cli.Command {
 	return cli.Command{
 		Name:  "sync",
 		Usage: "Sync authors & article from krautreporter.de",
-		Action: func(c *cli.Context) {
+		Action: func(c *cli.Context) error {
 			syncAuthor(kr.AuthorInteractor)
 			syncArticle(kr.ArticleInteractor)
+			return nil
 		},
 		Subcommands: []cli.Command{{
 			Name:  "authors",
 			Usage: "Sync all authors from krautreporter.de",
-			Action: func(c *cli.Context) {
+			Action: func(c *cli.Context) error {
 				syncAuthor(kr.AuthorInteractor)
+				return nil
 			},
 		}, {
 			Name:  "articles",
 			Usage: "Sync all articles from krautreporter.de",
-			Action: func(c *cli.Context) {
+			Action: func(c *cli.Context) error {
 				syncArticle(kr.ArticleInteractor)
+				return nil
 			},
 		}},
 	}
