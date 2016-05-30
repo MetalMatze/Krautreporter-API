@@ -6,6 +6,7 @@ type AuthorRepository interface {
 	Find() ([]*Author, error)
 	FindByID(int) (*Author, error)
 	SaveAll([]Author) error
+	Save(Author) error
 }
 
 type Author struct {

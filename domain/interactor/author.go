@@ -19,3 +19,7 @@ func (i AuthorInteractor) SaveAll(authors []entity.Author) error {
 func (i AuthorInteractor) FindByID(id int) (*entity.Author, error) {
 	return i.AuthorRepository.FindByID(id)
 }
+
+func (i AuthorInteractor) Save(author entity.Author) error {
+	return i.AuthorRepository.Save(author)
+}

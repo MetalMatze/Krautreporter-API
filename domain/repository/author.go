@@ -70,3 +70,11 @@ func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
 
 	return nil
 }
+
+func (r GormAuthorRepository) Save(author entity.Author) error {
+	if result := r.DB.Save(&author); result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

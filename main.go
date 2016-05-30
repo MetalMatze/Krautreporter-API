@@ -21,9 +21,12 @@ func main() {
 	kr := domain.NewKrautreporter(g)
 
 	g.AddRoutes(http.Routes(g, kr))
-	g.AddCommands(cli.CrawlCommand(kr))
+	g.AddCommands(
+		cli.SyncCommand(kr),
+		cli.CrawlCommand(kr),
+	)
 
 	if err := g.Run(); err != nil {
-		g.Log.Crit("gollection error", "err", err)
+		g.Log.Crit("Error running gollection", "err", err)
 	}
 }
