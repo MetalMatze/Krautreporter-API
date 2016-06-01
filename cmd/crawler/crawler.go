@@ -6,15 +6,15 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/gollection"
 	"github.com/MetalMatze/gollection/cache"
-	"github.com/MetalMatze/gollection/database"
 	"github.com/MetalMatze/gollection/router"
+	"github.com/MetalMatze/gollection/database/postgres"
 )
 
 func main() {
 	config := config.GetConfig()
 	g := gollection.New(config)
 
-	g.AddDB(database.Postgres(config))
+	g.AddDB(postgres.New(g.Config))
 	g.AddCache(cache.NewInMemory())
 	g.AddRouter(router.NewGin())
 
