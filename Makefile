@@ -27,7 +27,3 @@ api: $(wildcard *.go)
 
 crawler: $(wildcard *.go)
 	go build -ldflags '-s -w $(LDFLAGS)' -o crawler cmd/crawler/crawler.go
-
-docker:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o $(EXECUTABLE)
-	docker build --rm -t $(IMAGE) .
