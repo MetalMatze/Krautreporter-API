@@ -8,6 +8,7 @@ all: deps build test
 
 clean:
 	if [ -f api ] ; then rm -f api ; fi
+	if [ -f crawler ] ; then rm -f crawler ; fi
 
 deps:
 	go get -u github.com/govend/govend
@@ -23,7 +24,7 @@ test:
 build: api crawler
 
 api: $(wildcard *.go)
-	go build -ldflags '-s -w $(LDFLAGS)' -o api cmd/api/api.go
+	CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o api cmd/api/api.go
 
 crawler: $(wildcard *.go)
-	go build -ldflags '-s -w $(LDFLAGS)' -o crawler cmd/crawler/crawler.go
+	CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o crawler cmd/crawler/crawler.go
