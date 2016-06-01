@@ -11,8 +11,7 @@ clean:
 	if [ -f crawler ] ; then rm -f crawler ; fi
 
 deps:
-	go get -u github.com/govend/govend
-	govend -v
+	go get ./...
 
 lint:
 	go fmt $(PACKAGES)
