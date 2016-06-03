@@ -15,6 +15,16 @@ func Routes(g *gollection.Gollection, kr *domain.Krautreporter) func(router.Rout
 			return res.String(http.StatusOK, "hi")
 		})
 
+		r.GET("/health", func(res router.Response, req router.Request) error {
+			if g.DB.DB().Ping() != nil{
+				status := http.StatusInternalServerError
+				return res.String(status, http.StatusText(status))
+			}
+
+			status := http.StatusOK
+			return res.String(status, http.StatusText(status))
+		})
+
 		authorsController := controller.AuthorsController{AuthorInteractor: kr.AuthorInteractor, Log: g.Log}
 		r.GET("/authors", authorsController.GetAuthors)
 		r.GET("/authors/:id", authorsController.GetAuthor)
