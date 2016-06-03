@@ -7,7 +7,6 @@ import (
 	"github.com/gollection/gollection"
 	"github.com/gollection/gollection/cache"
 	"github.com/gollection/gollection/database/postgres"
-	"github.com/gollection/gollection/router"
 )
 
 func main() {
@@ -16,7 +15,6 @@ func main() {
 
 	g.AddDB(postgres.New(g.Config))
 	g.AddCache(cache.NewInMemory())
-	g.AddRouter(router.NewGin())
 
 	kr := domain.NewKrautreporter(g)
 
