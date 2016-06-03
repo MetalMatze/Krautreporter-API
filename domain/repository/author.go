@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
-	"github.com/MetalMatze/gollection/cache"
+	"github.com/gollection/gollection/cache"
 	"github.com/jinzhu/gorm"
 )
 

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/MetalMatze/gollection"
+	"github.com/gollection/gollection"
 )
 
 // GetConfig returns the gollection configuration

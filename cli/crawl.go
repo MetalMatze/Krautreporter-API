@@ -7,7 +7,7 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/service"
 	"github.com/MetalMatze/Krautreporter-API/workerqueue"
-	"github.com/MetalMatze/gollection/log"
+	"github.com/gollection/gollection/log"
 	"github.com/urfave/cli"
 )
 

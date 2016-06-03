@@ -3,8 +3,8 @@ package domain
 import (
 	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
 	"github.com/MetalMatze/Krautreporter-API/domain/repository"
-	"github.com/MetalMatze/gollection"
-	"github.com/MetalMatze/gollection/log"
+	"github.com/gollection/gollection"
+	"github.com/gollection/gollection/log"
 )
 
 type Krautreporter struct {

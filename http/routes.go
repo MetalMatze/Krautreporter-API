@@ -5,8 +5,8 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/Krautreporter-API/http/controller"
-	"github.com/MetalMatze/gollection"
-	"github.com/MetalMatze/gollection/router"
+	"github.com/gollection/gollection"
+	"github.com/gollection/gollection/router"
 )
 
 func Routes(g *gollection.Gollection, kr *domain.Krautreporter) func(router.Router) {
