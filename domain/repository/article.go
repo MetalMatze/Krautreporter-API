@@ -4,10 +4,10 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/jinzhu/gorm"
-	"time"
 )
 
 const MaxArticleID int = 1234567890

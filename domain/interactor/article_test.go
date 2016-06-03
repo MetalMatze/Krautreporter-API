@@ -1,8 +1,9 @@
 package interactor
 
 import (
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"testing"
+
+	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 )
 
 type testArticleRepository struct {

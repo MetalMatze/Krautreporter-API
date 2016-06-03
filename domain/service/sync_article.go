@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/PuerkitoBio/goquery"
-	"strings"
 )
 
 const mainURL string = "https://krautreporter.de"

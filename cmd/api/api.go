@@ -5,9 +5,9 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/Krautreporter-API/http"
 	"github.com/gollection/gollection"
-	"github.com/gollection/gollection/router"
 	"github.com/gollection/gollection/cache"
 	"github.com/gollection/gollection/database/postgres"
+	"github.com/gollection/gollection/router"
 )
 
 func main() {

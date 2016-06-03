@@ -6,9 +6,9 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/domain/entity"
 	"github.com/MetalMatze/Krautreporter-API/domain/repository"
+	"github.com/gin-gonic/gin"
 	"github.com/gollection/gollection/log"
 	"github.com/gollection/gollection/router"
-	"github.com/gin-gonic/gin"
 )
 
 type AuthorInteractor interface {
