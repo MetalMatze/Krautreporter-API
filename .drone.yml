@@ -14,6 +14,6 @@ publish:
     email: $$DOCKER_EMAIL
     repo: metalmatze/krautreporter-api
     tag: latest
-    storage_driver: overlay
+    storage_driver: vfs
     when:
       branch: go
