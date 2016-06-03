@@ -1,0 +1,10 @@
+FROM alpine:latest
+
+WORKDIR /app
+
+RUN apk update
+RUN apk add bash ca-certificates
+
+ADD crawler .
+
+ENTRYPOINT ["/app/crawler"]
