@@ -16,7 +16,7 @@ func Routes(g *gollection.Gollection, kr *domain.Krautreporter) func(router.Rout
 		})
 
 		r.GET("/health", func(res router.Response, req router.Request) error {
-			if g.DB.DB().Ping() != nil{
+			if g.DB.DB().Ping() != nil {
 				status := http.StatusInternalServerError
 				return res.String(status, http.StatusText(status))
 			}
