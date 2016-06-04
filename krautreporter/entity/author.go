@@ -21,5 +21,5 @@ type Author struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 
 	Images []Image `gorm:"polymorphic:Imageable;" json:"images"`
-	Crawl  Crawl   `gorm:"polymorphic:Crawlable;" json:"crawl"`
+	Crawl  Crawl   `gorm:"polymorphic:Crawlable;" json:"-"`
 }

@@ -18,5 +18,5 @@ type Article struct {
 	AuthorID int     `json:"author_id"`
 	Author   *Author `json:"-"`
 	Images   []Image `gorm:"polymorphic:Imageable;" json:"-"`
-	Crawl    Crawl   `gorm:"polymorphic:Crawlable;" json:"crawls"`
+	Crawl    Crawl   `gorm:"polymorphic:Crawlable;" json:"-"`
 }

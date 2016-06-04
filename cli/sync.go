@@ -3,9 +3,9 @@ package cli
 import (
 	"log"
 
-	"github.com/MetalMatze/Krautreporter-API/domain"
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
-	"github.com/MetalMatze/Krautreporter-API/domain/service"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/service"
 	"github.com/urfave/cli"
 )
 
