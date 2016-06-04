@@ -16,7 +16,7 @@ type CrawlInteractor interface {
 	SaveAuthor(entity.Author) error
 }
 
-func CrawlCommand(kr *domain.Krautreporter) cli.Command {
+func CrawlCommand(kr *krautreporter.Krautreporter) cli.Command {
 	return cli.Command{
 		Name:  "crawl",
 		Usage: "Crawl article & authors",

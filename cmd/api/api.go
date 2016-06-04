@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/MetalMatze/Krautreporter-API/config"
-	"github.com/MetalMatze/Krautreporter-API/domain"
 	"github.com/MetalMatze/Krautreporter-API/http"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter"
 	"github.com/gollection/gollection"
 	"github.com/gollection/gollection/cache"
 	"github.com/gollection/gollection/database/postgres"
@@ -18,7 +18,7 @@ func main() {
 	g.AddCache(cache.NewInMemory())
 	g.AddRouter(router.NewGin())
 
-	kr := domain.NewKrautreporter(g)
+	kr := krautreporter.New(g)
 
 	g.AddRoutes(http.Routes(g, kr))
 

@@ -1,6 +1,6 @@
 package interactor
 
-import "github.com/MetalMatze/Krautreporter-API/domain/entity"
+import "github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 
 type ArticleRepository interface {
 	SaveAll([]entity.Article) error

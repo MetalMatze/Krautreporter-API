@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
 )
 

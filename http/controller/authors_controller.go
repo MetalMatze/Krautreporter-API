@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
-	"github.com/MetalMatze/Krautreporter-API/domain/repository"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/gollection/gollection/log"
 	"github.com/gollection/gollection/router"

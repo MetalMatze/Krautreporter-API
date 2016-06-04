@@ -1,12 +1,13 @@
-package domain
+package krautreporter
 
 import (
-	"github.com/MetalMatze/Krautreporter-API/domain/interactor"
-	"github.com/MetalMatze/Krautreporter-API/domain/repository"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/interactor"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/gollection/gollection"
 	"github.com/gollection/gollection/log"
 )
 
+// Krautreporter has all domain objects and dependencies
 type Krautreporter struct {
 	AuthorInteractor  interactor.AuthorInteractor
 	ArticleInteractor interactor.ArticleInteractor
@@ -14,7 +15,8 @@ type Krautreporter struct {
 	Log               log.Logger
 }
 
-func NewKrautreporter(g *gollection.Gollection) *Krautreporter {
+// New returns a Krautreporter domain object
+func New(g *gollection.Gollection) *Krautreporter {
 	authorRepository := repository.GormAuthorRepository{
 		Cache: g.Cache,
 		DB:    g.DB,

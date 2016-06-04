@@ -1,6 +1,8 @@
 package interactor
 
-import "github.com/MetalMatze/Krautreporter-API/domain/entity"
+import (
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+)
 
 type AuthorRepository interface {
 	Save(author entity.Author) error

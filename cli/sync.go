@@ -17,7 +17,7 @@ type ArticleInteractor interface {
 	SaveAll(authors []entity.Article) error
 }
 
-func SyncCommand(kr *domain.Krautreporter) cli.Command {
+func SyncCommand(kr *krautreporter.Krautreporter) cli.Command {
 	return cli.Command{
 		Name:  "sync",
 		Usage: "Sync authors & article from krautreporter.de",

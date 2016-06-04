@@ -1,7 +1,7 @@
 package interactor
 
 import (
-	"github.com/MetalMatze/Krautreporter-API/domain/entity"
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 )
 
 type AuthorInteractor struct {
