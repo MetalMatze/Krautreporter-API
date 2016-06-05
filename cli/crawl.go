@@ -13,7 +13,9 @@ import (
 
 type CrawlInteractor interface {
 	FindOutdatedAuthors() ([]entity.Author, error)
+	FindOutdatedArticles() ([]entity.Article, error)
 	SaveAuthor(entity.Author) error
+	SaveArticle(entity.Article) error
 }
 
 func CrawlCommand(kr *krautreporter.Krautreporter) cli.Command {
@@ -27,6 +29,7 @@ func CrawlCommand(kr *krautreporter.Krautreporter) cli.Command {
 
 				crawler := newCrawler(kr.Log, kr.CrawlInteractor)
 				crawler.authors()
+				crawler.articles()
 
 				time.Sleep(5 * time.Minute)
 			}
@@ -62,11 +65,44 @@ func (c crawler) authors() {
 			a, err := service.CrawlAuthor(a)
 			if err != nil {
 				c.log.Error("Crawling author has failed", "id", a.ID, "url", a.URL)
+				return
 			}
 
-			c.interactor.SaveAuthor(a)
+			err = c.interactor.SaveAuthor(a)
+			if err != nil {
+				c.log.Warn("Failed to save crawled author", "id", a.ID, "url", a.URL, "duration", time.Since(start))
+				return
+			}
 
 			c.log.Info("Author crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
+		})
+	}
+}
+
+func (c crawler) articles() {
+	articles, err := c.interactor.FindOutdatedArticles()
+	if err != nil {
+		c.log.Warn("Can't get outdated articles from CrawlInteractor", "err", err)
+	}
+
+	for _, a := range articles {
+		c.wq.Push(func() {
+			start := time.Now()
+			a, err := service.CrawlArticle(a)
+			if err != nil {
+				c.log.Error("Crawling articles has failed", "id", a.ID, "url", a.URL)
+				return
+			}
+
+			//c.log.Debug("", "article", fmt.Sprintf("%+v", a))
+
+			err = c.interactor.SaveArticle(a)
+			if err != nil {
+				c.log.Warn("Failed to save crawled article", "id", a.ID, "url", a.URL, "duration", time.Since(start))
+				return
+			}
+
+			c.log.Info("Article crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 		})
 	}
 }

@@ -27,3 +27,18 @@ func (r CrawlRepository) FindOutdatedAuthors() ([]entity.Author, error) {
 
 	return authors, nil
 }
+
+func (r CrawlRepository) FindOutdatedArticles() ([]entity.Article, error) {
+	var crawls []*entity.Crawl
+	r.DB.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
+
+	var IDs []int
+	for _, c := range crawls {
+		IDs = append(IDs, c.CrawlableID)
+	}
+
+	var articles []entity.Article
+	r.DB.Preload("Crawl").Where(IDs).Find(&articles)
+
+	return articles, nil
+}
