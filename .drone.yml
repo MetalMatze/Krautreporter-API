@@ -28,3 +28,15 @@ publish:
     storage_driver: vfs
     when:
       branch: go
+  rancher:
+    url: $$RANCHER_URL
+    access_key: $$RANCHER_KEY
+    secret_key: $$RANCHER_SECRET
+    service: Krautreporter/api
+    docker_image: metalmatze/krautreporter-api:latest
+  rancher:
+    url: $$RANCHER_URL
+    access_key: $$RANCHER_KEY
+    secret_key: $$RANCHER_SECRET
+    service: Krautreporter/crawler
+    docker_image: metalmatze/krautreporter-crawler:latest
