@@ -3,16 +3,16 @@ package entity
 import "time"
 
 type Author struct {
-	ID          int       `json:"id"`
-	Ordering    int       `json:"order"`
-	Name        string    `json:"name"`
-	Title       string    `json:"title"`
-	URL         string    `json:"url"`
-	Biography   string    `json:"biography"`
-	SocialMedia string    `json:"social-media"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          int
+	Ordering    int
+	Name        string
+	Title       string
+	URL         string
+	Biography   string
+	SocialMedia string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 
-	Images []Image `gorm:"polymorphic:Imageable;" json:"images"`
-	Crawl  Crawl   `gorm:"polymorphic:Crawlable;" json:"-"`
+	Images []Image `gorm:"polymorphic:Imageable;"`
+	Crawl  Crawl   `gorm:"polymorphic:Crawlable;"`
 }

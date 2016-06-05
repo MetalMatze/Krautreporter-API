@@ -1,10 +1,10 @@
 package entity
 
 type Image struct {
-	ID    int    `json:"id"`
-	Width int    `json:"width"`
-	Src   string `json:"src"`
+	ID    int
+	Width int
+	Src   string
 
-	ImageableID   int    `json:"-"`
-	ImageableType string `json:"-"`
+	ImageableID   int
+	ImageableType string
 }
