@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/MetalMatze/Krautreporter-API/http/marshaller"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/gin-gonic/gin"
@@ -50,5 +51,5 @@ func (c *AuthorsController) GetAuthor(res router.Response, req router.Request) e
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	return res.JSON(http.StatusOK, author)
+	return res.JSON(http.StatusOK, marshaller.Author(author))
 }
