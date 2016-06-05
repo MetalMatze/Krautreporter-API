@@ -4,10 +4,6 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 )
 
-type AuthorRepository interface {
-	Save(author entity.Author) error
-}
-
 type CrawlRepository interface {
 	FindOutdatedAuthors() ([]entity.Author, error)
 }
