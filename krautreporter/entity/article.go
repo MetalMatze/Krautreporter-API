@@ -7,7 +7,7 @@ type Article struct {
 	Ordering  int       `json:"order"`
 	Title     string    `json:"title"`
 	Headline  string    `json:"headline"`
-	Date      string    `json:"date"`
+	Date      time.Time `json:"date"`
 	Preview   bool      `json:"preview"`
 	URL       string    `json:"url"`
 	Excerpt   string    `json:"excerpt"`

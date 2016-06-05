@@ -6,7 +6,7 @@ CREATE TABLE articles (
     ordering integer,
     title text,
     headline text,
-    date text,
+    date timestamp with time zone,
     preview boolean,
     url text,
     excerpt text,
