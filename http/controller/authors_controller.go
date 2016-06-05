@@ -29,7 +29,7 @@ func (c *AuthorsController) GetAuthors(res router.Response, req router.Request) 
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	return res.JSON(http.StatusOK, authors)
+	return res.JSON(http.StatusOK, marshaller.Authors(authors))
 }
 
 func (c *AuthorsController) GetAuthor(res router.Response, req router.Request) error {

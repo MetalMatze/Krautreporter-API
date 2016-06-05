@@ -22,6 +22,24 @@ type authorMarshaller struct {
 	Images map[string][]imageMarshaller `json:"images"`
 }
 
+func Author(a *entity.Author) map[string]authorMarshaller {
+	return map[string]authorMarshaller{
+		"data": marshallAuthor(a),
+	}
+}
+
+func Authors(authors []*entity.Author) map[string][]authorMarshaller {
+	var as []authorMarshaller
+
+	for _, a := range authors {
+		as = append(as, marshallAuthor(a))
+	}
+
+	return map[string][]authorMarshaller{
+		"data": as,
+	}
+}
+
 func marshallAuthor(a *entity.Author) authorMarshaller {
 	am := authorMarshaller{
 		ID:          a.ID,
@@ -40,10 +58,4 @@ func marshallAuthor(a *entity.Author) authorMarshaller {
 	}
 
 	return am
-}
-
-func Author(a *entity.Author) map[string]authorMarshaller {
-	return map[string]authorMarshaller{
-		"data": marshallAuthor(a),
-	}
 }

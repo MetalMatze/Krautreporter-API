@@ -40,3 +40,17 @@ func TestMarshallAuthor(t *testing.T) {
 		string(b),
 	)
 }
+
+func TestName(t *testing.T) {
+	authors := []*entity.Author{{
+		ID:       1,
+		Ordering: 1,
+	}, {
+		ID:       2,
+		Ordering: 0,
+	}}
+
+	b, err := json.Marshal(Authors(authors))
+	assert.Nil(t, err)
+	assert.JSONEq(t, `{"data":[{"id":1,"order":1,"name":"","title":"","url":"https://krautreporter.de","biography":"","socialmedia":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","images":null},{"id":2,"order":0,"name":"","title":"","url":"https://krautreporter.de","biography":"","socialmedia":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","images":null}]}`, string(b))
+}
