@@ -78,3 +78,11 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 
 	return nil
 }
+
+func (r GormArticleRepository) Save(article entity.Article) error {
+	if result := r.DB.Save(&article); result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

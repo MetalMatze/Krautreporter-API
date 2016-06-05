@@ -6,6 +6,7 @@ type ArticleRepository interface {
 	SaveAll([]entity.Article) error
 	FindOlderThan(id int, number int) ([]*entity.Article, error)
 	FindByID(int) (*entity.Article, error)
+	Save(entity.Article) error
 }
 
 type ArticleInteractor struct {
