@@ -4,8 +4,15 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 )
 
+type AuthorRepository interface {
+	Find() ([]*entity.Author, error)
+	FindByID(int) (*entity.Author, error)
+	SaveAll([]entity.Author) error
+	Save(entity.Author) error
+}
+
 type AuthorInteractor struct {
-	AuthorRepository entity.AuthorRepository
+	AuthorRepository AuthorRepository
 }
 
 func (i AuthorInteractor) GetAll() ([]*entity.Author, error) {
