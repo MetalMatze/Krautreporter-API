@@ -21,9 +21,7 @@ func (r CrawlRepository) FindOutdatedAuthors() ([]entity.Author, error) {
 	}
 
 	var authors []entity.Author
-	r.DB.LogMode(true)
 	r.DB.Preload("Crawl").Where(IDs).Find(&authors)
-	r.DB.LogMode(false)
 
 	return authors, nil
 }
