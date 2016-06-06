@@ -7,7 +7,7 @@ type Article struct {
 	Ordering  int
 	Title     string
 	Headline  string
-	Date      string
+	Date      time.Time
 	Preview   bool
 	URL       string
 	Excerpt   string

@@ -11,7 +11,7 @@ type articleMarshaller struct {
 	Ordering   int       `json:"order"`
 	Title      string    `json:"title"`
 	Headline   string    `json:"headline"`
-	Date       string    `json:"date"`
+	Date       time.Time `json:"date"`
 	Morgenpost bool      `json:"morgenpost"`
 	Preview    bool      `json:"preview"`
 	URL        string    `json:"url"`
