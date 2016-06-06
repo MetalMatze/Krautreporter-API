@@ -26,7 +26,7 @@ func TestMarshallArticle(t *testing.T) {
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
-		`{"data":{"id":123,"order":10,"title":"Title","headline":"Headline","date":"","morgenpost":false,"preview":true,"url":"https://krautreporter.de/123--article","excerpt":"foo","content":"bar","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":13,"images":null}}`,
+		`{"data":{"id":123,"order":10,"title":"Title","headline":"Headline","date":"0001-01-01T00:00:00Z","morgenpost":false,"preview":true,"url":"https://krautreporter.de/123--article","excerpt":"foo","content":"bar","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":13,"images":null}}`,
 		string(b),
 	)
 
@@ -36,7 +36,7 @@ func TestMarshallArticle(t *testing.T) {
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
-		`{"data":{"id":123,"order":10,"title":"Title","headline":"Headline","date":"","morgenpost":false,"preview":true,"url":"https://krautreporter.de/123--article","excerpt":"foo","content":"bar","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":13,"images":{"data":[{"id":123,"width":256,"src":"https://krautreporter.de/foo.jpg"}]}}}`,
+		`{"data":{"id":123,"order":10,"title":"Title","headline":"Headline","date":"0001-01-01T00:00:00Z","morgenpost":false,"preview":true,"url":"https://krautreporter.de/123--article","excerpt":"foo","content":"bar","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":13,"images":{"data":[{"id":123,"width":256,"src":"https://krautreporter.de/foo.jpg"}]}}}`,
 		string(b),
 	)
 }
@@ -54,7 +54,7 @@ func TestMarshallArticles(t *testing.T) {
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
-		`{"data":[{"id":1,"order":1,"title":"","headline":"","date":"","morgenpost":false,"preview":false,"url":"https://krautreporter.de","excerpt":"","content":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":0,"images":null},{"id":2,"order":0,"title":"","headline":"","date":"","morgenpost":false,"preview":false,"url":"https://krautreporter.de","excerpt":"","content":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":0,"images":null}]}`,
+		`{"data":[{"id":1,"order":1,"title":"","headline":"","date":"0001-01-01T00:00:00Z","morgenpost":false,"preview":false,"url":"https://krautreporter.de","excerpt":"","content":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":0,"images":null},{"id":2,"order":0,"title":"","headline":"","date":"0001-01-01T00:00:00Z","morgenpost":false,"preview":false,"url":"https://krautreporter.de","excerpt":"","content":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","author_id":0,"images":null}]}`,
 		string(b),
 	)
 }
