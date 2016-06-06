@@ -28,7 +28,8 @@ func New(g *gollection.Gollection) *Krautreporter {
 		},
 		ArticleInteractor: interactor.ArticleInteractor{
 			ArticleRepository: repository.GormArticleRepository{
-				DB: g.DB,
+				DB:  g.DB,
+				Log: g.Log,
 			},
 		},
 		CrawlInteractor: interactor.CrawlInteractor{

@@ -2,11 +2,11 @@ package repository
 
 import (
 	"errors"
-	"log"
 	"strings"
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/gollection/gollection/log"
 	"github.com/jinzhu/gorm"
 )
 
@@ -15,7 +15,8 @@ const MaxArticleID int = 1234567890
 var ErrArticleNotFound = errors.New("Article not found")
 
 type GormArticleRepository struct {
-	DB *gorm.DB
+	DB  *gorm.DB
+	Log log.Logger
 }
 
 func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Article, error) {
@@ -56,7 +57,7 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 		var author entity.Author
 		r.DB.First(&author, "name = ?", strings.TrimSpace(a.Author.Name))
 		if author.ID == 0 {
-			log.Printf(`Can't find author "%s" for article %s`, a.Author.Name, a.URL)
+			r.Log.Warn("Can't find author for article ", "author", a.Author.Name, "article", a.URL)
 			continue
 		}
 		a.AuthorID = author.ID

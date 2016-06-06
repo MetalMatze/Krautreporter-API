@@ -1,11 +1,10 @@
 package cli
 
 import (
-	"log"
-
 	"github.com/MetalMatze/Krautreporter-API/krautreporter"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/service"
+	"github.com/gollection/gollection/log"
 	"github.com/urfave/cli"
 )
 
@@ -22,46 +21,46 @@ func SyncCommand(kr *krautreporter.Krautreporter) cli.Command {
 		Name:  "sync",
 		Usage: "Sync authors & article from krautreporter.de",
 		Action: func(c *cli.Context) error {
-			syncAuthor(kr.AuthorInteractor)
-			syncArticle(kr.ArticleInteractor)
+			syncAuthor(kr.Log, kr.AuthorInteractor)
+			syncArticle(kr.Log, kr.ArticleInteractor)
 			return nil
 		},
 		Subcommands: []cli.Command{{
 			Name:  "authors",
 			Usage: "Sync all authors from krautreporter.de",
 			Action: func(c *cli.Context) error {
-				syncAuthor(kr.AuthorInteractor)
+				syncAuthor(kr.Log, kr.AuthorInteractor)
 				return nil
 			},
 		}, {
 			Name:  "articles",
 			Usage: "Sync all articles from krautreporter.de",
 			Action: func(c *cli.Context) error {
-				syncArticle(kr.ArticleInteractor)
+				syncArticle(kr.Log, kr.ArticleInteractor)
 				return nil
 			},
 		}},
 	}
 }
 
-func syncAuthor(authorInteractor AuthorInteractor) {
-	authors, err := service.SyncAuthor()
+func syncAuthor(log log.Logger, authorInteractor AuthorInteractor) {
+	authors, err := service.SyncAuthor(log)
 	if err != nil {
-		log.Fatal(err)
+		log.Error("Failed to sync authors", "err", err)
 	}
 
 	if err := authorInteractor.SaveAll(authors); err != nil {
-		log.Fatal(err)
+		log.Error("Failed to save authors", "err", err)
 	}
 }
 
-func syncArticle(articlesInteractor ArticleInteractor) {
-	articles, err := service.SyncArticles()
+func syncArticle(log log.Logger, articlesInteractor ArticleInteractor) {
+	articles, err := service.SyncArticles(log)
 	if err != nil {
-		log.Fatal(err)
+		log.Error("Failed to sync articles", "err", err)
 	}
 
 	if err := articlesInteractor.SaveAll(articles); err != nil {
-		log.Fatal(err)
+		log.Error("Failed to save articles", "err", err)
 	}
 }

@@ -22,8 +22,8 @@ func CrawlCommand(kr *krautreporter.Krautreporter) cli.Command {
 		Usage: "Crawl article & authors",
 		Action: func(c *cli.Context) error {
 			for {
-				syncAuthor(kr.AuthorInteractor)
-				syncArticle(kr.ArticleInteractor)
+				syncAuthor(kr.Log, kr.AuthorInteractor)
+				syncArticle(kr.Log, kr.ArticleInteractor)
 
 				crawler := newCrawler(kr.Log, kr.CrawlInteractor)
 				crawler.authors()

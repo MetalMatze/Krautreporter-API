@@ -1,26 +1,28 @@
 package service
 
 import (
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gollection/gollection/log"
 )
 
 var IDRegex = regexp.MustCompile(`\/(\d*)--`)
 var SrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
-func SyncAuthor() ([]entity.Author, error) {
+func SyncAuthor(log log.Logger) ([]entity.Author, error) {
+	start := time.Now()
+
 	doc, err := goquery.NewDocument("https://krautreporter.de")
 	if err != nil {
 		return nil, err
 	}
 
 	authorNodes := doc.Find("#author-list-tab li a")
-	log.Printf("Found %d authors", authorNodes.Length())
 
 	authors := []entity.Author{}
 	authorNodes.Each(func(i int, s *goquery.Selection) {
@@ -41,6 +43,8 @@ func SyncAuthor() ([]entity.Author, error) {
 
 		authors = append(authors, author)
 	})
+
+	log.Info("Synced authors", "count", authorNodes.Length(), "duration", time.Since(start))
 
 	return authors, nil
 }
