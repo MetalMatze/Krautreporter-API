@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/MetalMatze/Krautreporter-API/http/marshaller"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/gin-gonic/gin"
@@ -47,7 +48,7 @@ func (c *ArticlesController) GetArticles(res router.Response, req router.Request
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	return res.JSON(http.StatusOK, articles)
+	return res.JSON(http.StatusOK, marshaller.Articles(articles))
 }
 
 func (c *ArticlesController) GetArticle(res router.Response, req router.Request) error {
@@ -63,5 +64,5 @@ func (c *ArticlesController) GetArticle(res router.Response, req router.Request)
 		return res.AbortWithStatus(http.StatusNotFound)
 	}
 
-	return res.JSON(http.StatusOK, article)
+	return res.JSON(http.StatusOK, marshaller.Article(article))
 }
