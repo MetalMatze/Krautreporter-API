@@ -14,6 +14,7 @@ import (
 var IDRegex = regexp.MustCompile(`\/(\d*)`)
 var SrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
+// SyncAuthor finds all author's meta data from the krautreporter homepage
 func SyncAuthor(log log.Logger) ([]entity.Author, error) {
 	start := time.Now()
 
