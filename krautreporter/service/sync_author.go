@@ -11,7 +11,7 @@ import (
 	"github.com/gollection/gollection/log"
 )
 
-var IDRegex = regexp.MustCompile(`\/(\d*)--`)
+var IDRegex = regexp.MustCompile(`\/(\d*)`)
 var SrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
 func SyncAuthor(log log.Logger) ([]entity.Author, error) {
