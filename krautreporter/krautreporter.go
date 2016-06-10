@@ -22,19 +22,22 @@ func New(g *gollection.Gollection) *Krautreporter {
 		DB:    g.DB,
 	}
 
+	articleRepository := repository.GormArticleRepository{
+		DB:  g.DB,
+		Log: g.Log,
+	}
+
 	return &Krautreporter{
 		AuthorInteractor: interactor.AuthorInteractor{
 			AuthorRepository: authorRepository,
 		},
 		ArticleInteractor: interactor.ArticleInteractor{
-			ArticleRepository: repository.GormArticleRepository{
-				DB:  g.DB,
-				Log: g.Log,
-			},
+			ArticleRepository: articleRepository,
 		},
 		CrawlInteractor: interactor.CrawlInteractor{
-			AuthorRepository: authorRepository,
-			CrawlRepository:  repository.CrawlRepository{DB: g.DB},
+			AuthorRepository:  authorRepository,
+			ArticleRepository: articleRepository,
+			CrawlRepository:   repository.CrawlRepository{DB: g.DB},
 		},
 		Log: g.Log,
 	}
