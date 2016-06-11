@@ -9,10 +9,9 @@ import (
 
 // Krautreporter has all domain objects and dependencies
 type Krautreporter struct {
-	AuthorInteractor  interactor.AuthorInteractor
-	ArticleInteractor interactor.ArticleInteractor
-	CrawlInteractor   interactor.CrawlInteractor
-	Log               log.Logger
+	CrawlInteractor *interactor.CrawlInteractor
+	HTTPInteractor  *interactor.HTTPInteractor
+	Log             log.Logger
 }
 
 // New returns a Krautreporter domain object
@@ -27,18 +26,18 @@ func New(g *gollection.Gollection) *Krautreporter {
 		Log: g.Log,
 	}
 
+	crawlRepository := repository.CrawlRepository{DB: g.DB}
+
 	return &Krautreporter{
-		AuthorInteractor: interactor.AuthorInteractor{
-			AuthorRepository: authorRepository,
-		},
-		ArticleInteractor: interactor.ArticleInteractor{
-			ArticleRepository: articleRepository,
-		},
-		CrawlInteractor: interactor.CrawlInteractor{
-			AuthorRepository:  authorRepository,
-			ArticleRepository: articleRepository,
-			CrawlRepository:   repository.CrawlRepository{DB: g.DB},
-		},
+		CrawlInteractor: interactor.NewCrawlInteractor(
+			authorRepository,
+			articleRepository,
+			crawlRepository,
+		),
+		HTTPInteractor: interactor.NewHTTPInteractor(
+			authorRepository,
+			articleRepository,
+		),
 		Log: g.Log,
 	}
 }
