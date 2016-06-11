@@ -94,8 +94,6 @@ func (c crawler) articles() {
 				return
 			}
 
-			//c.log.Debug("", "article", fmt.Sprintf("%+v", a))
-
 			err = c.interactor.SaveArticle(a)
 			if err != nil {
 				c.log.Warn("Failed to save crawled article", "id", a.ID, "url", a.URL, "duration", time.Since(start))
