@@ -21,6 +21,10 @@ func (r testArticleRepository) FindByID(int) (*entity.Article, error) {
 	return nil, nil
 }
 
+func (r testArticleRepository) Save(entity.Article) error {
+	return nil
+}
+
 func TestArticleInteractor_SaveAll(t *testing.T) {
 	ai := ArticleInteractor{ArticleRepository: testArticleRepository{}}
 
