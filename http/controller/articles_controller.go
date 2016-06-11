@@ -8,7 +8,6 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/gin-gonic/gin"
-	"github.com/gollection/gollection/log"
 	"github.com/gollection/gollection/router"
 )
 
@@ -18,8 +17,8 @@ type ArticleInteractor interface {
 }
 
 type ArticlesController struct {
+	Controller
 	ArticleInteractor ArticleInteractor
-	Log               log.Logger
 }
 
 func (c *ArticlesController) GetArticles(res router.Response, req router.Request) error {
@@ -27,7 +26,7 @@ func (c *ArticlesController) GetArticles(res router.Response, req router.Request
 	if req.Query("olderthan") != "" {
 		olderthan, err := strconv.Atoi(req.Query("olderthan"))
 		if err != nil {
-			c.Log.Info("Can't convert olderthan id to int", "err", err.Error())
+			c.log.Info("Can't convert olderthan id to int", "err", err.Error())
 			return res.AbortWithStatus(http.StatusInternalServerError)
 		}
 		id = olderthan
@@ -36,7 +35,7 @@ func (c *ArticlesController) GetArticles(res router.Response, req router.Request
 	articles, err := c.ArticleInteractor.FindOlderThan(id, 20)
 	if err != nil {
 		if err == repository.ErrArticleNotFound {
-			c.Log.Debug("Can't find olderthan article", "id", id)
+			c.log.Debug("Can't find olderthan article", "id", id)
 			status := http.StatusNotFound
 			return res.JSON(status, gin.H{
 				"message":     http.StatusText(status),
@@ -44,7 +43,7 @@ func (c *ArticlesController) GetArticles(res router.Response, req router.Request
 			})
 		}
 
-		c.Log.Warn("Failed to get olderthan articles", "id", id, "err", err)
+		c.log.Warn("Failed to get olderthan articles", "id", id, "err", err)
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
@@ -54,13 +53,13 @@ func (c *ArticlesController) GetArticles(res router.Response, req router.Request
 func (c *ArticlesController) GetArticle(res router.Response, req router.Request) error {
 	id, err := strconv.Atoi(req.Param("id"))
 	if err != nil {
-		c.Log.Info("Can't convert article id to int", "err", err.Error())
+		c.log.Info("Can't convert article id to int", "err", err.Error())
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
 	article, err := c.ArticleInteractor.FindByID(id)
 	if err != nil {
-		c.Log.Debug("Can't find article", "id", id)
+		c.log.Debug("Can't find article", "id", id)
 		return res.AbortWithStatus(http.StatusNotFound)
 	}
 

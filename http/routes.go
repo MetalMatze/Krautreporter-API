@@ -25,11 +25,13 @@ func Routes(g *gollection.Gollection, kr *krautreporter.Krautreporter) func(rout
 			return res.String(status, http.StatusText(status))
 		})
 
-		authorsController := controller.AuthorsController{AuthorInteractor: kr.AuthorInteractor, Log: g.Log}
+		c := controller.Controller{}
+
+		authorsController := controller.AuthorsController{Controller: c, AuthorInteractor: kr.AuthorInteractor}
 		r.GET("/authors", authorsController.GetAuthors)
 		r.GET("/authors/:id", authorsController.GetAuthor)
 
-		articlesController := controller.ArticlesController{ArticleInteractor: kr.ArticleInteractor, Log: g.Log}
+		articlesController := controller.ArticlesController{Controller: c, ArticleInteractor: kr.ArticleInteractor}
 		r.GET("/articles", articlesController.GetArticles)
 		r.GET("/articles/:id", articlesController.GetArticle)
 	}
