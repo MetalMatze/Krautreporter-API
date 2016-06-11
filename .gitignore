@@ -3,3 +3,5 @@
 /crawler
 /secrets.yml
 /vendor/
+
+coverage.out
