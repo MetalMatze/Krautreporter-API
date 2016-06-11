@@ -1,11 +1,12 @@
 package service
 
 import (
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
-	"github.com/PuerkitoBio/goquery"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/PuerkitoBio/goquery"
 )
 
 func CrawlArticle(a entity.Article) (entity.Article, error) {
@@ -35,6 +36,8 @@ func CrawlArticle(a entity.Article) (entity.Article, error) {
 	a.Headline = strings.TrimSpace(nodeHeader.Find("h1.article__title").Text())
 	a.Excerpt = excerpt
 	a.Content = html
+
+	a.Crawl.Next = time.Now().Add(6 * time.Hour)
 
 	return a, nil
 }
