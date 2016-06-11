@@ -11,12 +11,15 @@ type (
 	}
 	crawlAuthorRepository interface {
 		Save(entity.Author) error
+		SaveAll([]entity.Author) error
 	}
 
 	crawlArticleRepository interface {
 		Save(entity.Article) error
+		SaveAll([]entity.Article) error
 	}
 )
+
 type CrawlInteractor struct {
 	authorRepository  crawlAuthorRepository
 	articleRepository crawlArticleRepository
@@ -37,6 +40,14 @@ func (i *CrawlInteractor) FindOutdatedAuthors() ([]entity.Author, error) {
 
 func (i *CrawlInteractor) FindOutdatedArticles() ([]entity.Article, error) {
 	return i.crawlRepository.FindOutdatedArticles()
+}
+
+func (i *CrawlInteractor) SaveAuthors(as []entity.Author) error {
+	return i.authorRepository.SaveAll(as)
+}
+
+func (i *CrawlInteractor) SaveArticles(as []entity.Article) error {
+	return i.articleRepository.SaveAll(as)
 }
 
 func (i *CrawlInteractor) SaveAuthor(a entity.Author) error {

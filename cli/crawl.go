@@ -14,6 +14,10 @@ import (
 type CrawlInteractor interface {
 	FindOutdatedAuthors() ([]entity.Author, error)
 	FindOutdatedArticles() ([]entity.Article, error)
+
+	SaveAuthors([]entity.Author) error
+	SaveArticles([]entity.Article) error
+
 	SaveAuthor(entity.Author) error
 	SaveArticle(entity.Article) error
 }
@@ -24,8 +28,8 @@ func CrawlCommand(kr *krautreporter.Krautreporter) cli.Command {
 		Usage: "Crawl article & authors",
 		Action: func(c *cli.Context) error {
 			for {
-				syncAuthor(kr.Log, kr.AuthorInteractor)
-				syncArticle(kr.Log, kr.ArticleInteractor)
+				syncAuthor(kr.Log, kr.CrawlInteractor)
+				syncArticle(kr.Log, kr.CrawlInteractor)
 
 				crawler := newCrawler(kr.Log, kr.CrawlInteractor)
 				crawler.authors()
