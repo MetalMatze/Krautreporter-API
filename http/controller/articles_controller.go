@@ -5,20 +5,13 @@ import (
 	"strconv"
 
 	"github.com/MetalMatze/Krautreporter-API/http/marshaller"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/gollection/gollection/router"
 )
 
-type ArticleInteractor interface {
-	FindOlderThan(id int, number int) ([]*entity.Article, error)
-	FindByID(id int) (*entity.Article, error)
-}
-
 type ArticlesController struct {
-	Controller
-	ArticleInteractor ArticleInteractor
+	*Controller
 }
 
 func (c *ArticlesController) GetArticles(res router.Response, req router.Request) error {
@@ -32,7 +25,7 @@ func (c *ArticlesController) GetArticles(res router.Response, req router.Request
 		id = olderthan
 	}
 
-	articles, err := c.ArticleInteractor.FindOlderThan(id, 20)
+	articles, err := c.interactor.ArticlesOlderThan(id, 20)
 	if err != nil {
 		if err == repository.ErrArticleNotFound {
 			c.log.Debug("Can't find olderthan article", "id", id)
@@ -57,7 +50,7 @@ func (c *ArticlesController) GetArticle(res router.Response, req router.Request)
 		return res.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	article, err := c.ArticleInteractor.FindByID(id)
+	article, err := c.interactor.ArticleByID(id)
 	if err != nil {
 		c.log.Debug("Can't find article", "id", id)
 		return res.AbortWithStatus(http.StatusNotFound)
