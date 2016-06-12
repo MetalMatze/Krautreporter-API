@@ -37,6 +37,7 @@ func New(g *gollection.Gollection) *Krautreporter {
 		HTTPInteractor: interactor.NewHTTPInteractor(
 			authorRepository,
 			articleRepository,
+			crawlRepository,
 		),
 		Log: g.Log,
 	}

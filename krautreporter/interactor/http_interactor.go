@@ -12,15 +12,21 @@ type httpArticleRepository interface {
 	FindByID(int) (*entity.Article, error)
 }
 
+type httpCrawlRepository interface {
+	NextCrawls(limit int) ([]*entity.Crawl, error)
+}
+
 type HTTPInteractor struct {
 	authorRepository  httpAuthorRepository
 	articleRepository httpArticleRepository
+	crawlRepository   httpCrawlRepository
 }
 
-func NewHTTPInteractor(aur httpAuthorRepository, arr httpArticleRepository) *HTTPInteractor {
+func NewHTTPInteractor(aur httpAuthorRepository, arr httpArticleRepository, cr httpCrawlRepository) *HTTPInteractor {
 	return &HTTPInteractor{
 		authorRepository:  aur,
 		articleRepository: arr,
+		crawlRepository:   cr,
 	}
 }
 
@@ -38,4 +44,8 @@ func (i HTTPInteractor) ArticlesOlderThan(id int, number int) ([]*entity.Article
 
 func (i HTTPInteractor) ArticleByID(id int) (*entity.Article, error) {
 	return i.articleRepository.FindByID(id)
+}
+
+func (i HTTPInteractor) NextCrawls(limit int) ([]*entity.Crawl, error) {
+	return i.crawlRepository.NextCrawls(limit)
 }

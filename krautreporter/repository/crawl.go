@@ -40,3 +40,14 @@ func (r CrawlRepository) FindOutdatedArticles() ([]entity.Article, error) {
 
 	return articles, nil
 }
+
+// NextCrawls gets the next crawls limited by number
+func (r CrawlRepository) NextCrawls(limit int) ([]*entity.Crawl, error) {
+	var crawls []*entity.Crawl
+
+	if result := r.DB.Limit(limit).Order("next").Find(&crawls); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return crawls, nil
+}

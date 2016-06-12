@@ -11,6 +11,8 @@ type HTTPInteractor interface {
 
 	ArticlesOlderThan(id int, number int) ([]*entity.Article, error)
 	ArticleByID(id int) (*entity.Article, error)
+
+	NextCrawls(limit int) ([]*entity.Crawl, error)
 }
 
 type Controller struct {

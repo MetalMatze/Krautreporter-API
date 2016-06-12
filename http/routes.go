@@ -34,5 +34,8 @@ func Routes(g *gollection.Gollection, kr *krautreporter.Krautreporter) func(rout
 		articlesController := controller.ArticlesController{Controller: c}
 		r.GET("/articles", articlesController.GetArticles)
 		r.GET("/articles/:id", articlesController.GetArticle)
+
+		crawlsController := controller.CrawlsController{Controller: c}
+		r.GET("/crawls", crawlsController.GetCrawls)
 	}
 }
