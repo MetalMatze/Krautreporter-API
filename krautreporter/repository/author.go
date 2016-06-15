@@ -51,20 +51,21 @@ func (r GormAuthorRepository) FindByID(id int) (*entity.Author, error) {
 func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
 	tx := r.DB.Begin()
 	for _, a := range authors {
-		if author, err := r.FindByID(a.ID); err == ErrAuthorNotFound {
-			a.Crawl = entity.Crawl{Next: time.Now()} // Create crawl if author is new
-			if result := tx.Create(&a); result.Error != nil {
-				return result.Error
-			}
-		} else {
-			if len(author.Images) > 0 {
-				a.Images = author.Images
-			}
+		author := entity.Author{ID: a.ID}
+		tx.Preload("Crawl").Preload("Images").FirstOrCreate(&author)
 
-			if result := tx.Save(&a); result.Error != nil {
-				return result.Error
-			}
+		author.Ordering = a.Ordering
+		author.Name = a.Name
+		author.Title = a.Title
+		author.URL = a.URL
+
+		if author.Crawl.ID == 0 {
+			author.Crawl = entity.Crawl{Next: time.Now()}
 		}
+
+		// TODO: Save author images
+
+		tx.Save(&author)
 	}
 	tx.Commit()
 

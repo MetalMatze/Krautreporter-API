@@ -52,27 +52,27 @@ func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
 func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 	tx := r.DB.Begin()
 	for i, a := range articles {
-		a.Ordering = len(articles) - 1 - i
+		article := entity.Article{ID: a.ID}
+		tx.Preload("Crawl").FirstOrCreate(&article)
 
-		var author entity.Author
-		r.DB.First(&author, "name = ?", strings.TrimSpace(a.Author.Name))
+		article.Ordering = len(articles) - 1 - i
+		article.Title = a.Title
+		article.URL = a.URL
+		article.Preview = a.Preview
+
+		author := entity.Author{}
+		tx.First(&author, "name = ?", strings.TrimSpace(a.Author.Name))
 		if author.ID == 0 {
 			r.Log.Warn("Can't find author for article ", "author", a.Author.Name, "article", a.URL)
 			continue
 		}
-		a.AuthorID = author.ID
-		a.Author = nil
+		article.AuthorID = author.ID
 
-		if _, err := r.FindByID(a.ID); err == ErrArticleNotFound {
-			a.Crawl = entity.Crawl{Next: time.Now()} // Create crawl if article is new
-			if result := tx.Create(&a); result.Error != nil {
-				return result.Error
-			}
-		} else {
-			if result := tx.Save(&a); result.Error != nil {
-				return result.Error
-			}
+		if article.Crawl.ID == 0 {
+			article.Crawl = entity.Crawl{Next: time.Now()}
 		}
+
+		tx.Save(&article)
 	}
 	tx.Commit()
 
