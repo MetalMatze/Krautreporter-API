@@ -83,7 +83,7 @@ func parseArticle(s *goquery.Selection) (entity.Article, error) {
 		Title:   strings.TrimSpace(s.Find(".item__title").Text()),
 		Preview: preview,
 		Author: &entity.Author{
-			Name: s.Find(".meta").Text(),
+			Name: strings.TrimSpace(s.Find(".meta").Text()),
 		},
 	}, nil
 }

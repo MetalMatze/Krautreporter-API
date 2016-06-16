@@ -32,7 +32,7 @@ func SyncAuthor(log log.Logger) ([]entity.Author, error) {
 		author.ID, _ = strconv.Atoi(IDRegex.FindStringSubmatch(author.URL)[1])
 		author.Ordering = authorNodes.Length() - i - 1
 		author.Name = strings.TrimSpace(s.Find(".author__name").Text())
-		author.Title = s.Find(".item__title").Text()
+		author.Title = strings.TrimSpace(s.Find(".item__title").Text())
 
 		if srcset, exists := s.Find("img").Attr("srcset"); exists {
 			matches := SrcsetRegex.FindStringSubmatch(srcset)
