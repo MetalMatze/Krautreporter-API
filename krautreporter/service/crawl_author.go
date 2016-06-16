@@ -21,7 +21,7 @@ func CrawlAuthor(a entity.Author) (entity.Author, error) {
 
 		html, err := s.Find("#author-page--media-links").Html()
 		if err == nil {
-			a.SocialMedia = html
+			a.SocialMedia = strings.TrimSpace(html)
 		}
 	})
 
