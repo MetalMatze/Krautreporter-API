@@ -16,17 +16,10 @@ type Krautreporter struct {
 
 // New returns a Krautreporter domain object
 func New(g *gollection.Gollection) *Krautreporter {
-	authorRepository := repository.GormAuthorRepository{
-		Cache: g.Cache,
-		DB:    g.DB,
-	}
 
-	articleRepository := repository.GormArticleRepository{
-		DB:  g.DB,
-		Log: g.Log,
-	}
-
-	crawlRepository := repository.CrawlRepository{DB: g.DB}
+	authorRepository := repository.NewGormAuthorRepository(g.Cache, g.DB, g.Log)
+	articleRepository := repository.NewGormArticleRepository(g.Cache, g.DB, g.Log)
+	crawlRepository := repository.NewCrawlRepository(g.Cache, g.DB, g.Log)
 
 	return &Krautreporter{
 		CrawlInteractor: interactor.NewCrawlInteractor(

@@ -4,16 +4,22 @@ import (
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/gollection/gollection/cache"
+	"github.com/gollection/gollection/log"
 	"github.com/jinzhu/gorm"
 )
 
 type CrawlRepository struct {
-	DB *gorm.DB
+	repository
+}
+
+func NewCrawlRepository(c cache.Cache, db *gorm.DB, log log.Logger) *CrawlRepository {
+	return &CrawlRepository{repository: newRepository(c, db, log)}
 }
 
 func (r CrawlRepository) FindOutdatedAuthors() ([]entity.Author, error) {
 	var crawls []*entity.Crawl
-	r.DB.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
+	r.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
 
 	var IDs []int
 	for _, c := range crawls {
@@ -21,14 +27,14 @@ func (r CrawlRepository) FindOutdatedAuthors() ([]entity.Author, error) {
 	}
 
 	var authors []entity.Author
-	r.DB.Preload("Crawl").Where(IDs).Find(&authors)
+	r.db.Preload("Crawl").Where(IDs).Find(&authors)
 
 	return authors, nil
 }
 
 func (r CrawlRepository) FindOutdatedArticles() ([]entity.Article, error) {
 	var crawls []*entity.Crawl
-	r.DB.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
+	r.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
 
 	var IDs []int
 	for _, c := range crawls {
@@ -36,7 +42,7 @@ func (r CrawlRepository) FindOutdatedArticles() ([]entity.Article, error) {
 	}
 
 	var articles []entity.Article
-	r.DB.Preload("Crawl").Where(IDs).Find(&articles)
+	r.db.Preload("Crawl").Where(IDs).Find(&articles)
 
 	return articles, nil
 }
@@ -45,7 +51,7 @@ func (r CrawlRepository) FindOutdatedArticles() ([]entity.Article, error) {
 func (r CrawlRepository) NextCrawls(limit int) ([]*entity.Crawl, error) {
 	var crawls []*entity.Crawl
 
-	if result := r.DB.Limit(limit).Order("next").Find(&crawls); result.Error != nil {
+	if result := r.db.Limit(limit).Order("next").Find(&crawls); result.Error != nil {
 		return nil, result.Error
 	}
 

@@ -7,49 +7,53 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/gollection/gollection/cache"
+	"github.com/gollection/gollection/log"
 	"github.com/jinzhu/gorm"
 )
 
 var ErrAuthorNotFound = errors.New("Author not found")
 
 type GormAuthorRepository struct {
-	Cache cache.Cache
-	DB    *gorm.DB
+	repository
+}
+
+func NewGormAuthorRepository(c cache.Cache, db *gorm.DB, log log.Logger) *GormAuthorRepository {
+	return &GormAuthorRepository{repository: newRepository(c, db, log)}
 }
 
 func (r GormAuthorRepository) Find() ([]*entity.Author, error) {
-	if cached, exists := r.Cache.Get("authors.list"); exists {
+	if cached, exists := r.cache.Get("authors.list"); exists {
 		return cached.([]*entity.Author), nil
 	}
 
 	var authors []*entity.Author
 
-	r.DB.Preload("Images").Order("ordering desc").Find(&authors)
+	r.db.Preload("Images").Order("ordering desc").Find(&authors)
 
-	r.Cache.Set("authors.list", authors, time.Minute)
+	r.cache.Set("authors.list", authors, time.Minute)
 
 	return authors, nil
 }
 
 func (r GormAuthorRepository) FindByID(id int) (*entity.Author, error) {
-	if cached, exists := r.Cache.Get(fmt.Sprintf("authors.%d", id)); exists {
+	if cached, exists := r.cache.Get(fmt.Sprintf("authors.%d", id)); exists {
 		return cached.(*entity.Author), nil
 	}
 
 	var author entity.Author
-	r.DB.Preload("Images").First(&author, "id = ?", id)
+	r.db.Preload("Images").First(&author, "id = ?", id)
 
 	if author.ID == 0 {
 		return nil, ErrAuthorNotFound
 	}
 
-	r.Cache.Set(fmt.Sprintf("authors.%d", author.ID), &author, time.Minute)
+	r.cache.Set(fmt.Sprintf("authors.%d", author.ID), &author, time.Minute)
 
 	return &author, nil
 }
 
 func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
-	tx := r.DB.Begin()
+	tx := r.db.Begin()
 	for _, a := range authors {
 		author := entity.Author{ID: a.ID}
 		tx.Preload("Crawl").Preload("Images").FirstOrCreate(&author)
@@ -73,7 +77,7 @@ func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
 }
 
 func (r GormAuthorRepository) Save(author entity.Author) error {
-	if result := r.DB.Save(&author); result.Error != nil {
+	if result := r.db.Save(&author); result.Error != nil {
 		return result.Error
 	}
 

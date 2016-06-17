@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/gollection/gollection/cache"
 	"github.com/gollection/gollection/log"
 	"github.com/jinzhu/gorm"
 )
@@ -15,8 +16,11 @@ const MaxArticleID int = 1234567890
 var ErrArticleNotFound = errors.New("Article not found")
 
 type GormArticleRepository struct {
-	DB  *gorm.DB
-	Log log.Logger
+	repository
+}
+
+func NewGormArticleRepository(c cache.Cache, db *gorm.DB, log log.Logger) *GormArticleRepository {
+	return &GormArticleRepository{repository: newRepository(c, db, log)}
 }
 
 func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Article, error) {
@@ -31,7 +35,7 @@ func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Arti
 	}
 
 	var articles []*entity.Article
-	if result := r.DB.Where("ordering < ?", ordering).Limit(number).Order("ordering desc").Find(&articles); result.Error != nil {
+	if result := r.db.Where("ordering < ?", ordering).Limit(number).Order("ordering desc").Find(&articles); result.Error != nil {
 		return nil, result.Error
 	}
 
@@ -40,7 +44,7 @@ func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Arti
 
 func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
 	var a entity.Article
-	r.DB.First(&a, "id = ?", id)
+	r.db.First(&a, "id = ?", id)
 
 	if a.ID == 0 {
 		return nil, ErrArticleNotFound
@@ -50,7 +54,7 @@ func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
 }
 
 func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
-	tx := r.DB.Begin()
+	tx := r.db.Begin()
 	for i, a := range articles {
 		article := entity.Article{ID: a.ID}
 		tx.Preload("Crawl").FirstOrCreate(&article)
@@ -63,7 +67,7 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 		author := entity.Author{}
 		tx.First(&author, "name = ?", strings.TrimSpace(a.Author.Name))
 		if author.ID == 0 {
-			r.Log.Warn("Can't find author for article ", "author", a.Author.Name, "article", a.URL)
+			r.log.Warn("Can't find author for article ", "author", a.Author.Name, "article", a.URL)
 			continue
 		}
 		article.AuthorID = author.ID
@@ -80,7 +84,7 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 }
 
 func (r GormArticleRepository) Save(article entity.Article) error {
-	if result := r.DB.Save(&article); result.Error != nil {
+	if result := r.db.Save(&article); result.Error != nil {
 		return result.Error
 	}
 
