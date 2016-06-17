@@ -22,7 +22,7 @@ func main() {
 	kr := krautreporter.New(g)
 
 	g.AddRoutes(http.Routes(g, kr))
-	g.AddCommands(cli.SeedCommand(kr))
+	g.AddCommands(cli.SeedCommand(g))
 
 	if err := g.Run(); err != nil {
 		g.Log.Crit("Error running gollection", "err", err)

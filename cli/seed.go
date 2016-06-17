@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/gollection/gollection"
 	"github.com/icrowley/fake"
 	"github.com/urfave/cli"
 )
@@ -16,13 +16,14 @@ const articlesCount int = 1000
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func SeedCommand(kr *krautreporter.Krautreporter) cli.Command {
+func SeedCommand(g *gollection.Gollection) cli.Command {
 	return cli.Command{
 		Name:  "seed",
 		Usage: "Seed the database with some test data",
 		Action: func(c *cli.Context) error {
 			start := time.Now()
 
+			tx := g.DB.Begin()
 			var authors []entity.Author
 			for i := 1; i <= authorsCount; i++ {
 				author := entity.Author{
@@ -38,8 +39,8 @@ func SeedCommand(kr *krautreporter.Krautreporter) cli.Command {
 				}
 
 				authors = append(authors, author)
+				tx.Create(&author)
 			}
-			kr.CrawlInteractor.SaveAuthors(authors)
 
 			var articles []entity.Article
 			for i := 1; i <= articlesCount; i++ {
@@ -59,11 +60,12 @@ func SeedCommand(kr *krautreporter.Krautreporter) cli.Command {
 				}
 
 				articles = append(articles, article)
+				tx.Create(&article)
 			}
-			kr.CrawlInteractor.SaveArticles(articles)
-			fmt.Printf("%+v\n", articles[len(articles)-1])
 
-			kr.Log.Info("Database is seeded", "duration", time.Since(start))
+			tx.Commit()
+
+			g.Log.Info("Database is seeded", "duration", time.Since(start))
 
 			return nil
 		},
