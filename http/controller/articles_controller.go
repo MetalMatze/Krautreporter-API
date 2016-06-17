@@ -10,6 +10,8 @@ import (
 	"github.com/gollection/gollection/router"
 )
 
+const ArticlesPerPage int = 10
+
 type ArticlesController struct {
 	*Controller
 }
@@ -25,7 +27,7 @@ func (c *ArticlesController) GetArticles(res router.Response, req router.Request
 		id = olderthan
 	}
 
-	articles, err := c.interactor.ArticlesOlderThan(id, 20)
+	articles, err := c.interactor.ArticlesOlderThan(id, ArticlesPerPage)
 	if err != nil {
 		if err == repository.ErrArticleNotFound {
 			c.log.Debug("Can't find olderthan article", "id", id)
