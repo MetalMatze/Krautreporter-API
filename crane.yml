@@ -9,9 +9,3 @@ containers:
         - "POSTGRES_DB=postgres"
         - "POSTGRES_USER=postgres"
         - "POSTGRES_PASSWORD=postgres"
-  krautreporter-redis:
-    image: redis:3-alpine
-    run:
-      detach: true
-      restart: always
-      publish: ["63790:6379"]
