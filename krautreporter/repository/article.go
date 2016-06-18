@@ -35,7 +35,12 @@ func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Arti
 	}
 
 	var articles []*entity.Article
-	if result := r.db.Where("ordering < ?", ordering).Limit(number).Order("ordering desc").Find(&articles); result.Error != nil {
+	if result := r.db.
+		Preload("Images").
+		Where("ordering < ?", ordering).
+		Limit(number).
+		Order("ordering desc").
+		Find(&articles); result.Error != nil {
 		return nil, result.Error
 	}
 
@@ -71,6 +76,10 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 			continue
 		}
 		article.AuthorID = author.ID
+
+		for _, i := range a.Images {
+			article.AddImage(i)
+		}
 
 		if article.Crawl.ID == 0 {
 			article.Crawl = entity.Crawl{Next: time.Now()}

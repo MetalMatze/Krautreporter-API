@@ -3,9 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
+
+	"strings"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
@@ -14,6 +16,8 @@ import (
 
 const mainURL string = "https://krautreporter.de"
 const moreURL string = "https://krautreporter.de/articles%s/load_more_navigation_items"
+
+var articleSrcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
 
 func SyncArticles(log log.Logger) ([]entity.Article, error) {
 	start := time.Now()
@@ -62,6 +66,8 @@ func SyncArticles(log log.Logger) ([]entity.Article, error) {
 }
 
 func parseArticle(s *goquery.Selection) (entity.Article, error) {
+	article := entity.Article{}
+
 	url, exists := s.Attr("href")
 	if !exists {
 		return entity.Article{}, errors.New("Can't find the url for an article")
@@ -77,13 +83,21 @@ func parseArticle(s *goquery.Selection) (entity.Article, error) {
 		preview = true
 	}
 
-	return entity.Article{
-		ID:      id,
-		URL:     strings.TrimSpace(url),
-		Title:   strings.TrimSpace(s.Find(".item__title").Text()),
-		Preview: preview,
-		Author: &entity.Author{
-			Name: strings.TrimSpace(s.Find(".meta").Text()),
-		},
-	}, nil
+	if srcset, exists := s.Find("img").Attr("srcset"); exists {
+		matches := articleSrcsetRegex.FindStringSubmatch(srcset)
+		if len(matches) == 5 {
+			article.AddImage(entity.Image{Width: 300, Src: matches[1]})
+			article.AddImage(entity.Image{Width: 600, Src: matches[2]})
+			article.AddImage(entity.Image{Width: 1000, Src: matches[3]})
+			article.AddImage(entity.Image{Width: 2000, Src: matches[4]})
+		}
+	}
+
+	article.ID = id
+	article.URL = strings.TrimSpace(url)
+	article.Title = strings.TrimSpace(s.Find(".item__title").Text())
+	article.Preview = preview
+	article.Author = &entity.Author{Name: strings.TrimSpace(s.Find(".meta").Text())}
+
+	return article, nil
 }

@@ -12,7 +12,7 @@ import (
 )
 
 var IDRegex = regexp.MustCompile(`\/(\d*)`)
-var SrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
+var authorSrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
 // SyncAuthor finds all author's meta data from the krautreporter homepage
 func SyncAuthor(log log.Logger) ([]entity.Author, error) {
@@ -35,10 +35,10 @@ func SyncAuthor(log log.Logger) ([]entity.Author, error) {
 		author.Title = strings.TrimSpace(s.Find(".item__title").Text())
 
 		if srcset, exists := s.Find("img").Attr("srcset"); exists {
-			matches := SrcsetRegex.FindStringSubmatch(srcset)
+			matches := authorSrcsetRegex.FindStringSubmatch(srcset)
 			if len(matches) == 3 {
-				author.Images = append(author.Images, entity.Image{Width: 50, Src: matches[1]})
-				author.Images = append(author.Images, entity.Image{Width: 100, Src: matches[2]})
+				author.AddImage(entity.Image{Width: 130, Src: matches[1]})
+				author.AddImage(entity.Image{Width: 260, Src: matches[2]})
 			}
 		}
 

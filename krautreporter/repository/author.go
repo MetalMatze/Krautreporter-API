@@ -63,11 +63,13 @@ func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
 		author.Title = a.Title
 		author.URL = a.URL
 
+		for _, i := range a.Images {
+			author.AddImage(i)
+		}
+
 		if author.Crawl.ID == 0 {
 			author.Crawl = entity.Crawl{Next: time.Now()}
 		}
-
-		// TODO: Save author images
 
 		tx.Save(&author)
 	}
