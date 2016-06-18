@@ -18,7 +18,7 @@ var authorSrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 func SyncAuthor(log log.Logger) ([]entity.Author, error) {
 	start := time.Now()
 
-	doc, err := goquery.NewDocument("https://krautreporter.de")
+	doc, err := goquery.NewDocument(mainURL)
 	if err != nil {
 		return nil, err
 	}

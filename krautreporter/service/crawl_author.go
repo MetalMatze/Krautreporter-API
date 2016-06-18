@@ -11,8 +11,9 @@ import (
 )
 
 var authorPageSrcsetRegex = regexp.MustCompile(`(.*) 170w, (.*) 340w`)
+
 func CrawlAuthor(a entity.Author) (entity.Author, error) {
-	doc, err := goquery.NewDocument("https://krautreporter.de" + a.URL)
+	doc, err := goquery.NewDocument(mainURL + a.URL)
 	if err != nil {
 		log.Println("Failed to fetch %s", a.URL)
 		return entity.Author{}, err

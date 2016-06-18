@@ -10,7 +10,7 @@ import (
 )
 
 func CrawlArticle(a entity.Article) (entity.Article, error) {
-	doc, err := goquery.NewDocument("https://krautreporter.de" + a.URL)
+	doc, err := goquery.NewDocument(mainURL + a.URL)
 	if err != nil {
 		log.Println("Failed to fetch %s", a.URL)
 		return a, err
