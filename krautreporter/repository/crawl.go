@@ -4,17 +4,17 @@ import (
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
-	"github.com/gollection/gollection/cache"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
+	gocache "github.com/patrickmn/go-cache"
 )
 
 type CrawlRepository struct {
 	repository
 }
 
-func NewCrawlRepository(c cache.Cache, db *gorm.DB, log log.Logger) *CrawlRepository {
-	return &CrawlRepository{repository: newRepository(c, db, log)}
+func NewCrawlRepository(logger log.Logger, db *gorm.DB, cache *gocache.Cache) *CrawlRepository {
+	return &CrawlRepository{repository: newRepository(logger, db, cache)}
 }
 
 func (r CrawlRepository) FindOutdatedAuthors() ([]entity.Author, error) {

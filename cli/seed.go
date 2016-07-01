@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
-	"github.com/gollection/gollection"
+	"github.com/go-kit/kit/log"
 	"github.com/icrowley/fake"
+	"github.com/jinzhu/gorm"
 	"github.com/urfave/cli"
 )
 
@@ -16,14 +17,14 @@ const articlesCount int = 1000
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func SeedCommand(g *gollection.Gollection) cli.Command {
+func SeedCommand(logger log.Logger, db *gorm.DB) cli.Command {
 	return cli.Command{
 		Name:  "seed",
 		Usage: "Seed the database with some test data",
 		Action: func(c *cli.Context) error {
 			start := time.Now()
 
-			tx := g.DB.Begin()
+			tx := db.Begin()
 			var authors []entity.Author
 			for i := 1; i <= authorsCount; i++ {
 				author := entity.Author{
@@ -65,7 +66,7 @@ func SeedCommand(g *gollection.Gollection) cli.Command {
 
 			tx.Commit()
 
-			g.Log.Info("Database is seeded", "duration", time.Since(start))
+			logger.Log("msg", "Database is seeded", "duration", time.Since(start))
 
 			return nil
 		},

@@ -11,7 +11,7 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 )
 
 const mainURL string = "https://krautreporter.de"
@@ -19,7 +19,7 @@ const moreURL string = "https://krautreporter.de/articles%s/load_more_navigation
 
 var articleSrcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
 
-func SyncArticles(log log.Logger) ([]entity.Article, error) {
+func SyncArticles(logger log.Logger) ([]entity.Article, error) {
 	start := time.Now()
 
 	url := mainURL
@@ -44,7 +44,7 @@ func SyncArticles(log log.Logger) ([]entity.Article, error) {
 		doc.Find(selector).Each(func(i int, s *goquery.Selection) {
 			article, err := parseArticle(s)
 			if err != nil {
-				log.Warn("Error parsing article", "err", err)
+				logger.Log("msg", "Error parsing article", "err", err)
 			}
 
 			articles = append(articles, article)
@@ -53,14 +53,14 @@ func SyncArticles(log log.Logger) ([]entity.Article, error) {
 		latestArticle := articles[len(articles)-1]
 		url = fmt.Sprintf(moreURL, latestArticle.URL)
 
-		log.Debug("Synced articles",
+		logger.Log("msg", "Synced articles",
 			"count", len(articles),
 			"duration", time.Since(startNext),
 			"next", latestArticle.URL,
 		)
 	}
 
-	log.Info("Synced articles", "count", len(articles), "duration", time.Since(start))
+	logger.Log("msg", "Synced articles", "count", len(articles), "duration", time.Since(start))
 
 	return articles, nil
 }

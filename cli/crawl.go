@@ -7,7 +7,7 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/service"
 	"github.com/MetalMatze/Krautreporter-API/workerqueue"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 	"github.com/urfave/cli"
 )
 
@@ -28,10 +28,10 @@ func CrawlCommand(kr *krautreporter.Krautreporter) cli.Command {
 		Usage: "Crawl article & authors",
 		Action: func(c *cli.Context) error {
 			for {
-				syncAuthor(kr.Log, kr.CrawlInteractor)
-				syncArticle(kr.Log, kr.CrawlInteractor)
+				syncAuthor(kr.Logger, kr.CrawlInteractor)
+				syncArticle(kr.Logger, kr.CrawlInteractor)
 
-				crawler := newCrawler(kr.Log, kr.CrawlInteractor)
+				crawler := newCrawler(kr.Logger, kr.CrawlInteractor)
 				crawler.authors()
 				crawler.articles()
 
@@ -45,14 +45,14 @@ func CrawlCommand(kr *krautreporter.Krautreporter) cli.Command {
 
 type crawler struct {
 	interactor CrawlInteractor
-	log        log.Logger
+	logger     log.Logger
 	wq         workerqueue.WorkerQueue
 }
 
-func newCrawler(log log.Logger, ci CrawlInteractor) crawler {
+func newCrawler(logger log.Logger, ci CrawlInteractor) crawler {
 	return crawler{
 		interactor: ci,
-		log:        log,
+		logger:     logger,
 		wq:         workerqueue.New(10),
 	}
 }
@@ -60,7 +60,7 @@ func newCrawler(log log.Logger, ci CrawlInteractor) crawler {
 func (c crawler) authors() {
 	authors, err := c.interactor.FindOutdatedAuthors()
 	if err != nil {
-		c.log.Warn("Can't get outdated authors from CrawlInteractor", "err", err)
+		c.logger.Log("msg", "Can't get outdated authors from CrawlInteractor", "err", err)
 	}
 
 	for _, a := range authors {
@@ -68,17 +68,17 @@ func (c crawler) authors() {
 			start := time.Now()
 			a, err := service.CrawlAuthor(a)
 			if err != nil {
-				c.log.Error("Crawling author has failed", "id", a.ID, "url", a.URL)
+				c.logger.Log("msg", "Crawling author has failed", "id", a.ID, "url", a.URL)
 				return
 			}
 
 			err = c.interactor.SaveAuthor(a)
 			if err != nil {
-				c.log.Warn("Failed to save crawled author", "id", a.ID, "url", a.URL, "duration", time.Since(start))
+				c.logger.Log("msg", "Failed to save crawled author", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 				return
 			}
 
-			c.log.Info("Author crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
+			c.logger.Log("msg", "Author crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 		})
 	}
 }
@@ -86,7 +86,7 @@ func (c crawler) authors() {
 func (c crawler) articles() {
 	articles, err := c.interactor.FindOutdatedArticles()
 	if err != nil {
-		c.log.Warn("Can't get outdated articles from CrawlInteractor", "err", err)
+		c.logger.Log("msg", "Can't get outdated articles from CrawlInteractor", "err", err)
 	}
 
 	for _, a := range articles {
@@ -94,17 +94,17 @@ func (c crawler) articles() {
 			start := time.Now()
 			a, err := service.CrawlArticle(a)
 			if err != nil {
-				c.log.Error("Crawling articles has failed", "id", a.ID, "url", a.URL)
+				c.logger.Log("msg", "Crawling articles has failed", "id", a.ID, "url", a.URL)
 				return
 			}
 
 			err = c.interactor.SaveArticle(a)
 			if err != nil {
-				c.log.Warn("Failed to save crawled article", "id", a.ID, "url", a.URL, "duration", time.Since(start))
+				c.logger.Log("msg", "Failed to save crawled article", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 				return
 			}
 
-			c.log.Info("Article crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
+			c.logger.Log("msg", "Article crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 		})
 	}
 }

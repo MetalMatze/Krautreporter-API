@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
-	"github.com/gollection/gollection/cache"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
+	gocache "github.com/patrickmn/go-cache"
 )
 
 var ErrAuthorNotFound = errors.New("Author not found")
@@ -17,8 +17,8 @@ type GormAuthorRepository struct {
 	repository
 }
 
-func NewGormAuthorRepository(c cache.Cache, db *gorm.DB, log log.Logger) *GormAuthorRepository {
-	return &GormAuthorRepository{repository: newRepository(c, db, log)}
+func NewGormAuthorRepository(logger log.Logger, db *gorm.DB, cache *gocache.Cache) *GormAuthorRepository {
+	return &GormAuthorRepository{repository: newRepository(logger, db, cache)}
 }
 
 func (r GormAuthorRepository) Find() ([]*entity.Author, error) {

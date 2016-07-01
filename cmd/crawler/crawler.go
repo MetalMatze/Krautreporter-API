@@ -1,29 +1,32 @@
 package main
 
 import (
+	"os"
+
 	"github.com/MetalMatze/Krautreporter-API/cli"
+	"github.com/MetalMatze/Krautreporter-API/cmd"
 	"github.com/MetalMatze/Krautreporter-API/config"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter"
+	"github.com/go-kit/kit/log"
 	"github.com/gollection/gollection"
-	"github.com/gollection/gollection/cache"
-	"github.com/gollection/gollection/database/postgres"
 )
 
 func main() {
-	config := config.GetConfig()
-	g := gollection.New(config)
+	logger := log.NewLogfmtLogger(os.Stderr)
+	logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
 
-	g.AddDB(postgres.New(g.Config))
-	g.AddCache(cache.NewInMemory())
+	c := config.Config()
+	g := gollection.New(logger, c.Config)
 
-	kr := krautreporter.New(g)
+	gorm := cmd.Gorm(g, c)
+	cache := cmd.Cache()
 
-	g.AddCommands(
-		cli.SyncCommand(kr),
-		cli.CrawlCommand(kr),
-	)
+	kr := krautreporter.New(logger, gorm, cache)
+
+	g.Cli.Commands = append(g.Cli.Commands, cli.SyncCommand(kr))
+	g.Cli.Commands = append(g.Cli.Commands, cli.CrawlCommand(kr))
 
 	if err := g.Run(); err != nil {
-		g.Log.Crit("Error running gollection", "err", err)
+		g.Logger.Log("msg", "Error running gollection", "err", err)
 	}
 }

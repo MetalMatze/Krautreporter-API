@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 )
 
 type HTTPInteractor interface {
@@ -17,9 +17,9 @@ type HTTPInteractor interface {
 
 type Controller struct {
 	interactor HTTPInteractor
-	log        log.Logger
+	logger     log.Logger
 }
 
-func New(log log.Logger, interactor HTTPInteractor) *Controller {
-	return &Controller{interactor, log}
+func New(logger log.Logger, interactor HTTPInteractor) *Controller {
+	return &Controller{interactor, logger}
 }

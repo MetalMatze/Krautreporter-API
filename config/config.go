@@ -1,34 +1,59 @@
 package config
 
 import (
+	"log"
+	"os"
+	"strconv"
+
 	"github.com/gollection/gollection"
+	"github.com/gollection/gollection/database"
+	"github.com/gollection/gollection/router"
+	"github.com/joho/godotenv"
 )
 
-// GetConfig returns the gollection configuration
-func GetConfig() gollection.Config {
-	gollection.LoadEnv(".env") // Loads env variables from .env, but doesn't override if already set
+type AppConfig struct {
+	Config         gollection.Config
+	DatabaseConfig database.Config
+	RouterConfig   router.Config
+}
 
-	return gollection.Config{
-		AppConfig: gollection.AppConfig{
+func Config() AppConfig {
+	loadEnv()
+
+	databasePort, err := strconv.Atoi(os.Getenv("DB_PORT"))
+	if err != nil {
+		log.Println(err)
+	}
+
+	routerPort, err := strconv.Atoi(os.Getenv("APP_PORT"))
+	if err != nil {
+		log.Println(err)
+	}
+
+	return AppConfig{
+		Config: gollection.Config{
 			Name:  "Kraureporter-API",
 			Usage: "RESTful json API which crawls krautreporter.de and serves its content",
-			Host:  gollection.GetEnv("APP_HOST", "127.0.0.1"),
-			Port:  gollection.GetEnvInt("APP_PORT", 1234),
-			Debug: gollection.GetEnvBool("APP_DEBUG", false),
 		},
-		DBConfig: gollection.DBConfig{
-			Dialect:  gollection.GetEnv("DB_DIALECT", "postgres"), // postgres, mysql or sqlite3
-			Host:     gollection.GetEnv("DB_HOST", "127.0.0.1"),
-			Port:     gollection.GetEnvInt("DB_PORT", 5432),
-			Database: gollection.GetEnv("DB_DATABASE", "postgres"),
-			Username: gollection.GetEnv("DB_USERNAME", "postgres"),
-			Password: gollection.GetEnv("DB_PASSWORD", "postgres"),
+		// Use all for non sqlite databases
+		DatabaseConfig: database.Config{
+			Driver:   "postgres",
+			Host:     os.Getenv("DB_HOST"),
+			Port:     databasePort,
+			Username: os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASS"),
+			Database: os.Getenv("DB_NAME"),
 		},
-		RedisConfig: gollection.RedisConfig{
-			Host:     gollection.GetEnv("REDIS_HOST", "127.0.0.1"),
-			Password: gollection.GetEnv("REDIS_PASSWORD", ""),
-			Port:     gollection.GetEnvInt("REDIS_PORT", 6379),
-			Database: 0,
+		RouterConfig: router.Config{
+			Host: os.Getenv("APP_HOST"),
+			Port: routerPort,
 		},
+	}
+}
+
+func loadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(err)
 	}
 }

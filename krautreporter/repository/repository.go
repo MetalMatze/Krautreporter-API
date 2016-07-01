@@ -1,21 +1,17 @@
 package repository
 
 import (
-	"github.com/gollection/gollection/cache"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
+	gocache "github.com/patrickmn/go-cache"
 )
 
 type repository struct {
-	cache cache.Cache
-	db    *gorm.DB
-	log   log.Logger
+	cache  *gocache.Cache
+	db     *gorm.DB
+	logger log.Logger
 }
 
-func newRepository(c cache.Cache, db *gorm.DB, log log.Logger) repository {
-	return repository{
-		cache: c,
-		db:    db,
-		log:   log,
-	}
+func newRepository(logger log.Logger, db *gorm.DB, cache *gocache.Cache) repository {
+	return repository{logger: logger, db: db, cache: cache}
 }

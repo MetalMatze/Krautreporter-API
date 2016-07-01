@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
-	"github.com/gollection/gollection/cache"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
+	gocache "github.com/patrickmn/go-cache"
 )
 
 const MaxArticleID int = 1234567890
@@ -19,8 +19,8 @@ type GormArticleRepository struct {
 	repository
 }
 
-func NewGormArticleRepository(c cache.Cache, db *gorm.DB, log log.Logger) *GormArticleRepository {
-	return &GormArticleRepository{repository: newRepository(c, db, log)}
+func NewGormArticleRepository(logger log.Logger, db *gorm.DB, cache *gocache.Cache) *GormArticleRepository {
+	return &GormArticleRepository{repository: newRepository(logger, db, cache)}
 }
 
 func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Article, error) {
@@ -72,7 +72,7 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 		author := entity.Author{}
 		tx.First(&author, "name = ?", strings.TrimSpace(a.Author.Name))
 		if author.ID == 0 {
-			r.log.Warn("Can't find author for article ", "author", a.Author.Name, "article", a.URL)
+			r.logger.Log("msg", "Can't find author for article ", "author", a.Author.Name, "article", a.URL)
 			continue
 		}
 		article.AuthorID = author.ID

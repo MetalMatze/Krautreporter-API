@@ -1,30 +1,48 @@
 package main
 
 import (
+	nethttp "net/http"
+	"os"
+
 	"github.com/MetalMatze/Krautreporter-API/cli"
+	"github.com/MetalMatze/Krautreporter-API/cmd"
 	"github.com/MetalMatze/Krautreporter-API/config"
 	"github.com/MetalMatze/Krautreporter-API/http"
 	"github.com/MetalMatze/Krautreporter-API/krautreporter"
+	"github.com/gin-gonic/gin"
+	"github.com/go-kit/kit/log"
 	"github.com/gollection/gollection"
-	"github.com/gollection/gollection/cache"
-	"github.com/gollection/gollection/database/postgres"
-	"github.com/gollection/gollection/router"
 )
 
 func main() {
-	config := config.GetConfig()
-	g := gollection.New(config)
+	logger := log.NewLogfmtLogger(os.Stderr)
+	logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
 
-	g.AddDB(postgres.New(g.Config))
-	g.AddCache(cache.NewInMemory())
-	g.AddRouter(router.NewGin())
+	c := config.Config()
+	g := gollection.New(logger, c.Config)
 
-	kr := krautreporter.New(g)
+	router := cmd.Gin(g, c)
+	gorm := cmd.Gorm(g, c)
+	cache := cmd.Cache()
+	cmd.Migrate(g, c)
 
-	g.AddRoutes(http.Routes(g, kr))
-	g.AddCommands(cli.SeedCommand(g))
+	kr := krautreporter.New(logger, gorm, cache)
+
+	http.Routes(kr, router)
+
+	router.GET("/health", func(c *gin.Context) {
+		if gorm.DB().Ping() != nil {
+			status := nethttp.StatusInternalServerError
+			c.String(status, nethttp.StatusText(status))
+		}
+
+		status := nethttp.StatusOK
+		c.String(status, nethttp.StatusText(status))
+	})
+
+	g.Cli.Commands = append(g.Cli.Commands, cli.SeedCommand(logger, gorm))
 
 	if err := g.Run(); err != nil {
-		g.Log.Crit("Error running gollection", "err", err)
+		g.Logger.Log("msg", "Error running gollection")
 	}
 }

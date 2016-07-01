@@ -8,14 +8,14 @@ import (
 
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gollection/gollection/log"
+	"github.com/go-kit/kit/log"
 )
 
 var IDRegex = regexp.MustCompile(`\/(\d*)`)
 var authorSrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
 // SyncAuthor finds all author's meta data from the krautreporter homepage
-func SyncAuthor(log log.Logger) ([]entity.Author, error) {
+func SyncAuthor(logger log.Logger) ([]entity.Author, error) {
 	start := time.Now()
 
 	doc, err := goquery.NewDocument(mainURL)
@@ -45,7 +45,7 @@ func SyncAuthor(log log.Logger) ([]entity.Author, error) {
 		authors = append(authors, author)
 	})
 
-	log.Info("Synced authors", "count", authorNodes.Length(), "duration", time.Since(start))
+	logger.Log("msg", "Synced authors", "count", authorNodes.Length(), "duration", time.Since(start))
 
 	return authors, nil
 }

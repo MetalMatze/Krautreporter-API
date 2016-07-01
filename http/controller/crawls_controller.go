@@ -3,19 +3,18 @@ package controller
 import (
 	"net/http"
 
-	"github.com/gollection/gollection/router"
+	"github.com/gin-gonic/gin"
 )
 
 type CrawlsController struct {
 	*Controller
 }
 
-func (c *CrawlsController) GetCrawls(res router.Response, req router.Request) error {
+func (c *CrawlsController) GetCrawls(ctx *gin.Context) {
 	crawls, err := c.interactor.NextCrawls(20)
 	if err != nil {
-		return res.AbortWithStatus(http.StatusInternalServerError)
-
+		ctx.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	return res.JSON(http.StatusOK, crawls)
+	ctx.JSON(http.StatusOK, crawls)
 }
