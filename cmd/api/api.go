@@ -24,7 +24,6 @@ func main() {
 	router := cmd.Gin(g, c)
 	gorm := cmd.Gorm(g, c)
 	cache := cmd.Cache()
-	cmd.Migrate(g, c)
 
 	kr := krautreporter.New(logger, gorm, cache)
 

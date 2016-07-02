@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gollection/gollection"
 	"github.com/gollection/gollection/database/gorm/postgres"
-	"github.com/gollection/gollection/database/migrate"
 	gogin "github.com/gollection/gollection/router/gin"
 	"github.com/jinzhu/gorm"
 	gocache "github.com/patrickmn/go-cache"
@@ -33,9 +32,4 @@ func Gin(g *gollection.Gollection, c config.AppConfig) *gin.Engine {
 
 func Cache() *gocache.Cache {
 	return gocache.New(5*time.Minute, 30*time.Second)
-}
-
-func Migrate(g *gollection.Gollection, c config.AppConfig) {
-	m := migrate.New(g.Logger, c.DatabaseConfig)
-	g.Register(m)
 }
