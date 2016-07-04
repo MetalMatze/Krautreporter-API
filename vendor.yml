@@ -1,79 +1,71 @@
 vendors:
+- path: github.com/DATA-DOG/godog
+  rev: 12144eff80b898ac56a60649479f0bf17d17becd
 - path: github.com/PuerkitoBio/goquery
-  rev: aeecb06b1e04a72e7d3312468c5b92f6bb2f3459
+  rev: f0d75731e0db647903c8611d00c7b85002751317
 - path: github.com/andybalholm/cascadia
   rev: 3ad29d1ad1c4f2023e355603324348cf1f4b2d48
 - path: github.com/davecgh/go-spew
   rev: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
 - path: github.com/denisenkom/go-mssqldb
-  rev: 2a223b1644106bc7ca456c12cde55a80185813ef
+  rev: c5885153c18c8e4cdde7608f3fa65c2df212d3cb
 - path: github.com/erikstmartin/go-testdb
   rev: 8d10e4a1bae52cd8b81ffdec3445890d6dccab3d
-- path: github.com/garyburd/redigo
-  rev: b8dc90050f24c1a73a52f107f3f575be67b21b7c
+- path: github.com/fortytw2/leaktest
+  rev: 458c5a91af6c5484ab31b401c20077fae5aa8f1c
+- path: github.com/fortytw2/radish
+  rev: e08b89737b9758acc090be1b0cc03b8d5ce8dbc7
 - path: github.com/gin-gonic/gin
   rev: f931d1ea80ae95a6fc739213cdd9399bd2967fb6
+- path: github.com/go-kit/kit
+  rev: 46b7abc89d51ae89761da7b8a0f5f7d4b04de23b
+- path: github.com/go-logfmt/logfmt
+  rev: d4327190ff838312623b09bfeb50d7c93c8d9c1d
 - path: github.com/go-sql-driver/mysql
   rev: 3654d25ec346ee8ce71a68431025458d52a38ac0
 - path: github.com/go-stack/stack
   rev: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - path: github.com/golang/protobuf
-  rev: 3b06fc7a4cad73efce5fe6217ab6c33e7231ab4a
+  rev: 3852dcfda249c2097355a6aabb199a28d97b30df
 - path: github.com/gollection/gollection
-  rev: 348374ca6f7847124dae79ef5621f7912aa2b251
-- path: github.com/inconshreveable/log15
-  rev: 20bca5a7a57282e241fac83ec9ea42538027f1c1
+  rev: 70ba5968093af7578779e485368a0f0404292729
+- path: github.com/icrowley/fake
+  rev: 84bff6d01560fb0b5a396ba29534e93fd00d09c6
 - path: github.com/jinzhu/gorm
-  rev: bf0e23607840019d62e32e87e9af48e881d74b1e
-- path: github.com/jinzhu/inflection
-  rev: 3272df6c21d04180007eb3349844c89a3856bc25
+  rev: c1c4f9f86e732a042aac9f37e025893d6d6cabec
+- path: github.com/jinzhu/inflectionmake
+  rev: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
 - path: github.com/jinzhu/now
-  rev: ce80572eb55aa0ac839330041ca9db1afa5f1f6c
+  rev: d9861969c7a7e84746d341c09020c2ef8a617f8f
+- path: github.com/joho/godotenv
+  rev: 4ed13390c0acd2ff4e371e64d8b97c8954138243
+- path: github.com/kr/logfmt
+  rev: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 - path: github.com/lib/pq
-  rev: ee1442bda7bd1b6a84e913bdb421cb1874ec629d
+  rev: 4dd446efc17690bc53e154025146f73203b18309
 - path: github.com/manucorporat/sse
   rev: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
-- path: github.com/mattn/go-colorable
-  rev: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
-- path: github.com/mattn/go-isatty
-  rev: 56b76bdf51f7708750eac80fa38b952bb9f32639
 - path: github.com/mattn/go-sqlite3
   rev: 38ee283dabf11c9cbdb968eebd79b1fa7acbabe6
-- path: github.com/onsi/ginkgo
-  rev: 5437a97bf824dec14e58d68c56ee36e772670c2e
-- path: github.com/onsi/gomega
-  rev: c73e51675ad2455a4515b6213eb7145eaade4824
 - path: github.com/patrickmn/go-cache
   rev: 1881a9bccb818787f68c52bfba648c6cf34c34fa
 - path: github.com/pmezard/go-difflib
   rev: 792786c7400a136282c1664665ae0a8db921c6c2
 - path: github.com/qor/inflection
-  rev: 3272df6c21d04180007eb3349844c89a3856bc25
-- path: github.com/rubenv/sql-migrate
-  rev: 51aa4cacd5b4e5793f3713fcbc2c12d2fb8cc4ec
+  rev: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
 - path: github.com/stretchr/testify
-  rev: 8d64eb7173c7753d6419fd4a9caf057398611364
+  rev: d77da356e56a7428ad25149ca77381849a6a5232
 - path: github.com/urfave/cli
-  rev: edb24d02aa3cea2319c33f2836d4a5133907fe4c
-- path: github.com/ziutek/mymysql
-  rev: e5d54ebfda3f8a15e7b192b65c2aa10cb4fd7e04
+  rev: 1efa31f08b9333f1bd4882d61f9d668a70cd902e
 - path: golang.org/x/crypto
-  rev: 5bcd134fee4dd1475da17714aac19c0aa0142e2f
+  rev: 0c565bf13221fb55497d7ae2bb95694db1fd1bff
 - path: golang.org/x/net
-  rev: c4c3ea71919de159c9e246d7be66deb7f0a39a58
-- path: golang.org/x/sys
-  rev: 076b546753157f758b316e59bcb51e6807c04057
-- path: gopkg.in/bsm/ratelimit.v1
-  rev: db14e161995a5177acef654cb0dd785e8ee8bc22
+  rev: b400c2eff1badec7022a8c8f5bea058b6315eed7
 - path: gopkg.in/check.v1
   rev: 4f90aeace3a26ad7021961c297b22c42160c7b25
 - path: gopkg.in/go-playground/assert.v1
   rev: 4f4dfbc7d1c48336cf93399deae81aa9067e88af
 - path: gopkg.in/go-playground/validator.v8
-  rev: 014792cf3e266caff1e916876be12282b33059e0
-- path: gopkg.in/gorp.v1
-  rev: c87af80f3cc5036b55b83d77171e156791085e2e
-- path: gopkg.in/redis.v3
-  rev: 5183f8dcde9737db7583dbfa9881800dba26e3fa
+  rev: 25f1823069d853eccffbde025dca1812fa09c14b
 - path: gopkg.in/yaml.v2
   rev: a83829b6f1293c91addabc89d0571c246397bbf4
