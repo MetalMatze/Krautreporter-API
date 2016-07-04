@@ -9,11 +9,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func CrawlArticle(a entity.Article) (entity.Article, error) {
+func CrawlArticle(a *entity.Article) error {
 	doc, err := goquery.NewDocument(mainURL + a.URL)
 	if err != nil {
 		log.Println("Failed to fetch %s", a.URL)
-		return a, err
+		return err
 	}
 
 	node := doc.Find("main article.article.article--full")
@@ -22,14 +22,14 @@ func CrawlArticle(a entity.Article) (entity.Article, error) {
 
 	date, err := time.Parse("02.01.2006", nodeHeader.Find("h2.meta").Text())
 	if err != nil {
-		return a, err
+		return err
 	}
 
 	excerpt := strings.TrimSpace(nodeContent.Find("h2.gamma").Text())
 
 	html, err := nodeContent.Html()
 	if err != nil {
-		return a, err
+		return err
 	}
 
 	a.Date = date
@@ -39,5 +39,5 @@ func CrawlArticle(a entity.Article) (entity.Article, error) {
 
 	a.Crawl.Next = time.Now().Add(6 * time.Hour)
 
-	return a, nil
+	return nil
 }
