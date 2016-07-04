@@ -17,7 +17,7 @@ func NewCrawlRepository(logger log.Logger, db *gorm.DB, cache *gocache.Cache) *C
 	return &CrawlRepository{repository: newRepository(logger, db, cache)}
 }
 
-func (r CrawlRepository) FindOutdatedAuthors() ([]entity.Author, error) {
+func (r CrawlRepository) FindOutdatedAuthors() ([]*entity.Author, error) {
 	var crawls []*entity.Crawl
 	r.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
 
@@ -26,13 +26,13 @@ func (r CrawlRepository) FindOutdatedAuthors() ([]entity.Author, error) {
 		IDs = append(IDs, c.CrawlableID)
 	}
 
-	var authors []entity.Author
+	var authors []*entity.Author
 	r.db.Preload("Crawl").Where(IDs).Find(&authors)
 
 	return authors, nil
 }
 
-func (r CrawlRepository) FindOutdatedArticles() ([]entity.Article, error) {
+func (r CrawlRepository) FindOutdatedArticles() ([]*entity.Article, error) {
 	var crawls []*entity.Crawl
 	r.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
 
@@ -41,7 +41,7 @@ func (r CrawlRepository) FindOutdatedArticles() ([]entity.Article, error) {
 		IDs = append(IDs, c.CrawlableID)
 	}
 
-	var articles []entity.Article
+	var articles []*entity.Article
 	r.db.Preload("Crawl").Where(IDs).Find(&articles)
 
 	return articles, nil

@@ -58,7 +58,7 @@ func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
 	return &a, nil
 }
 
-func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
+func (r GormArticleRepository) SaveAll(articles []*entity.Article) error {
 	tx := r.db.Begin()
 	for i, a := range articles {
 		article := entity.Article{ID: a.ID}
@@ -92,7 +92,7 @@ func (r GormArticleRepository) SaveAll(articles []entity.Article) error {
 	return nil
 }
 
-func (r GormArticleRepository) Save(article entity.Article) error {
+func (r GormArticleRepository) Save(article *entity.Article) error {
 	if result := r.db.Save(&article); result.Error != nil {
 		return result.Error
 	}

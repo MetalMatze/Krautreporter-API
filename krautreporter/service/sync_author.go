@@ -15,7 +15,7 @@ var IDRegex = regexp.MustCompile(`\/(\d*)`)
 var authorSrcsetRegex = regexp.MustCompile(`(.*) 50w, (.*) 100w`)
 
 // SyncAuthor finds all author's meta data from the krautreporter homepage
-func SyncAuthor(logger log.Logger) ([]entity.Author, error) {
+func SyncAuthor(logger log.Logger) ([]*entity.Author, error) {
 	start := time.Now()
 
 	doc, err := goquery.NewDocument(mainURL)
@@ -25,7 +25,7 @@ func SyncAuthor(logger log.Logger) ([]entity.Author, error) {
 
 	authorNodes := doc.Find("#author-list-tab li a")
 
-	var authors []entity.Author
+	var authors []*entity.Author
 	authorNodes.Each(func(i int, s *goquery.Selection) {
 		author := entity.Author{}
 		author.URL, _ = s.Attr("href")
@@ -42,7 +42,7 @@ func SyncAuthor(logger log.Logger) ([]entity.Author, error) {
 			}
 		}
 
-		authors = append(authors, author)
+		authors = append(authors, &author)
 	})
 
 	logger.Log("msg", "Synced authors", "count", authorNodes.Length(), "duration", time.Since(start))

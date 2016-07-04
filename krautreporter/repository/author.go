@@ -52,7 +52,7 @@ func (r GormAuthorRepository) FindByID(id int) (*entity.Author, error) {
 	return &author, nil
 }
 
-func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
+func (r GormAuthorRepository) SaveAll(authors []*entity.Author) error {
 	tx := r.db.Begin()
 	for _, a := range authors {
 		author := entity.Author{ID: a.ID}
@@ -78,7 +78,7 @@ func (r GormAuthorRepository) SaveAll(authors []entity.Author) error {
 	return nil
 }
 
-func (r GormAuthorRepository) Save(author entity.Author) error {
+func (r GormAuthorRepository) Save(author *entity.Author) error {
 	if result := r.db.Save(&author); result.Error != nil {
 		return result.Error
 	}

@@ -19,11 +19,11 @@ const moreURL string = "https://krautreporter.de/articles%s/load_more_navigation
 
 var articleSrcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
 
-func SyncArticles(logger log.Logger) ([]entity.Article, error) {
+func SyncArticles(logger log.Logger) ([]*entity.Article, error) {
 	start := time.Now()
 
 	url := mainURL
-	articles := []entity.Article{}
+	articles := []*entity.Article{}
 	for {
 		startNext := time.Now()
 		doc, err := goquery.NewDocument(url)
@@ -47,7 +47,7 @@ func SyncArticles(logger log.Logger) ([]entity.Article, error) {
 				logger.Log("msg", "Error parsing article", "err", err)
 			}
 
-			articles = append(articles, article)
+			articles = append(articles, &article)
 		})
 
 		latestArticle := articles[len(articles)-1]

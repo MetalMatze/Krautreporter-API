@@ -12,11 +12,11 @@ import (
 
 var authorPageSrcsetRegex = regexp.MustCompile(`(.*) 170w, (.*) 340w`)
 
-func CrawlAuthor(a entity.Author) (entity.Author, error) {
+func CrawlAuthor(a *entity.Author) error {
 	doc, err := goquery.NewDocument(mainURL + a.URL)
 	if err != nil {
 		log.Println("Failed to fetch %s", a.URL)
-		return entity.Author{}, err
+		return err
 	}
 
 	doc.Find("header.article__header").Each(func(i int, s *goquery.Selection) {
@@ -38,5 +38,5 @@ func CrawlAuthor(a entity.Author) (entity.Author, error) {
 
 	a.Crawl.Next = time.Now().Add(6 * time.Hour)
 
-	return a, nil
+	return nil
 }
