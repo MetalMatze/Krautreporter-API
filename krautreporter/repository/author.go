@@ -41,7 +41,7 @@ func (r GormAuthorRepository) FindByID(id int) (*entity.Author, error) {
 	}
 
 	var author entity.Author
-	r.db.Preload("Images").First(&author, "id = ?", id)
+	r.db.Preload("Images").Preload("Crawl").First(&author, "id = ?", id)
 
 	if author.ID == 0 {
 		return nil, ErrAuthorNotFound

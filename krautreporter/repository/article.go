@@ -49,7 +49,7 @@ func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Arti
 
 func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
 	var a entity.Article
-	r.db.First(&a, "id = ?", id)
+	r.db.Preload("Images").Preload("Crawl").First(&a, "id = ?", id)
 
 	if a.ID == 0 {
 		return nil, ErrArticleNotFound
