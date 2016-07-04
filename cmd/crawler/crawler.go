@@ -24,7 +24,7 @@ func main() {
 	kr := krautreporter.New(logger, gorm, cache)
 
 	g.Cli.Commands = append(g.Cli.Commands, cli.SyncCommand(kr))
-	g.Cli.Commands = append(g.Cli.Commands, cli.CrawlCommand(kr))
+	g.Cli.Commands = append(g.Cli.Commands, cli.CrawlCommand(kr, logger))
 
 	if err := g.Run(); err != nil {
 		g.Logger.Log("msg", "Error running gollection", "err", err)
