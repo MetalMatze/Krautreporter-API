@@ -62,7 +62,7 @@ func (r GormArticleRepository) SaveAll(articles []*entity.Article) error {
 	tx := r.db.Begin()
 	for i, a := range articles {
 		article := entity.Article{ID: a.ID}
-		tx.Preload("Crawl").FirstOrCreate(&article)
+		tx.Preload("Images").Preload("Crawl").FirstOrCreate(&article)
 
 		article.Ordering = len(articles) - 1 - i
 		article.Title = a.Title
