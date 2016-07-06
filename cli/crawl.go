@@ -9,6 +9,7 @@ import (
 	"github.com/MetalMatze/Krautreporter-API/krautreporter/service"
 	"github.com/fortytw2/radish"
 	"github.com/go-kit/kit/log"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli"
 )
 
@@ -27,19 +28,23 @@ type CrawlInteractor interface {
 const articleQueue = "articleQueue"
 const authorQueue = "authorQueue"
 
-func CrawlCommand(kr *krautreporter.Krautreporter, logger log.Logger) cli.Command {
+func CrawlCommand(kr *krautreporter.Krautreporter, logger log.Logger, syncCounter prometheus.Counter, crawlCounter *prometheus.CounterVec) cli.Command {
 	return cli.Command{
 		Name:  "crawl",
 		Usage: "Crawl article & authors",
 		Action: func(c *cli.Context) (err error) {
-			crawler := newCrawler(logger, kr.CrawlInteractor)
+			crawler := &crawler{
+				interactor:   kr.CrawlInteractor,
+				logger:       logger,
+				crawlCounter: crawlCounter,
+			}
 
 			logger.Log("msg", "creating broker")
 			broker := radish.NewMemBroker()
 
 			logger.Log("msg", "creating pools")
 			authorsPool := radish.NewPool(broker, authorQueue, crawler.authors, logger)
-			articlesPool := radish.NewPool(broker, articleQueue, crawler.crawlArticle, logger)
+			articlesPool := radish.NewPool(broker, articleQueue, crawler.articles, logger)
 
 			logger.Log("msg", "creating publishers")
 			authorsPub, err := broker.Publisher(authorQueue)
@@ -65,6 +70,7 @@ func CrawlCommand(kr *krautreporter.Krautreporter, logger log.Logger) cli.Comman
 			for {
 				syncAuthor(kr.Logger, kr.CrawlInteractor)
 				syncArticle(kr.Logger, kr.CrawlInteractor)
+				syncCounter.Inc()
 
 				authors, err := kr.CrawlInteractor.FindOutdatedAuthors()
 				if err != nil {
@@ -99,15 +105,9 @@ func CrawlCommand(kr *krautreporter.Krautreporter, logger log.Logger) cli.Comman
 }
 
 type crawler struct {
-	interactor CrawlInteractor
-	logger     log.Logger
-}
-
-func newCrawler(logger log.Logger, ci CrawlInteractor) *crawler {
-	return &crawler{
-		interactor: ci,
-		logger:     logger,
-	}
+	interactor   CrawlInteractor
+	logger       log.Logger
+	crawlCounter *prometheus.CounterVec
 }
 
 func (c *crawler) authors(in []byte) ([][]byte, error) {
@@ -135,12 +135,13 @@ func (c *crawler) authors(in []byte) ([][]byte, error) {
 		return nil, err
 	}
 
+	c.crawlCounter.WithLabelValues("authors").Inc()
 	c.logger.Log("msg", "Author crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 
 	return nil, nil
 }
 
-func (c *crawler) crawlArticle(in []byte) ([][]byte, error) {
+func (c *crawler) articles(in []byte) ([][]byte, error) {
 	start := time.Now()
 
 	id, err := strconv.Atoi(string(in))
@@ -165,6 +166,7 @@ func (c *crawler) crawlArticle(in []byte) ([][]byte, error) {
 		return nil, err
 	}
 
+	c.crawlCounter.WithLabelValues("articles").Inc()
 	c.logger.Log("msg", "Article crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 
 	return nil, nil
