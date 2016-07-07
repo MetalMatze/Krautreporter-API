@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -48,12 +49,18 @@ func (r GormArticleRepository) FindOlderThan(id int, number int) ([]*entity.Arti
 }
 
 func (r GormArticleRepository) FindByID(id int) (*entity.Article, error) {
+	if cached, exists := r.cache.Get(fmt.Sprintf("articles.%d", id)); exists {
+		return cached.(*entity.Article), nil
+	}
+
 	var a entity.Article
 	r.db.Preload("Images").Preload("Crawl").First(&a, "id = ?", id)
 
 	if a.ID == 0 {
 		return nil, ErrArticleNotFound
 	}
+
+	r.cache.Set(fmt.Sprintf("authors.%d", a.ID), &a, 5*time.Second)
 
 	return &a, nil
 }
