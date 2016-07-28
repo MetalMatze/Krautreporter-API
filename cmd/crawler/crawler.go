@@ -25,7 +25,7 @@ var (
 			Name: "crawls",
 			Help: "Number of crawls",
 		},
-		[]string{"type"},
+		[]string{"type", "status"},
 	)
 )
 

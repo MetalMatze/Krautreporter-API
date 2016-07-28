@@ -125,17 +125,19 @@ func (c *crawler) authors(in []byte) ([][]byte, error) {
 
 	err = service.CrawlAuthor(a)
 	if err != nil {
+		c.crawlCounter.WithLabelValues("authors", "error").Inc()
 		c.logger.Log("msg", "Crawling author has failed", "id", a.ID, "url", a.URL)
 		return nil, err
 	}
 
 	err = c.interactor.SaveAuthor(a)
 	if err != nil {
+		c.crawlCounter.WithLabelValues("authors", "error").Inc()
 		c.logger.Log("msg", "Failed to save crawled author", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 		return nil, err
 	}
 
-	c.crawlCounter.WithLabelValues("authors").Inc()
+	c.crawlCounter.WithLabelValues("authors", "success").Inc()
 	c.logger.Log("msg", "Author crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 
 	return nil, nil
@@ -156,17 +158,19 @@ func (c *crawler) articles(in []byte) ([][]byte, error) {
 
 	err = service.CrawlArticle(a)
 	if err != nil {
+		c.crawlCounter.WithLabelValues("articles", "error").Inc()
 		c.logger.Log("msg", "Crawling articles has failed", "id", a.ID, "url", a.URL)
 		return nil, err
 	}
 
 	err = c.interactor.SaveArticle(a)
 	if err != nil {
+		c.crawlCounter.WithLabelValues("articles", "error").Inc()
 		c.logger.Log("msg", "Failed to save crawled article", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 		return nil, err
 	}
 
-	c.crawlCounter.WithLabelValues("articles").Inc()
+	c.crawlCounter.WithLabelValues("articles", "success").Inc()
 	c.logger.Log("msg", "Article crawled successfully", "id", a.ID, "url", a.URL, "duration", time.Since(start))
 
 	return nil, nil
