@@ -20,7 +20,8 @@ import (
 )
 
 var (
-	IDRegex = regexp.MustCompile(`\/(v2\/)?(\d*)`)
+	idRegex     = regexp.MustCompile(`\/(v2\/)?(\d*)`)
+	srcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
 )
 
 func main() {
@@ -47,24 +48,21 @@ func main() {
 }
 
 type Crawler struct {
-	host    string
-	db      *gorm.DB
-	metrics crawlerMetrics
+	host string
+	db   *gorm.DB
 }
 
 func (crawler Crawler) indexCommand(c *cli.Context) error {
 	var articles []TeaserArticle
 
 	for {
-		a, err := crawler.indexHomepage()
-		if err != nil {
-			return err
-		}
-		articles = append(articles, a...)
-
-		page := 2
+		page := 1
 		for {
-			url := fmt.Sprintf(crawler.host+"/api/articles?page=%d", page)
+			url := crawler.host + "/api/articles"
+			if page > 1 {
+				url = fmt.Sprintf("%s?page=%d", url, page)
+			}
+
 			log.Println(url)
 
 			resp, err := http.Get(url)
@@ -91,38 +89,17 @@ func (crawler Crawler) indexCommand(c *cli.Context) error {
 			page++
 		}
 
-		time.Sleep(20 * time.Second)
+		if err := crawler.SaveArticles(articles); err != nil {
+			log.Println(err)
+		}
+
+		time.Sleep(15 * time.Second)
 	}
 
 	return nil
 }
 
-func (crawler Crawler) indexHomepage() ([]TeaserArticle, error) {
-	var articles []TeaserArticle
-
-	log.Println(crawler.host)
-	doc, err := goquery.NewDocument(crawler.host)
-	if err != nil {
-		return articles, err
-	}
-	// TODO: Need to check if really 200 OK
-
-	layoutNode := doc.Find(".content .layout .layout__item")
-	layoutNode.Each(func(i int, s *goquery.Selection) {
-		if i == 9 { // the 10th node is the more button, don't include it
-			return
-		}
-
-		html, err := s.Html()
-		if err != nil {
-			log.Println(err)
-		}
-		articles = append(articles, TeaserArticle{TeaserHTML: html})
-	})
-
-	return articles, nil
-}
-
+// SaveArticles takes a slice of TeaserArticles and saves them to the db
 func (crawler Crawler) SaveArticles(articles []TeaserArticle) error {
 	tx := crawler.db.Begin()
 	for i, a := range articles {
@@ -130,11 +107,15 @@ func (crawler Crawler) SaveArticles(articles []TeaserArticle) error {
 		if err != nil {
 			return err
 		}
+
 		article.Ordering = len(articles) - i - 1
 
-		if tx := tx.FirstOrCreate(&article); tx.Error != nil {
-			return err
+		if article.Crawl.ID == 0 {
+			article.Crawl = entity.Crawl{Next: time.Now()}
 		}
+
+		tx.Preload("Images").Preload("Crawl").FirstOrCreate(&article)
+		tx.Save(&article)
 	}
 	tx.Commit()
 
@@ -170,7 +151,7 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 	}
 
 	// ID
-	id, err := strconv.Atoi(IDRegex.FindStringSubmatch(URL)[2])
+	id, err := strconv.Atoi(idRegex.FindStringSubmatch(URL)[2])
 	if err != nil {
 		return nil, fmt.Errorf("couldn't parse id for %d:  ID attr doesn't exist", id)
 	}
@@ -187,22 +168,43 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 
 	// Preview
 	var preview bool
+	var images []entity.Image
 	if imageNode.Length() > 0 { // preview available if img node exists
 		preview = true
 
-		imageHTML, err := imageNode.Html()
+		srcset, _ := imageNode.Attr("srcset")
+		images, err = ParseImages(srcset)
 		if err != nil {
 			return nil, err
 		}
-
-		fmt.Println(imageHTML)
 	}
 
-	return &entity.Article{
+	article := &entity.Article{
 		ID:      id,
 		Title:   title,
 		Date:    date,
 		Preview: preview,
 		URL:     URL,
-	}, nil
+	}
+
+	for _, i := range images {
+		article.AddImage(i)
+	}
+
+	return article, nil
+}
+
+// ParseImages takes a string with srcset and returns a slice of Images
+func ParseImages(srcset string) ([]entity.Image, error) {
+	var images []entity.Image
+
+	matches := srcsetRegex.FindStringSubmatch(srcset)
+	if len(matches) == 5 {
+		images = append(images, entity.Image{Width: 300, Src: matches[1]})
+		images = append(images, entity.Image{Width: 600, Src: matches[2]})
+		images = append(images, entity.Image{Width: 1000, Src: matches[3]})
+		images = append(images, entity.Image{Width: 2000, Src: matches[4]})
+	}
+
+	return images, nil
 }
