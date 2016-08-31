@@ -5,6 +5,6 @@ WORKDIR /app
 RUN apk update
 RUN apk add bash ca-certificates
 
-ADD crawler .
+ADD scraper .
 
-ENTRYPOINT ["/app/crawler"]
+ENTRYPOINT ["/app/scraper"]

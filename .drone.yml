@@ -22,8 +22,8 @@ publish:
     username: $$DOCKER_USER
     password: $$DOCKER_PASS
     email: $$DOCKER_EMAIL
-    repo: metalmatze/krautreporter-crawler
-    file: Dockerfile.crawler
+    repo: metalmatze/krautreporter-scraper
+    file: Dockerfile.scraper
     tag: latest
     storage_driver: vfs
     when:

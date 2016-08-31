@@ -1,6 +1,6 @@
 /.env
 /api
-/crawler
+/scraper
 /secrets.yml
 /vendor/
 
