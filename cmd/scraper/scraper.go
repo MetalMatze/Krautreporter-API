@@ -78,17 +78,26 @@ func (scraper Scraper) indexCommand(c *cli.Context) error {
 func (scraper Scraper) crawlCommand(c *cli.Context) error {
 
 	articleChan := make(chan *entity.Article, 1024)
-
 	for i := 0; i < 10; i++ {
 		go func() {
 			for a := range articleChan {
-				scraper.crawlArticle(a)
+				scraper.scrapeArticle(a)
+			}
+		}()
+	}
+
+	authorChan := make(chan *entity.Author, 1024)
+	for i := 0; i < 10; i++ {
+		go func() {
+			for a := range authorChan {
+				scraper.scrapeAuthor(a)
 			}
 		}()
 	}
 
 	go func() {
 		for {
+			// articles
 			var crawls []*entity.Crawl
 			scraper.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
 
@@ -102,6 +111,20 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 
 			for _, a := range articles {
 				articleChan <- a
+			}
+
+			// authors
+			scraper.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
+
+			for _, c := range crawls {
+				IDs = append(IDs, c.CrawlableID)
+			}
+
+			var authors []*entity.Author
+			scraper.db.Preload("Crawl").Where(IDs).Find(&authors)
+
+			for _, a := range authors {
+				authorChan <- a
 			}
 
 			time.Sleep(crawlInterval)
@@ -272,7 +295,7 @@ func ParseImages(srcset string) ([]entity.Image, error) {
 	return images, nil
 }
 
-func (scraper Scraper) crawlArticle(a *entity.Article) {
+func (scraper Scraper) scrapeArticle(a *entity.Article) {
 	log.Println(scraper.host + a.URL)
 	doc, err := goquery.NewDocument(scraper.host + a.URL)
 	if err != nil {
@@ -318,6 +341,29 @@ func (scraper Scraper) crawlArticle(a *entity.Article) {
 
 	scraper.db.Save(&author)
 
+	a.Crawl.Next = time.Now().Add(time.Hour)
 	a.AuthorID = author.ID
+	scraper.db.Save(&a)
+}
+
+func (scraper Scraper) scrapeAuthor(a *entity.Author) {
+	log.Println(scraper.host + a.URL)
+	doc, err := goquery.NewDocument(scraper.host + a.URL)
+	if err != nil {
+		log.Println(err)
+	}
+
+	authorNode := doc.Find("main .island .author")
+
+	a.Biography = strings.TrimSpace(authorNode.Find("p").First().Text())
+
+	html, err := authorNode.Find("p.meta").Html()
+	if err != nil {
+		log.Println(err)
+	}
+
+	a.SocialMedia = html
+	a.Crawl.Next = time.Now().Add(time.Hour)
+
 	scraper.db.Save(&a)
 }
