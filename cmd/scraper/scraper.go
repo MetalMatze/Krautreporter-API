@@ -30,7 +30,7 @@ var (
 )
 
 func main() {
-	db, err := gorm.Open("postgres", "postgres://postgres:postgres@localhost:54320/postgres?sslmode=disable")
+	db, err := gorm.Open("postgres", os.Getenv("DSN"))
 	if err != nil {
 		log.Fatal(err)
 	}
