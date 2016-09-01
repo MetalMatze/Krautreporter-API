@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -21,8 +22,8 @@ import (
 )
 
 const (
-	indexInterval = time.Minute
-	crawlInterval = 5 * time.Minute
+	indexInterval = 5 * time.Minute
+	crawlInterval = indexInterval
 )
 
 var (
@@ -177,6 +178,11 @@ func (scraper Scraper) index() error {
 			return err
 		}
 		if resp.StatusCode != 200 {
+			log.Printf("request for %s returned %d", url, resp.StatusCode)
+			body, _ := ioutil.ReadAll(resp.Body)
+			log.Println(string(body))
+			resp.Body.Close()
+
 			continue
 		}
 
