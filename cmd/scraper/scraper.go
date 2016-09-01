@@ -12,10 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli"
 )
 
@@ -27,7 +28,25 @@ const (
 var (
 	idRegex     = regexp.MustCompile(`\/(\d*)`)
 	srcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
+
+	indexCounter = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "krautreporter_index_total",
+			Help: "How often the scraper indexed the site",
+		},
+	)
+	indexArticleGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "krautreporter_index_article_total",
+			Help: "How often articles are successfully scraped",
+		},
+		[]string{"status"},
+	)
 )
+
+func init() {
+	prometheus.MustRegister(indexCounter, indexArticleGauge)
+}
 
 func main() {
 	db, err := gorm.Open("postgres", os.Getenv("DSN"))
@@ -56,6 +75,11 @@ func main() {
 		},
 	}
 
+	go func() {
+		http.Handle("/metrics", prometheus.Handler())
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
+
 	app.Run(os.Args)
 }
 
@@ -69,6 +93,7 @@ func (scraper Scraper) indexCommand(c *cli.Context) error {
 		if err := scraper.index(); err != nil {
 			return err
 		}
+		indexCounter.Inc()
 		time.Sleep(indexInterval)
 	}
 
@@ -76,7 +101,6 @@ func (scraper Scraper) indexCommand(c *cli.Context) error {
 }
 
 func (scraper Scraper) crawlCommand(c *cli.Context) error {
-
 	articleChan := make(chan *entity.Article, 1024)
 	for i := 0; i < 10; i++ {
 		go func() {
@@ -131,7 +155,7 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 		}
 	}()
 
-	scraper.indexCommand(c) // blocks and crawling works in a goroutine
+	scraper.indexCommand(c) // indexing blocks and crawling works in a goroutines
 
 	return nil
 }
@@ -181,11 +205,13 @@ func (scraper Scraper) index() error {
 
 // SaveArticles takes a slice of TeaserArticles and saves them to the db
 func (scraper Scraper) SaveArticles(articles []TeaserArticle) error {
+	indexArticleGauge.Reset()
 	tx := scraper.db.Begin()
 	for i, a := range articles {
 		article, err := a.Parse()
 		if err != nil {
 			log.Println(err)
+			indexArticleGauge.WithLabelValues("error").Inc()
 			continue
 		}
 
@@ -197,6 +223,7 @@ func (scraper Scraper) SaveArticles(articles []TeaserArticle) error {
 
 		tx.Preload("Images").Preload("Crawl").FirstOrCreate(&article)
 		tx.Save(&article)
+		indexArticleGauge.WithLabelValues("success").Inc()
 	}
 	tx.Commit()
 
@@ -367,7 +394,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) {
 		log.Println(err)
 	}
 
-	a.SocialMedia = html
+	a.SocialMedia = strings.TrimSpace(html)
 	a.Crawl.Next = time.Now().Add(time.Hour)
 
 	scraper.db.Save(&a)
