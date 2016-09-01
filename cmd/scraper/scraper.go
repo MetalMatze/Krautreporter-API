@@ -322,8 +322,13 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) {
 	authorURL, _ := authorNode.Attr("href")
 	authorName := strings.TrimSpace(authorNode.Text())
 
+	idMatches := idRegex.FindStringSubmatch(authorURL)
+	if len(idMatches) != 2 {
+		log.Printf("couldn't parse id for author %s\n", authorURL)
+	}
+
 	// ID
-	authorID, err := strconv.Atoi(idRegex.FindStringSubmatch(authorURL)[1])
+	authorID, err := strconv.Atoi(idMatches[1])
 	if err != nil {
 		log.Printf("couldn't parse id for author %s\n", authorURL)
 	}
