@@ -211,13 +211,13 @@ func (scraper Scraper) index() error {
 
 // SaveArticles takes a slice of TeaserArticles and saves them to the db
 func (scraper Scraper) SaveArticles(articles []TeaserArticle) error {
-	indexArticleGauge.Reset()
+	var successCount, errorCount float64
 	tx := scraper.db.Begin()
 	for i, a := range articles {
 		article, err := a.Parse()
 		if err != nil {
 			log.Println(err)
-			indexArticleGauge.WithLabelValues("error").Inc()
+			errorCount++
 			continue
 		}
 
@@ -229,9 +229,12 @@ func (scraper Scraper) SaveArticles(articles []TeaserArticle) error {
 
 		tx.Preload("Images").Preload("Crawl").FirstOrCreate(&article)
 		tx.Save(&article)
-		indexArticleGauge.WithLabelValues("success").Inc()
+		successCount++
 	}
 	tx.Commit()
+
+	indexArticleGauge.WithLabelValues("success").Set(successCount)
+	indexArticleGauge.WithLabelValues("error").Set(errorCount)
 
 	return nil
 }
