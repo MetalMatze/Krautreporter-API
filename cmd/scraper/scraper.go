@@ -27,8 +27,9 @@ const (
 )
 
 var (
-	idRegex     = regexp.MustCompile(`\/(\d*)`)
-	srcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
+	idRegex            = regexp.MustCompile(`\/(\d*)`)
+	articleSrcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
+	authorSrcsetRegex  = regexp.MustCompile(`(.*) 170w, (.*) 340w`)
 
 	indexCounter = prometheus.NewCounter(
 		prometheus.CounterOpts{
@@ -295,7 +296,7 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 		preview = true
 
 		srcset, _ := imageNode.Attr("srcset")
-		images, err = ParseImages(srcset)
+		images, err = ParseArticleImages(srcset)
 		if err != nil {
 			return nil, err
 		}
@@ -317,10 +318,10 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 }
 
 // ParseImages takes a string with srcset and returns a slice of Images
-func ParseImages(srcset string) ([]entity.Image, error) {
+func ParseArticleImages(srcset string) ([]entity.Image, error) {
 	var images []entity.Image
 
-	matches := srcsetRegex.FindStringSubmatch(srcset)
+	matches := articleSrcsetRegex.FindStringSubmatch(srcset)
 	if len(matches) == 5 {
 		images = append(images, entity.Image{Width: 300, Src: matches[1]})
 		images = append(images, entity.Image{Width: 600, Src: matches[2]})
@@ -394,7 +395,10 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) {
 		log.Println(err)
 	}
 
+	scraper.db.Preload("Images").Preload("Crawl").FirstOrCreate(&a)
+
 	authorNode := doc.Find("main .island .author")
+	imageNode := authorNode.Find("img.author__img")
 
 	a.Biography = strings.TrimSpace(authorNode.Find("p").First().Text())
 
@@ -404,7 +408,32 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) {
 	}
 
 	a.SocialMedia = strings.TrimSpace(html)
-	a.Crawl.Next = time.Now().Add(time.Hour)
+	var images []entity.Image
+	if imageNode.Length() > 0 {
+		srcset, _ := imageNode.Attr("srcset")
+		images, err = ParseAuthorImages(srcset)
+		if err != nil {
+			log.Println(err)
+		}
+	}
 
+	for _, i := range images {
+		a.AddImage(i)
+	}
+
+	a.Crawl.Next = time.Now().Add(time.Hour)
 	scraper.db.Save(&a)
+}
+
+// ParseImages takes a string with srcset and returns a slice of Images
+func ParseAuthorImages(srcset string) ([]entity.Image, error) {
+	var images []entity.Image
+
+	matches := authorSrcsetRegex.FindStringSubmatch(srcset)
+	if len(matches) == 3 {
+		images = append(images, entity.Image{Width: 170, Src: matches[1]})
+		images = append(images, entity.Image{Width: 340, Src: matches[2]})
+	}
+
+	return images, nil
 }
