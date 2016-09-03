@@ -44,10 +44,17 @@ var (
 		},
 		[]string{"status"},
 	)
+	crawlCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "krautreporter_crawls_total",
+			Help: "How often authors & articles are crawled",
+		},
+		[]string{"type", "status"},
+	)
 )
 
 func init() {
-	prometheus.MustRegister(indexCounter, indexArticleGauge)
+	prometheus.MustRegister(indexCounter, indexArticleGauge, crawlCounter)
 }
 
 func main() {
@@ -107,7 +114,10 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 	for i := 0; i < 10; i++ {
 		go func() {
 			for a := range articleChan {
-				scraper.scrapeArticle(a)
+				if err := scraper.scrapeArticle(a); err != nil {
+					crawlCounter.WithLabelValues("articles", "error").Inc()
+				}
+				crawlCounter.WithLabelValues("articles", "success").Inc()
 			}
 		}()
 	}
@@ -116,7 +126,10 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 	for i := 0; i < 10; i++ {
 		go func() {
 			for a := range authorChan {
-				scraper.scrapeAuthor(a)
+				if err := scraper.scrapeAuthor(a); err != nil {
+					crawlCounter.WithLabelValues("authors", "error").Inc()
+				}
+				crawlCounter.WithLabelValues("authors", "success").Inc()
 			}
 		}()
 	}
@@ -332,11 +345,11 @@ func ParseArticleImages(srcset string) ([]entity.Image, error) {
 	return images, nil
 }
 
-func (scraper Scraper) scrapeArticle(a *entity.Article) {
+func (scraper Scraper) scrapeArticle(a *entity.Article) error {
 	log.Println(scraper.host + a.URL)
 	doc, err := goquery.NewDocument(scraper.host + a.URL)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	articleNode := doc.Find("main article.article")
@@ -348,7 +361,7 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) {
 
 	contentHTML, err := contentNode.Html()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	a.Headline = strings.TrimSpace(articleNode.Find(".article--title").Text())
@@ -386,13 +399,15 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) {
 	a.Crawl.Next = time.Now().Add(time.Hour)
 	a.AuthorID = author.ID
 	scraper.db.Save(&a)
+
+	return nil
 }
 
-func (scraper Scraper) scrapeAuthor(a *entity.Author) {
+func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
 	log.Println(scraper.host + a.URL)
 	doc, err := goquery.NewDocument(scraper.host + a.URL)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	scraper.db.Preload("Images").Preload("Crawl").FirstOrCreate(&a)
@@ -404,7 +419,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) {
 
 	html, err := authorNode.Find("p.meta").Html()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	a.SocialMedia = strings.TrimSpace(html)
@@ -413,7 +428,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) {
 		srcset, _ := imageNode.Attr("srcset")
 		images, err = ParseAuthorImages(srcset)
 		if err != nil {
-			log.Println(err)
+			return err
 		}
 	}
 
@@ -423,6 +438,8 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) {
 
 	a.Crawl.Next = time.Now().Add(time.Hour)
 	scraper.db.Save(&a)
+
+	return nil
 }
 
 // ParseImages takes a string with srcset and returns a slice of Images
