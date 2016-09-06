@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-kit/kit/log"
 	"github.com/gollection/gollection"
-	"github.com/metalmatze/krautreporter-api/cli"
 	"github.com/metalmatze/krautreporter-api/cmd"
 	"github.com/metalmatze/krautreporter-api/config"
 	"github.com/metalmatze/krautreporter-api/http"
@@ -34,12 +33,11 @@ func main() {
 			status := nethttp.StatusInternalServerError
 			c.String(status, nethttp.StatusText(status))
 		}
-
 		status := nethttp.StatusOK
 		c.String(status, nethttp.StatusText(status))
 	})
 
-	g.Cli.Commands = append(g.Cli.Commands, cli.SeedCommand(logger, gorm))
+	g.Cli.Commands = append(g.Cli.Commands)
 
 	if err := g.Run(); err != nil {
 		g.Logger.Log("msg", "Error running gollection")
