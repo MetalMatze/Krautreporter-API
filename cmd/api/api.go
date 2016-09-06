@@ -11,6 +11,7 @@ import (
 	"github.com/metalmatze/krautreporter-api/config"
 	"github.com/metalmatze/krautreporter-api/http"
 	"github.com/metalmatze/krautreporter-api/krautreporter"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func main() {
@@ -38,6 +39,11 @@ func main() {
 	})
 
 	g.Cli.Commands = append(g.Cli.Commands)
+
+	go func() {
+		nethttp.Handle("/metrics", prometheus.Handler())
+		nethttp.ListenAndServe(":8080", nil)
+	}()
 
 	if err := g.Run(); err != nil {
 		g.Logger.Log("msg", "Error running gollection")
