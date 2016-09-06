@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
 )
 
 var authorPageSrcsetRegex = regexp.MustCompile(`(.*) 170w, (.*) 340w`)

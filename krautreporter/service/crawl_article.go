@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
 )
 
 func CrawlArticle(a *entity.Article) error {

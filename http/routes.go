@@ -3,9 +3,9 @@ package http
 import (
 	"net/http"
 
-	"github.com/MetalMatze/Krautreporter-API/http/controller"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter"
 	"github.com/gin-gonic/gin"
+	"github.com/metalmatze/krautreporter-api/http/controller"
+	"github.com/metalmatze/krautreporter-api/krautreporter"
 )
 
 func Routes(kr *krautreporter.Krautreporter, r *gin.Engine) {

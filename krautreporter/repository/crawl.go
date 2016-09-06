@@ -3,9 +3,9 @@ package repository
 import (
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
 	gocache "github.com/patrickmn/go-cache"
 )
 

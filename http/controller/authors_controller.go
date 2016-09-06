@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/MetalMatze/Krautreporter-API/http/marshaller"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/gin-gonic/gin"
+	"github.com/metalmatze/krautreporter-api/http/marshaller"
+	"github.com/metalmatze/krautreporter-api/krautreporter/repository"
 )
 
 type AuthorsController struct {

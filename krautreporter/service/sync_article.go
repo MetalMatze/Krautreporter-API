@@ -9,9 +9,9 @@ import (
 
 	"strings"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/go-kit/kit/log"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
 )
 
 const mainURL string = "https://krautreporter.de"

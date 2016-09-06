@@ -1,6 +1,6 @@
 package interactor
 
-import "github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+import "github.com/metalmatze/krautreporter-api/krautreporter/entity"
 
 type httpAuthorRepository interface {
 	Find() ([]*entity.Author, error)

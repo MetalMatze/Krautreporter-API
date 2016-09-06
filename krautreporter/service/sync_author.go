@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/go-kit/kit/log"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
 )
 
 var IDRegex = regexp.MustCompile(`\/(\d*)`)

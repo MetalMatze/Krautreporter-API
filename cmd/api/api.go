@@ -4,14 +4,14 @@ import (
 	nethttp "net/http"
 	"os"
 
-	"github.com/MetalMatze/Krautreporter-API/cli"
-	"github.com/MetalMatze/Krautreporter-API/cmd"
-	"github.com/MetalMatze/Krautreporter-API/config"
-	"github.com/MetalMatze/Krautreporter-API/http"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter"
 	"github.com/gin-gonic/gin"
 	"github.com/go-kit/kit/log"
 	"github.com/gollection/gollection"
+	"github.com/metalmatze/krautreporter-api/cli"
+	"github.com/metalmatze/krautreporter-api/cmd"
+	"github.com/metalmatze/krautreporter-api/config"
+	"github.com/metalmatze/krautreporter-api/http"
+	"github.com/metalmatze/krautreporter-api/krautreporter"
 )
 
 func main() {

@@ -1,9 +1,9 @@
 package cli
 
 import (
-	"github.com/MetalMatze/Krautreporter-API/krautreporter"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/service"
 	"github.com/go-kit/kit/log"
+	"github.com/metalmatze/krautreporter-api/krautreporter"
+	"github.com/metalmatze/krautreporter-api/krautreporter/service"
 	"github.com/urfave/cli"
 )
 

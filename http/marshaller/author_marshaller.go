@@ -3,7 +3,7 @@ package marshaller
 import (
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
 )
 
 const KrautreporterURL string = "https://krautreporter.de"

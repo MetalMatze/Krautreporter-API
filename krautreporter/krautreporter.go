@@ -1,10 +1,10 @@
 package krautreporter
 
 import (
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/interactor"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/repository"
 	"github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
+	"github.com/metalmatze/krautreporter-api/krautreporter/interactor"
+	"github.com/metalmatze/krautreporter-api/krautreporter/repository"
 	gocache "github.com/patrickmn/go-cache"
 )
 

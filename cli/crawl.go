@@ -4,11 +4,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/service"
 	"github.com/fortytw2/radish"
 	"github.com/go-kit/kit/log"
+	"github.com/metalmatze/krautreporter-api/krautreporter"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/krautreporter/service"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli"
 )

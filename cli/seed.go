@@ -5,10 +5,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/krautreporter/entity"
 	"github.com/go-kit/kit/log"
 	"github.com/icrowley/fake"
 	"github.com/jinzhu/gorm"
+	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
 	"github.com/urfave/cli"
 )
 

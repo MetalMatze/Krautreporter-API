@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MetalMatze/Krautreporter-API/config"
 	"github.com/gin-gonic/gin"
 	"github.com/gollection/gollection"
 	"github.com/gollection/gollection/database/gorm/postgres"
 	gogin "github.com/gollection/gollection/router/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/metalmatze/krautreporter-api/config"
 	gocache "github.com/patrickmn/go-cache"
 )
 
