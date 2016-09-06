@@ -53,9 +53,7 @@ func marshallAuthor(a *entity.Author) authorMarshaller {
 		UpdatedAt:   a.UpdatedAt,
 	}
 
-	if len(a.Images) > 0 {
-		am.Images = Images(a.Images)
-	}
+	am.Images = Images(a.Images)
 
 	return am
 }

@@ -60,9 +60,7 @@ func marshallArticle(a *entity.Article) articleMarshaller {
 		AuthorID: a.AuthorID,
 	}
 
-	if len(a.Images) > 0 {
-		am.Images = Images(a.Images)
-	}
+	am.Images = Images(a.Images)
 
 	return am
 }

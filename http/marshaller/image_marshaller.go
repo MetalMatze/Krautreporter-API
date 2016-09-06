@@ -19,7 +19,7 @@ func marshallImage(i entity.Image) imageMarshaller {
 }
 
 func Images(images []entity.Image) map[string][]imageMarshaller {
-	var im []imageMarshaller
+	im := []imageMarshaller{}
 
 	for _, i := range images {
 		im = append(im, marshallImage(i))
