@@ -16,7 +16,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/entity"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli"
 )

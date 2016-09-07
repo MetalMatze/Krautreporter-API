@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
-	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/entity"
 	gocache "github.com/patrickmn/go-cache"
 )
 

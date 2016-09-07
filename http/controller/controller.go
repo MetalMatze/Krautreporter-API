@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/go-kit/kit/log"
-	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/entity"
 )
 
 type HTTPInteractor interface {

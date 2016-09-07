@@ -1,7 +1,7 @@
 package marshaller
 
 import (
-	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/entity"
 )
 
 type imageMarshaller struct {

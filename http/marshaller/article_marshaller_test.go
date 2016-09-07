@@ -5,7 +5,7 @@ import (
 
 	"encoding/json"
 
-	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/entity"
 	"github.com/stretchr/testify/assert"
 )
 

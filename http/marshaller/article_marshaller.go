@@ -3,7 +3,7 @@ package marshaller
 import (
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/entity"
 )
 
 type articleMarshaller struct {

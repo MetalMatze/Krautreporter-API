@@ -1,7 +1,7 @@
 package interactor
 
 import (
-	"github.com/metalmatze/krautreporter-api/krautreporter/entity"
+	"github.com/metalmatze/krautreporter-api/entity"
 )
 
 type (
