@@ -1,7 +1,16 @@
+sudo: required
+
 language: go
 
+services:
+  - docker
+
 go:
-  - 1.6
+  - 1.7
+
+before_install:
+  - go get -v ./...
 
 script:
-  - go version
+  - make build
+  - docker build
