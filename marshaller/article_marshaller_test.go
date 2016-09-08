@@ -1,9 +1,8 @@
 package marshaller
 
 import (
-	"testing"
-
 	"encoding/json"
+	"testing"
 
 	"github.com/metalmatze/krautreporter-api/entity"
 	"github.com/stretchr/testify/assert"

@@ -1,15 +1,8 @@
 api:
   image: "metalmatze/krautreporter-api:latest"
   environment:
-    APP_DEBUG: "false"
-    APP_HOST: 0.0.0.0
-    APP_PORT: 1234
-    DB_DIALECT: postgres
-    DB_HOST: postgres
-    DB_PORT: 5432
-    DB_DATABASE: postgres
-    DB_USERNAME: postgres
-    DB_PASSWORD: postgres
+    ADDR: "0.0.0.0:1234"
+    DSN: "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
   links:
     - "postgres:postgres"
   ports:
@@ -17,20 +10,14 @@ api:
   entrypoint:
     - /app/api
     - serve
-crawler:
-  image: "metalmatze/krautreporter-crawler:latest"
+scraper:
+  image: "metalmatze/krautreporter-scraper:latest"
   environment:
-    APP_DEBUG: "false"
-    DB_DIALECT: postgres
-    DB_HOST: postgres
-    DB_PORT: 5432
-    DB_DATABASE: postgres
-    DB_USERNAME: postgres
-    DB_PASSWORD: postgres
+    DSN: "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
   links:
     - "postgres:postgres"
   entrypoint:
-    - /app/crawler
+    - /app/scraper
     - crawl
 postgres:
   image: "postgres:9.5"
@@ -40,22 +27,4 @@ postgres:
     POSTGRES_DB: postgres
   restart: always
   ports:
-    - "54320:5432"
-migration:
-  image: "metalmatze/krautreporter-api:latest"
-  environment:
-    APP_DEBUG: "false"
-    APP_HOST: 0.0.0.0
-    APP_PORT: 1234
-    DB_DIALECT: postgres
-    DB_HOST: postgres
-    DB_PORT: 5432
-    DB_DATABASE: postgres
-    DB_USERNAME: postgres
-    DB_PASSWORD: postgres
-  links:
-    - "postgres:postgres"
-  entrypoint:
-    - /app/api
-    - migrate
-    - up
+    - "5432:5432"
