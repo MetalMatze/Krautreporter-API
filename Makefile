@@ -38,3 +38,7 @@ docker-api:
 docker-scraper:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o scraper cmd/scraper/scraper.go
 	docker build -t metalmatze/krautreporter-scraper -f Dockerfile.scraper .
+
+docker-push:
+	docker push metalmatze/krautreporter-api
+	docker push metalmatze/krautreporter-scraper
