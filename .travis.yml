@@ -12,5 +12,4 @@ before_install:
   - go get -v ./...
 
 script:
-  - make build
-  - docker build
+  - make docker
