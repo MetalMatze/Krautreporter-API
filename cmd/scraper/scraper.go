@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"math/rand"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -54,6 +56,7 @@ var (
 )
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
 	prometheus.MustRegister(indexCounter, indexArticleGauge, crawlCounter)
 }
 
@@ -396,7 +399,7 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) error {
 
 	scraper.db.Save(&author)
 
-	a.Crawl.Next = time.Now().Add(time.Hour)
+	a.Crawl.Next = time.Now().Add(time.Duration(rand.Intn(18000)+30*time.Minute.Seconds()) * time.Second)
 	a.AuthorID = author.ID
 	scraper.db.Save(&a)
 
@@ -436,7 +439,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
 		a.AddImage(i)
 	}
 
-	a.Crawl.Next = time.Now().Add(time.Hour)
+	a.Crawl.Next = time.Now().Add(time.Duration(rand.Intn(18000)+30*time.Minute.Seconds()) * time.Second)
 	scraper.db.Save(&a)
 
 	return nil
