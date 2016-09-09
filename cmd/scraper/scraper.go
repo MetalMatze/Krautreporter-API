@@ -399,7 +399,7 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) error {
 
 	scraper.db.Save(&author)
 
-	a.Crawl.Next = time.Now().Add(time.Duration(rand.Intn(18000)+30*time.Minute.Seconds()) * time.Second)
+	a.Crawl.Next = time.Now().Add(time.Duration(float64(rand.Intn(18000))+30*time.Minute.Seconds()) * time.Second)
 	a.AuthorID = author.ID
 	scraper.db.Save(&a)
 
@@ -439,7 +439,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
 		a.AddImage(i)
 	}
 
-	a.Crawl.Next = time.Now().Add(time.Duration(rand.Intn(18000)+30*time.Minute.Seconds()) * time.Second)
+	a.Crawl.Next = time.Now().Add(time.Duration(float64(rand.Intn(18000))+30*time.Minute.Seconds()) * time.Second)
 	scraper.db.Save(&a)
 
 	return nil
