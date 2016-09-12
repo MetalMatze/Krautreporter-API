@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"regexp"
@@ -13,11 +14,10 @@ import (
 	"strings"
 	"time"
 
-	"math/rand"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
 	"github.com/metalmatze/krautreporter-api/entity"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli"
@@ -60,13 +60,28 @@ func init() {
 	prometheus.MustRegister(indexCounter, indexArticleGauge, crawlCounter)
 }
 
+type Config struct {
+	DSN  string
+	Host string
+}
+
 func main() {
-	db, err := gorm.Open("postgres", os.Getenv("DSN"))
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(err)
+	}
+
+	config := &Config{
+		DSN:  os.Getenv("DSN"),
+		Host: os.Getenv("HOST"),
+	}
+
+	db, err := gorm.Open("postgres", config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
 	c := Scraper{
-		host: os.Getenv("HOST"),
+		host: config.Host,
 		db:   db,
 	}
 
