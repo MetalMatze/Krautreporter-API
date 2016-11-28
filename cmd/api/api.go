@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
+	ginprometheus "github.com/mcuadros/go-gin-prometheus"
 	"github.com/metalmatze/krautreporter-api/controller"
 	"github.com/metalmatze/krautreporter-api/repository"
 	gocache "github.com/patrickmn/go-cache"
@@ -77,6 +78,9 @@ func serve(logger log.Logger, config *Config, db *gorm.DB) func(*cli.Context) er
 			Logger:     logger,
 			Repository: repo,
 		}
+
+		ginprom := ginprometheus.NewPrometheus("gin")
+		ginprom.Use(router)
 
 		router.GET("/authors", ctrl.GetAuthors)
 		router.GET("/authors/:id", ctrl.GetAuthor)
