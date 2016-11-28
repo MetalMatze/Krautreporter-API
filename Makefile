@@ -1,18 +1,14 @@
-.PHONY: all clean deps fmt vet test docker
+.PHONY: all clean fmt vet test docker
 
 COMMIT ?= $(shell git rev-parse --short HEAD)
 LDFLAGS = -X "main.buildCommit=$(COMMIT)"
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
 
-all: deps build test
+all: build test
 
 clean:
 	if [ -f api ] ; then rm -f api ; fi
 	if [ -f scraper ] ; then rm -f scraper ; fi
-
-deps:
-	go get -u github.com/govend/govend
-	govend -v
 
 lint:
 	go fmt $(PACKAGES)

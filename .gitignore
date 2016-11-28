@@ -2,6 +2,5 @@
 /api
 /scraper
 /secrets.yml
-/vendor/
 
 coverage.out
