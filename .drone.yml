@@ -1,0 +1,22 @@
+workspace:
+  base: /go
+  path: src/github.com/metalmatze/krautreporter-api
+
+pipeline:
+  build:
+    image: golang:alpine
+    commands:
+      - apk add -U git make
+      - make build
+
+  api:
+    image: plugins/docker
+    repo: metalmatze/krautreporter-api
+    tag: latest
+    Dockerfile: Dockerfile.api
+
+  scraper:
+    image: plugins/docker
+    repo: metalmatze/krautreporter-scraper
+    tag: latest
+    Dockerfile: Dockerfile.scraper
