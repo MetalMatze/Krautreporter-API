@@ -20,21 +20,7 @@ test:
 build: api scraper
 
 api: $(wildcard *.go)
-	CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o api cmd/api/api.go
+	CGO_ENABLED=0 go build -ldflags '-w $(LDFLAGS)' -o api cmd/api/api.go
 
 scraper: $(wildcard *.go)
-	CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o scraper cmd/scraper/scraper.go
-
-docker: docker-api docker-scraper
-
-docker-api:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o api cmd/api/api.go
-	docker build -t metalmatze/krautreporter-api -f Dockerfile.api .
-
-docker-scraper:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' -o scraper cmd/scraper/scraper.go
-	docker build -t metalmatze/krautreporter-scraper -f Dockerfile.scraper .
-
-docker-push:
-	docker push metalmatze/krautreporter-api
-	docker push metalmatze/krautreporter-scraper
+	CGO_ENABLED=0 go build -ldflags '-w $(LDFLAGS)' -o scraper cmd/scraper/scraper.go
