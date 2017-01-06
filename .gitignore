@@ -1,6 +1,5 @@
 /.env
-/api
-/scraper
-/secrets.yml
-
+/krautreporter-api
+/krautreporter-scraper
+/krautreporter.sql
 coverage.out
