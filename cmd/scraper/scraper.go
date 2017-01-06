@@ -53,6 +53,10 @@ var (
 		},
 		[]string{"type", "status"},
 	)
+
+	client = &http.Client{
+		Timeout: 30 * time.Second,
+	}
 )
 
 func init() {
@@ -63,6 +67,17 @@ func init() {
 type Config struct {
 	DSN  string
 	Host string
+}
+
+func httpGet(url string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	req.Header.Set("User-Agent", "Golang_Spider_Bot/3.0")
+
+	return client.Do(req)
 }
 
 func main() {
@@ -123,8 +138,6 @@ func (scraper Scraper) indexCommand(c *cli.Context) error {
 		indexCounter.Inc()
 		time.Sleep(indexInterval)
 	}
-
-	return nil
 }
 
 func (scraper Scraper) crawlCommand(c *cli.Context) error {
@@ -133,6 +146,7 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 		go func() {
 			for a := range articleChan {
 				if err := scraper.scrapeArticle(a); err != nil {
+					log.Println(err)
 					crawlCounter.WithLabelValues("articles", "error").Inc()
 				}
 				crawlCounter.WithLabelValues("articles", "success").Inc()
@@ -203,15 +217,19 @@ func (scraper Scraper) index() error {
 			url = fmt.Sprintf("%s?page=%d", url, page)
 		}
 
-		log.Println(url)
-
-		resp, err := http.Get(url)
+		resp, err := httpGet(url)
 		if err != nil {
 			return err
 		}
+
+		log.Println(resp.Status, url)
+
 		if resp.StatusCode != 200 {
 			log.Printf("request for %s returned %d", url, resp.StatusCode)
-			body, _ := ioutil.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				log.Println(err)
+			}
 			log.Println(string(body))
 			resp.Body.Close()
 
@@ -326,7 +344,11 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 	if imageNode.Length() > 0 { // preview available if img node exists
 		preview = true
 
-		srcset, _ := imageNode.Attr("srcset")
+		srcset, exists := imageNode.Attr("srcset")
+		if !exists {
+			return nil, fmt.Errorf("article images has no srcset: %s", URL)
+		}
+
 		images, err = ParseArticleImages(srcset)
 		if err != nil {
 			return nil, err
@@ -364,8 +386,18 @@ func ParseArticleImages(srcset string) ([]entity.Image, error) {
 }
 
 func (scraper Scraper) scrapeArticle(a *entity.Article) error {
-	log.Println(scraper.host + a.URL)
-	doc, err := goquery.NewDocument(scraper.host + a.URL)
+	resp, err := httpGet(scraper.host + a.URL)
+	if err != nil {
+		return err
+	}
+
+	log.Println(resp.Status, scraper.host+a.URL)
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("scraping %s returned %d\n", a.URL, resp.StatusCode)
+	}
+
+	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		return err
 	}
@@ -387,18 +419,22 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) error {
 	a.Content = strings.TrimSpace(contentHTML)
 
 	authorNode := articleNode.Find(".author .author--link")
-	authorURL, _ := authorNode.Attr("href")
+	authorURL, exists := authorNode.Attr("href")
 	authorName := strings.TrimSpace(authorNode.Text())
+
+	if !exists {
+		return fmt.Errorf("author link doesn't exist for %s", a.URL)
+	}
 
 	idMatches := idRegex.FindStringSubmatch(authorURL)
 	if len(idMatches) != 2 {
-		log.Printf("couldn't parse id for author %s\n", authorURL)
+		log.Printf("couldn't parse article's author id, article: %s, author: %s\n", a.URL, authorURL)
 	}
 
 	// ID
 	authorID, err := strconv.Atoi(idMatches[1])
 	if err != nil {
-		log.Printf("couldn't parse id for author %s\n", authorURL)
+		log.Printf("couldn't parse article's author id, article: %s, author: %s\n", a.URL, authorURL)
 	}
 
 	author := entity.Author{
@@ -422,8 +458,17 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) error {
 }
 
 func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
-	log.Println(scraper.host + a.URL)
-	doc, err := goquery.NewDocument(scraper.host + a.URL)
+	resp, err := httpGet(scraper.host + a.URL)
+	if err != nil {
+		return err
+	}
+	log.Println(resp.Status, scraper.host+a.URL)
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("scraping %s returned %d\n", a.URL, resp.StatusCode)
+	}
+
+	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		return err
 	}
