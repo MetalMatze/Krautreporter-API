@@ -6,6 +6,6 @@ RUN apk update
 RUN apk add bash ca-certificates
 
 COPY database/ database/
-ADD api .
+ADD krautreporter-api .
 
-ENTRYPOINT ["/app/api"]
+ENTRYPOINT ["/app/krautreporter-api"]
