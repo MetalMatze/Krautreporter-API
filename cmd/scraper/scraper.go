@@ -53,7 +53,7 @@ func (s Scraper) get(types, url string) (*http.Response, error) {
 	}
 
 	duration := time.Since(start).Seconds()
-	scrapeTimeHistogram.WithLabelValues(types, string(resp.StatusCode)).Observe(duration)
+	scrapeTimeHistogram.WithLabelValues(types).Observe(duration)
 
 	log.Println(resp.Status, duration, url)
 
