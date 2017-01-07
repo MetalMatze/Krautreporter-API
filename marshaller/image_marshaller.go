@@ -1,7 +1,7 @@
 package marshaller
 
 import (
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
 // Image is a marshalled struct of the entity Image
@@ -11,7 +11,7 @@ type Image struct {
 	Src   string `json:"src"`
 }
 
-func marshallImage(i entity.Image) Image {
+func marshallImage(i krautreporter.Image) Image {
 	return Image{
 		ID:    i.ID,
 		Width: i.Width,
@@ -20,7 +20,7 @@ func marshallImage(i entity.Image) Image {
 }
 
 // FromImages turns a slice of Images into a marshalled data structure
-func FromImages(images []entity.Image) map[string][]Image {
+func FromImages(images []krautreporter.Image) map[string][]Image {
 	im := []Image{}
 
 	for _, i := range images {

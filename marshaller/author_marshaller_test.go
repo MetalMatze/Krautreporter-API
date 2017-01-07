@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMarshallAuthor(t *testing.T) {
-	a := &entity.Author{
+	a := &krautreporter.Author{
 		ID:          13,
 		Ordering:    65,
 		Name:        "Tilo Jung",
@@ -30,7 +30,7 @@ func TestMarshallAuthor(t *testing.T) {
 		string(b),
 	)
 
-	a.Images = append(a.Images, entity.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
+	a.Images = append(a.Images, krautreporter.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
 
 	b, err = json.Marshal(FromAuthor(a))
 	assert.Nil(t, err)
@@ -42,7 +42,7 @@ func TestMarshallAuthor(t *testing.T) {
 }
 
 func TestMarshallAuthors(t *testing.T) {
-	authors := []*entity.Author{{
+	authors := []*krautreporter.Author{{
 		ID:       1,
 		Ordering: 1,
 	}, {

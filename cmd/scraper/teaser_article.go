@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
 type (
@@ -23,7 +23,7 @@ type (
 )
 
 // Parse a TeaserArticle and return every data for an Article
-func (ta TeaserArticle) Parse() (*entity.Article, error) {
+func (ta TeaserArticle) Parse() (*krautreporter.Article, error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(ta.TeaserHTML))
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 
 	// Preview
 	var preview bool
-	var images []entity.Image
+	var images []krautreporter.Image
 	if imageNode.Length() > 0 { // preview available if img node exists
 		preview = true
 
@@ -76,7 +76,7 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 		}
 	}
 
-	article := &entity.Article{
+	article := &krautreporter.Article{
 		ID:      id,
 		Title:   title,
 		Date:    date,

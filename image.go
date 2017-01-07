@@ -1,4 +1,4 @@
-package entity
+package krautreporter
 
 // Image is polymorphic and can be used by Article or Author
 type Image struct {

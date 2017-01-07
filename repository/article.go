@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
 // MaxArticleID is used for sorting descending
@@ -16,7 +16,7 @@ const MaxArticleID int = 1234567890
 var ErrArticleNotFound = errors.New("Article not found")
 
 // FindArticlesOlderThan returns a slice of Article that are older than an ID
-func (r Repository) FindArticlesOlderThan(id int, number int) ([]*entity.Article, error) {
+func (r Repository) FindArticlesOlderThan(id int, number int) ([]*krautreporter.Article, error) {
 	ordering := MaxArticleID
 	if id != MaxArticleID {
 		a, err := r.FindArticleByID(id)
@@ -27,7 +27,7 @@ func (r Repository) FindArticlesOlderThan(id int, number int) ([]*entity.Article
 		ordering = a.Ordering
 	}
 
-	var articles []*entity.Article
+	var articles []*krautreporter.Article
 	if result := r.DB.
 		Preload("Images").
 		Where("ordering < ?", ordering).
@@ -41,12 +41,12 @@ func (r Repository) FindArticlesOlderThan(id int, number int) ([]*entity.Article
 }
 
 // FindArticleByID returns an Article for the ID matching the parameter
-func (r Repository) FindArticleByID(id int) (*entity.Article, error) {
+func (r Repository) FindArticleByID(id int) (*krautreporter.Article, error) {
 	if cached, exists := r.Cache.Get(fmt.Sprintf("articles.%d", id)); exists {
-		return cached.(*entity.Article), nil
+		return cached.(*krautreporter.Article), nil
 	}
 
-	var a entity.Article
+	var a krautreporter.Article
 	r.DB.Preload("Images").Preload("Crawl").First(&a, "id = ?", id)
 
 	if a.ID == 0 {
@@ -59,10 +59,10 @@ func (r Repository) FindArticleByID(id int) (*entity.Article, error) {
 }
 
 // SaveAllArticles takes a slice of Article and saves them to the database
-func (r Repository) SaveAllArticles(articles []*entity.Article) error {
+func (r Repository) SaveAllArticles(articles []*krautreporter.Article) error {
 	tx := r.DB.Begin()
 	for i, a := range articles {
-		article := entity.Article{ID: a.ID}
+		article := krautreporter.Article{ID: a.ID}
 		tx.Preload("Images").Preload("Crawl").FirstOrCreate(&article)
 
 		article.Ordering = len(articles) - 1 - i
@@ -70,7 +70,7 @@ func (r Repository) SaveAllArticles(articles []*entity.Article) error {
 		article.URL = a.URL
 		article.Preview = a.Preview
 
-		author := entity.Author{}
+		author := krautreporter.Author{}
 		tx.First(&author, "name = ?", strings.TrimSpace(a.Author.Name))
 		if author.ID == 0 {
 			r.Logger.Log("msg", "Can't find author for article ", "author", a.Author.Name, "article", a.URL)
@@ -83,7 +83,7 @@ func (r Repository) SaveAllArticles(articles []*entity.Article) error {
 		}
 
 		if article.Crawl.ID == 0 {
-			article.Crawl = entity.Crawl{Next: time.Now()}
+			article.Crawl = krautreporter.Crawl{Next: time.Now()}
 		}
 
 		tx.Save(&article)
@@ -94,7 +94,7 @@ func (r Repository) SaveAllArticles(articles []*entity.Article) error {
 }
 
 // SaveArticle takes an Article and saves it to the database
-func (r Repository) SaveArticle(article *entity.Article) error {
+func (r Repository) SaveArticle(article *krautreporter.Article) error {
 	if result := r.DB.Save(&article); result.Error != nil {
 		return result.Error
 	}

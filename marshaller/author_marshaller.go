@@ -3,7 +3,7 @@ package marshaller
 import (
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
 // KrautreporterURL is used as a prefix for URLs being marshalled
@@ -25,14 +25,14 @@ type Author struct {
 }
 
 // FromAuthor turns a single Author into a marshalled data structure
-func FromAuthor(a *entity.Author) map[string]Author {
+func FromAuthor(a *krautreporter.Author) map[string]Author {
 	return map[string]Author{
 		"data": marshallAuthor(a),
 	}
 }
 
 // FromAuthors turns a slice of Authors into a marshalled data structure
-func FromAuthors(authors []*entity.Author) map[string][]Author {
+func FromAuthors(authors []*krautreporter.Author) map[string][]Author {
 	var as []Author
 
 	for _, a := range authors {
@@ -44,7 +44,7 @@ func FromAuthors(authors []*entity.Author) map[string][]Author {
 	}
 }
 
-func marshallAuthor(a *entity.Author) Author {
+func marshallAuthor(a *krautreporter.Author) Author {
 	am := Author{
 		ID:          a.ID,
 		Ordering:    a.Ordering,

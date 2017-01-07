@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMarshallArticle(t *testing.T) {
-	a := &entity.Article{
+	a := &krautreporter.Article{
 		ID:       123,
 		Ordering: 10,
 		Title:    "Title",
@@ -29,7 +29,7 @@ func TestMarshallArticle(t *testing.T) {
 		string(b),
 	)
 
-	a.Images = append(a.Images, entity.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
+	a.Images = append(a.Images, krautreporter.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
 
 	b, err = json.Marshal(FromArticle(a))
 	assert.Nil(t, err)
@@ -41,7 +41,7 @@ func TestMarshallArticle(t *testing.T) {
 }
 
 func TestMarshallArticles(t *testing.T) {
-	articles := []*entity.Article{{
+	articles := []*krautreporter.Article{{
 		ID:       1,
 		Ordering: 1,
 	}, {

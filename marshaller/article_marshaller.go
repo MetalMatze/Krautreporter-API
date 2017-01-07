@@ -3,7 +3,7 @@ package marshaller
 import (
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
 // Article is a marshalled struct of the entity Article
@@ -26,14 +26,14 @@ type Article struct {
 }
 
 // FromArticle turns a single FromArticle into a marshalled data structure
-func FromArticle(a *entity.Article) map[string]Article {
+func FromArticle(a *krautreporter.Article) map[string]Article {
 	return map[string]Article{
 		"data": marshallArticle(a),
 	}
 }
 
 // FromArticles turns a slice of FromArticles into a marshalled data structure
-func FromArticles(articles []*entity.Article) map[string][]Article {
+func FromArticles(articles []*krautreporter.Article) map[string][]Article {
 	var as []Article
 
 	for _, a := range articles {
@@ -45,7 +45,7 @@ func FromArticles(articles []*entity.Article) map[string][]Article {
 	}
 }
 
-func marshallArticle(a *entity.Article) Article {
+func marshallArticle(a *krautreporter.Article) Article {
 	am := Article{
 		ID:         a.ID,
 		Ordering:   a.Ordering,
