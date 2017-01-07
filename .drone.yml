@@ -18,8 +18,7 @@ pipeline:
     Dockerfile: Dockerfile.api
     tags: [ '${DRONE_TAG##v}' ]
     when:
-      event: [ tag ]
-      branch: [ refs/tags/* ]
+      event: tag
 
   docker-tag:
     image: plugins/docker
@@ -27,8 +26,7 @@ pipeline:
     Dockerfile: Dockerfile.scraper
     tags: [ '${DRONE_TAG##v}' ]
     when:
-      event: [ tag ]
-      branch: [ refs/tags/* ]
+      event: tag
 
   docker-latest:
     image: plugins/docker
