@@ -2,6 +2,7 @@ package entity
 
 import "time"
 
+// Article posted on krautreporter.de
 type Article struct {
 	ID        int
 	Ordering  int

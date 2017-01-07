@@ -9,8 +9,10 @@ import (
 	"github.com/metalmatze/krautreporter-api/repository"
 )
 
+// ArticlesPerPage is the number of articles to be on a page with pagination
 const ArticlesPerPage int = 10
 
+// GetArticles returns a paginated list of marshalled FromArticles
 func (ctrl *Controller) GetArticles(c *gin.Context) {
 	id := repository.MaxArticleID
 	if c.Query("olderthan") != "" {
@@ -37,9 +39,10 @@ func (ctrl *Controller) GetArticles(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	c.JSON(http.StatusOK, marshaller.Articles(articles))
+	c.JSON(http.StatusOK, marshaller.FromArticles(articles))
 }
 
+// GetArticle returns a single marshalled article
 func (ctrl *Controller) GetArticle(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -53,5 +56,5 @@ func (ctrl *Controller) GetArticle(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNotFound)
 	}
 
-	c.JSON(http.StatusOK, marshaller.Article(article))
+	c.JSON(http.StatusOK, marshaller.FromArticle(article))
 }

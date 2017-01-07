@@ -6,6 +6,7 @@ import (
 	"github.com/metalmatze/krautreporter-api/entity"
 )
 
+// FindOutdatedAuthors returns a slice of Authors that need to be scraped
 func (r Repository) FindOutdatedAuthors() ([]*entity.Author, error) {
 	var crawls []*entity.Crawl
 	r.DB.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
@@ -21,6 +22,7 @@ func (r Repository) FindOutdatedAuthors() ([]*entity.Author, error) {
 	return authors, nil
 }
 
+// FindOutdatedArticles returns a slice of Articles that need to be scraped
 func (r Repository) FindOutdatedArticles() ([]*entity.Article, error) {
 	var crawls []*entity.Crawl
 	r.DB.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)

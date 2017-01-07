@@ -6,9 +6,11 @@ import (
 	"github.com/metalmatze/krautreporter-api/entity"
 )
 
+// KrautreporterURL is used as a prefix for URLs being marshalled
 const KrautreporterURL string = "https://krautreporter.de"
 
-type authorMarshaller struct {
+// Author is a marshalled struct of the entity Author
+type Author struct {
 	ID          int       `json:"id"`
 	Ordering    int       `json:"order"`
 	Name        string    `json:"name"`
@@ -19,29 +21,31 @@ type authorMarshaller struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 
-	Images map[string][]imageMarshaller `json:"images"`
+	Images map[string][]Image `json:"images"`
 }
 
-func Author(a *entity.Author) map[string]authorMarshaller {
-	return map[string]authorMarshaller{
+// FromAuthor turns a single Author into a marshalled data structure
+func FromAuthor(a *entity.Author) map[string]Author {
+	return map[string]Author{
 		"data": marshallAuthor(a),
 	}
 }
 
-func Authors(authors []*entity.Author) map[string][]authorMarshaller {
-	var as []authorMarshaller
+// FromAuthors turns a slice of Authors into a marshalled data structure
+func FromAuthors(authors []*entity.Author) map[string][]Author {
+	var as []Author
 
 	for _, a := range authors {
 		as = append(as, marshallAuthor(a))
 	}
 
-	return map[string][]authorMarshaller{
+	return map[string][]Author{
 		"data": as,
 	}
 }
 
-func marshallAuthor(a *entity.Author) authorMarshaller {
-	am := authorMarshaller{
+func marshallAuthor(a *entity.Author) Author {
+	am := Author{
 		ID:          a.ID,
 		Ordering:    a.Ordering,
 		Name:        a.Name,
@@ -53,7 +57,7 @@ func marshallAuthor(a *entity.Author) authorMarshaller {
 		UpdatedAt:   a.UpdatedAt,
 	}
 
-	am.Images = Images(a.Images)
+	am.Images = FromImages(a.Images)
 
 	return am
 }

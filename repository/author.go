@@ -8,8 +8,10 @@ import (
 	"github.com/metalmatze/krautreporter-api/entity"
 )
 
+// ErrAuthorNotFound is returned if an article is not found by id
 var ErrAuthorNotFound = errors.New("Author not found")
 
+// FindAuthors returns a slice of all Authors
 func (r Repository) FindAuthors() ([]*entity.Author, error) {
 	if cached, exists := r.Cache.Get("authors.list"); exists {
 		return cached.([]*entity.Author), nil
@@ -24,6 +26,7 @@ func (r Repository) FindAuthors() ([]*entity.Author, error) {
 	return authors, nil
 }
 
+// FindAuthorByID returns an Author for the ID matching the parameter
 func (r Repository) FindAuthorByID(id int) (*entity.Author, error) {
 	if cached, exists := r.Cache.Get(fmt.Sprintf("authors.%d", id)); exists {
 		return cached.(*entity.Author), nil
@@ -41,6 +44,7 @@ func (r Repository) FindAuthorByID(id int) (*entity.Author, error) {
 	return &author, nil
 }
 
+// SaveAllAuthors takes a slice of Author and saves them to the database
 func (r Repository) SaveAllAuthors(authors []*entity.Author) error {
 	tx := r.DB.Begin()
 	for _, a := range authors {
@@ -67,6 +71,7 @@ func (r Repository) SaveAllAuthors(authors []*entity.Author) error {
 	return nil
 }
 
+// SaveAuthor takes an Author and saves it to the database
 func (r Repository) SaveAuthor(author *entity.Author) error {
 	if result := r.DB.Save(&author); result.Error != nil {
 		return result.Error

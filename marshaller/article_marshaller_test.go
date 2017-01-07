@@ -21,7 +21,7 @@ func TestMarshallArticle(t *testing.T) {
 		AuthorID: 13,
 	}
 
-	b, err := json.Marshal(Article(a))
+	b, err := json.Marshal(FromArticle(a))
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
@@ -31,7 +31,7 @@ func TestMarshallArticle(t *testing.T) {
 
 	a.Images = append(a.Images, entity.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
 
-	b, err = json.Marshal(Article(a))
+	b, err = json.Marshal(FromArticle(a))
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
@@ -49,7 +49,7 @@ func TestMarshallArticles(t *testing.T) {
 		Ordering: 0,
 	}}
 
-	b, err := json.Marshal(Articles(articles))
+	b, err := json.Marshal(FromArticles(articles))
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,

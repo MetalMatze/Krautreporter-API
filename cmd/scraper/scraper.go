@@ -64,6 +64,7 @@ func init() {
 	prometheus.MustRegister(indexCounter, indexArticleGauge, crawlCounter)
 }
 
+// Config for the scraper binary
 type Config struct {
 	DSN  string
 	Host string
@@ -125,6 +126,7 @@ func main() {
 	app.Run(os.Args)
 }
 
+// Scraper knows the host to scrape and connects to the database
 type Scraper struct {
 	host string
 	db   *gorm.DB
@@ -290,14 +292,17 @@ func (scraper Scraper) SaveArticles(articles []TeaserArticle) error {
 }
 
 type (
+	// TeaserArticle is just the teaser part of an article
 	TeaserArticle struct {
 		TeaserHTML string `json:"teaser_html"`
 	}
+	// TeaserArticleResponse is a http json response with TeaserArticles
 	TeaserArticleResponse struct {
 		Articles []TeaserArticle `json:"articles"`
 	}
 )
 
+// Parse a TeaserArticle and return every data for an Article
 func (ta TeaserArticle) Parse() (*entity.Article, error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(ta.TeaserHTML))
 	if err != nil {
@@ -370,7 +375,7 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 	return article, nil
 }
 
-// ParseImages takes a string with srcset and returns a slice of Images
+// ParseArticleImages takes a string with srcset and returns a slice of Images
 func ParseArticleImages(srcset string) ([]entity.Image, error) {
 	var images []entity.Image
 
@@ -394,7 +399,7 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) error {
 	log.Println(resp.Status, scraper.host+a.URL)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("scraping %s returned %d\n", a.URL, resp.StatusCode)
+		return fmt.Errorf("scraping %s returned %d", a.URL, resp.StatusCode)
 	}
 
 	doc, err := goquery.NewDocumentFromResponse(resp)
@@ -465,7 +470,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
 	log.Println(resp.Status, scraper.host+a.URL)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("scraping %s returned %d\n", a.URL, resp.StatusCode)
+		return fmt.Errorf("scraping %s returned %d", a.URL, resp.StatusCode)
 	}
 
 	doc, err := goquery.NewDocumentFromResponse(resp)
@@ -505,7 +510,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
 	return nil
 }
 
-// ParseImages takes a string with srcset and returns a slice of Images
+// ParseAuthorImages takes a string with srcset and returns a slice of Images
 func ParseAuthorImages(srcset string) ([]entity.Image, error) {
 	var images []entity.Image
 

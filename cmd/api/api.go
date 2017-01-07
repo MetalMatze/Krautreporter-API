@@ -18,6 +18,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// Config for the api binary
 type Config struct {
 	Addr string
 	DSN  string
