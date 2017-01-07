@@ -89,7 +89,7 @@ func serve(logger log.Logger, config *Config, db *gorm.DB) func(*cli.Context) er
 		router.GET("/articles", ctrl.GetArticles)
 		router.GET("/articles/:id", ctrl.GetArticle)
 
-		router.GET("/crawls", ctrl.GetCrawls)
+		//router.GET("/crawls", ctrl.GetCrawls)
 
 		go func() {
 			http.Handle("/metrics", prometheus.Handler())
