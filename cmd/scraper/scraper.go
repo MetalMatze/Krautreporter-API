@@ -2,13 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,9 +15,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/joho/godotenv"
 	"github.com/metalmatze/krautreporter-api/entity"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli"
 )
 
@@ -32,45 +28,17 @@ var (
 	idRegex            = regexp.MustCompile(`\/(\d*)`)
 	articleSrcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
 	authorSrcsetRegex  = regexp.MustCompile(`(.*) 170w, (.*) 340w`)
-
-	indexCounter = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "krautreporter_index_total",
-			Help: "How often the scraper indexed the site",
-		},
-	)
-	indexArticleGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "krautreporter_index_article_total",
-			Help: "How often articles are successfully scraped",
-		},
-		[]string{"status"},
-	)
-	crawlCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "krautreporter_crawls_total",
-			Help: "How often authors & articles are crawled",
-		},
-		[]string{"type", "status"},
-	)
-
-	client = &http.Client{
-		Timeout: 30 * time.Second,
-	}
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-	prometheus.MustRegister(indexCounter, indexArticleGauge, crawlCounter)
+// Scraper knows the host to scrape and connects to the database
+type Scraper struct {
+	db *gorm.DB
+
+	host   string
+	client *http.Client
 }
 
-// Config for the scraper binary
-type Config struct {
-	DSN  string
-	Host string
-}
-
-func httpGet(url string) (*http.Response, error) {
+func (s Scraper) get(types, url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -78,63 +46,23 @@ func httpGet(url string) (*http.Response, error) {
 
 	req.Header.Set("User-Agent", "github.com/metalmatze/krautreporter-api/1.0.0")
 
-	return client.Do(req)
-}
-
-func main() {
-	err := godotenv.Load()
+	start := time.Now()
+	resp, err := s.client.Do(req)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	config := &Config{
-		DSN:  os.Getenv("DSN"),
-		Host: os.Getenv("HOST"),
-	}
+	duration := time.Since(start).Seconds()
+	scrapeTimeHistogram.WithLabelValues(types, string(resp.StatusCode)).Observe(duration)
 
-	db, err := gorm.Open("postgres", config.DSN)
-	if err != nil {
-		log.Fatal(err)
-	}
-	c := Scraper{
-		host: config.Host,
-		db:   db,
-	}
+	log.Println(resp.Status, duration, url)
 
-	app := cli.NewApp()
-	app.Name = "scraper"
-	app.Usage = "Index & crawl krautreporter.de"
-
-	app.Commands = []cli.Command{
-		{
-			Name:   "index",
-			Usage:  "Index all articles to start crawling",
-			Action: c.indexCommand,
-		},
-		{
-			Name:   "crawl",
-			Usage:  "Crawl to get all missing data",
-			Action: c.crawlCommand,
-		},
-	}
-
-	go func() {
-		http.Handle("/metrics", prometheus.Handler())
-		log.Fatal(http.ListenAndServe(":8080", nil))
-	}()
-
-	app.Run(os.Args)
+	return resp, err
 }
 
-// Scraper knows the host to scrape and connects to the database
-type Scraper struct {
-	host string
-	db   *gorm.DB
-}
-
-func (scraper Scraper) indexCommand(c *cli.Context) error {
+func (s Scraper) indexCommand(c *cli.Context) error {
 	for {
-		if err := scraper.index(); err != nil {
+		if err := s.index(); err != nil {
 			return err
 		}
 		indexCounter.Inc()
@@ -142,12 +70,12 @@ func (scraper Scraper) indexCommand(c *cli.Context) error {
 	}
 }
 
-func (scraper Scraper) crawlCommand(c *cli.Context) error {
+func (s Scraper) crawlCommand(c *cli.Context) error {
 	articleChan := make(chan *entity.Article, 1024)
 	for i := 0; i < 10; i++ {
 		go func() {
 			for a := range articleChan {
-				if err := scraper.scrapeArticle(a); err != nil {
+				if err := s.scrapeArticle(a); err != nil {
 					log.Println(err)
 					crawlCounter.WithLabelValues("articles", "error").Inc()
 				}
@@ -160,7 +88,7 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 	for i := 0; i < 10; i++ {
 		go func() {
 			for a := range authorChan {
-				if err := scraper.scrapeAuthor(a); err != nil {
+				if err := s.scrapeAuthor(a); err != nil {
 					crawlCounter.WithLabelValues("authors", "error").Inc()
 				}
 				crawlCounter.WithLabelValues("authors", "success").Inc()
@@ -172,7 +100,7 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 		for {
 			// articles
 			var crawls []*entity.Crawl
-			scraper.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
+			s.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
 
 			var IDs []int
 			for _, c := range crawls {
@@ -180,21 +108,21 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 			}
 
 			var articles []*entity.Article
-			scraper.db.Preload("Crawl").Where(IDs).Find(&articles)
+			s.db.Preload("Crawl").Where(IDs).Find(&articles)
 
 			for _, a := range articles {
 				articleChan <- a
 			}
 
 			// authors
-			scraper.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
+			s.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
 
 			for _, c := range crawls {
 				IDs = append(IDs, c.CrawlableID)
 			}
 
 			var authors []*entity.Author
-			scraper.db.Preload("Crawl").Where(IDs).Find(&authors)
+			s.db.Preload("Crawl").Where(IDs).Find(&authors)
 
 			for _, a := range authors {
 				authorChan <- a
@@ -204,27 +132,25 @@ func (scraper Scraper) crawlCommand(c *cli.Context) error {
 		}
 	}()
 
-	scraper.indexCommand(c) // indexing blocks and crawling works in a goroutines
+	s.indexCommand(c) // indexing blocks and crawling works in a goroutines
 
 	return nil
 }
 
-func (scraper Scraper) index() error {
+func (s Scraper) index() error {
 	var articles []TeaserArticle
 
 	page := 1
 	for {
-		url := scraper.host + "/api/articles"
+		url := s.host + "/api/articles"
 		if page > 1 {
 			url = fmt.Sprintf("%s?page=%d", url, page)
 		}
 
-		resp, err := httpGet(url)
+		resp, err := s.get("teaser_articles", url)
 		if err != nil {
 			return err
 		}
-
-		log.Println(resp.Status, url)
 
 		if resp.StatusCode != 200 {
 			log.Printf("request for %s returned %d", url, resp.StatusCode)
@@ -254,7 +180,7 @@ func (scraper Scraper) index() error {
 		page++
 	}
 
-	if err := scraper.SaveArticles(articles); err != nil {
+	if err := s.SaveArticles(articles); err != nil {
 		log.Println(err)
 	}
 
@@ -262,9 +188,9 @@ func (scraper Scraper) index() error {
 }
 
 // SaveArticles takes a slice of TeaserArticles and saves them to the db
-func (scraper Scraper) SaveArticles(articles []TeaserArticle) error {
+func (s Scraper) SaveArticles(articles []TeaserArticle) error {
 	var successCount, errorCount float64
-	tx := scraper.db.Begin()
+	tx := s.db.Begin()
 	for i, a := range articles {
 		article, err := a.Parse()
 		if err != nil {
@@ -291,86 +217,6 @@ func (scraper Scraper) SaveArticles(articles []TeaserArticle) error {
 	return nil
 }
 
-type (
-	// TeaserArticle is just the teaser part of an article
-	TeaserArticle struct {
-		TeaserHTML string `json:"teaser_html"`
-	}
-	// TeaserArticleResponse is a http json response with TeaserArticles
-	TeaserArticleResponse struct {
-		Articles []TeaserArticle `json:"articles"`
-	}
-)
-
-// Parse a TeaserArticle and return every data for an Article
-func (ta TeaserArticle) Parse() (*entity.Article, error) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(ta.TeaserHTML))
-	if err != nil {
-		return nil, err
-	}
-
-	cardNode := doc.Find("article a")
-	authorNode := cardNode.Find(".author__body")
-	imageNode := cardNode.Find("img.card__img")
-
-	// Title
-	title := strings.TrimSpace(cardNode.Find("h2").Text())
-
-	// URL
-	URL, exists := cardNode.Attr("href")
-	if !exists {
-		return nil, errors.New("URL attr doesn't exist")
-	}
-
-	// ID
-	idMatches := idRegex.FindStringSubmatch(URL)
-	if len(idMatches) != 2 {
-		return nil, fmt.Errorf("couldn't find id in %s", URL)
-	}
-
-	id, err := strconv.Atoi(idMatches[1])
-	if err != nil {
-		return nil, fmt.Errorf("couldn't find id in %s", URL)
-	}
-
-	// Date
-	dateString, exists := authorNode.Find("time").Attr("datetime")
-	if !exists {
-		return nil, fmt.Errorf("no date for %d found", id)
-	}
-	date, err := time.Parse("2006-01-02", dateString)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't parse date for %d: %s", id, err)
-	}
-
-	// Preview
-	var preview bool
-	var images []entity.Image
-	if imageNode.Length() > 0 { // preview available if img node exists
-		preview = true
-
-		srcset, _ := imageNode.Attr("srcset")
-		images, err = ParseArticleImages(srcset)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	article := &entity.Article{
-		ID:      id,
-		Title:   title,
-		Date:    date,
-		Preview: preview,
-		URL:     URL,
-	}
-
-	for _, i := range images {
-		article.AddImage(i)
-	}
-
-	return article, nil
-}
-
 // ParseArticleImages takes a string with srcset and returns a slice of Images
 func ParseArticleImages(srcset string) ([]entity.Image, error) {
 	var images []entity.Image
@@ -386,13 +232,13 @@ func ParseArticleImages(srcset string) ([]entity.Image, error) {
 	return images, nil
 }
 
-func (scraper Scraper) scrapeArticle(a *entity.Article) error {
-	resp, err := httpGet(scraper.host + a.URL)
+func (s Scraper) scrapeArticle(a *entity.Article) error {
+	resp, err := s.get("articles", s.host+a.URL)
 	if err != nil {
 		return err
 	}
 
-	log.Println(resp.Status, scraper.host+a.URL)
+	log.Println(resp.Status, s.host+a.URL)
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("scraping %s returned %d", a.URL, resp.StatusCode)
@@ -443,27 +289,27 @@ func (scraper Scraper) scrapeArticle(a *entity.Article) error {
 		Name: authorName,
 		URL:  authorURL,
 	}
-	scraper.db.Preload("Images").Preload("Crawl").FirstOrCreate(&author)
+	s.db.Preload("Images").Preload("Crawl").FirstOrCreate(&author)
 
 	if author.Crawl.ID == 0 {
 		author.Crawl = entity.Crawl{Next: time.Now()}
 	}
 
-	scraper.db.Save(&author)
+	s.db.Save(&author)
 
 	a.Crawl.Next = time.Now().Add(time.Duration(float64(rand.Intn(18000))+30*time.Minute.Seconds()) * time.Second)
 	a.AuthorID = author.ID
-	scraper.db.Save(&a)
+	s.db.Save(&a)
 
 	return nil
 }
 
-func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
-	resp, err := httpGet(scraper.host + a.URL)
+func (s Scraper) scrapeAuthor(a *entity.Author) error {
+	resp, err := s.get("authors", s.host+a.URL)
 	if err != nil {
 		return err
 	}
-	log.Println(resp.Status, scraper.host+a.URL)
+	log.Println(resp.Status, s.host+a.URL)
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("scraping %s returned %d", a.URL, resp.StatusCode)
@@ -474,7 +320,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
 		return err
 	}
 
-	scraper.db.Preload("Images").Preload("Crawl").FirstOrCreate(&a)
+	s.db.Preload("Images").Preload("Crawl").FirstOrCreate(&a)
 
 	authorNode := doc.Find("main .island .author")
 	imageNode := authorNode.Find("img.author__img")
@@ -501,7 +347,7 @@ func (scraper Scraper) scrapeAuthor(a *entity.Author) error {
 	}
 
 	a.Crawl.Next = time.Now().Add(time.Duration(float64(rand.Intn(18000))+30*time.Minute.Seconds()) * time.Second)
-	scraper.db.Save(&a)
+	s.db.Save(&a)
 
 	return nil
 }
