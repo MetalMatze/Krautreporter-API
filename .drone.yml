@@ -9,15 +9,59 @@ pipeline:
       - apk add -U git make
       - make fmt vet lint
       - make build
+    when:
+      event: [ push, tag, pull_request ]
 
-  api:
+  docker-tag:
     image: plugins/docker
     repo: metalmatze/krautreporter-api
-    tag: latest
     Dockerfile: Dockerfile.api
+    tags: [ '${DRONE_TAG##v}' ]
+    when:
+      event: [ tag ]
+      branch: [ refs/tags/* ]
 
-  scraper:
+  docker-tag:
     image: plugins/docker
     repo: metalmatze/krautreporter-scraper
-    tag: latest
     Dockerfile: Dockerfile.scraper
+    tags: [ '${DRONE_TAG##v}' ]
+    when:
+      event: [ tag ]
+      branch: [ refs/tags/* ]
+
+  docker-latest:
+    image: plugins/docker
+    repo: metalmatze/krautreporter-api
+    Dockerfile: Dockerfile.api
+    tags: [ 'latest' ]
+    when:
+      event: [ push ]
+      branch: [ master ]
+
+  docker-latest:
+    image: plugins/docker
+    repo: metalmatze/krautreporter-scraper
+    Dockerfile: Dockerfile.scraper
+    tags: [ 'latest' ]
+    when:
+      event: [ push ]
+      branch: [ master ]
+
+  docker-develop:
+    image: plugins/docker
+    repo: metalmatze/krautreporter-api
+    Dockerfile: Dockerfile.api
+    tags: [ 'develop' ]
+    when:
+      event: [ push ]
+      branch: [ develop ]
+
+  docker-develop:
+    image: plugins/docker
+    repo: metalmatze/krautreporter-scraper
+    Dockerfile: Dockerfile.scraper
+    tags: [ 'develop' ]
+    when:
+      event: [ push ]
+      branch: [ develop ]
