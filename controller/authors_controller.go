@@ -9,6 +9,7 @@ import (
 	"github.com/metalmatze/krautreporter-api/repository"
 )
 
+// GetAuthors returns a list of marshalled authors
 func (ctrl *Controller) GetAuthors(c *gin.Context) {
 	authors, err := ctrl.Repository.FindAuthors()
 	if err != nil {
@@ -16,9 +17,10 @@ func (ctrl *Controller) GetAuthors(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	c.JSON(http.StatusOK, marshaller.Authors(authors))
+	c.JSON(http.StatusOK, marshaller.FromAuthors(authors))
 }
 
+// GetAuthor returns a single marshalled author
 func (ctrl *Controller) GetAuthor(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -38,5 +40,5 @@ func (ctrl *Controller) GetAuthor(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}
 
-	c.JSON(http.StatusOK, marshaller.Author(author))
+	c.JSON(http.StatusOK, marshaller.FromAuthor(author))
 }

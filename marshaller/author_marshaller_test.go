@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMarshallAuthor(t *testing.T) {
-	a := &entity.Author{
+	a := &krautreporter.Author{
 		ID:          13,
 		Ordering:    65,
 		Name:        "Tilo Jung",
@@ -22,7 +22,7 @@ func TestMarshallAuthor(t *testing.T) {
 		UpdatedAt:   time.Date(2016, 06, 05, 22, 32, 0, 0, time.UTC),
 	}
 
-	b, err := json.Marshal(Author(a))
+	b, err := json.Marshal(FromAuthor(a))
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
@@ -30,9 +30,9 @@ func TestMarshallAuthor(t *testing.T) {
 		string(b),
 	)
 
-	a.Images = append(a.Images, entity.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
+	a.Images = append(a.Images, krautreporter.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
 
-	b, err = json.Marshal(Author(a))
+	b, err = json.Marshal(FromAuthor(a))
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
@@ -42,7 +42,7 @@ func TestMarshallAuthor(t *testing.T) {
 }
 
 func TestMarshallAuthors(t *testing.T) {
-	authors := []*entity.Author{{
+	authors := []*krautreporter.Author{{
 		ID:       1,
 		Ordering: 1,
 	}, {
@@ -50,7 +50,7 @@ func TestMarshallAuthors(t *testing.T) {
 		Ordering: 0,
 	}}
 
-	b, err := json.Marshal(Authors(authors))
+	b, err := json.Marshal(FromAuthors(authors))
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,

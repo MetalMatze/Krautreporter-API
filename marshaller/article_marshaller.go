@@ -3,10 +3,11 @@ package marshaller
 import (
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
-type articleMarshaller struct {
+// Article is a marshalled struct of the entity Article
+type Article struct {
 	ID         int       `json:"id"`
 	Ordering   int       `json:"order"`
 	Title      string    `json:"title"`
@@ -20,30 +21,32 @@ type articleMarshaller struct {
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 
-	AuthorID int                          `json:"author_id"`
-	Images   map[string][]imageMarshaller `json:"images"`
+	AuthorID int                `json:"author_id"`
+	Images   map[string][]Image `json:"images"`
 }
 
-func Article(a *entity.Article) map[string]articleMarshaller {
-	return map[string]articleMarshaller{
+// FromArticle turns a single FromArticle into a marshalled data structure
+func FromArticle(a *krautreporter.Article) map[string]Article {
+	return map[string]Article{
 		"data": marshallArticle(a),
 	}
 }
 
-func Articles(articles []*entity.Article) map[string][]articleMarshaller {
-	var as []articleMarshaller
+// FromArticles turns a slice of FromArticles into a marshalled data structure
+func FromArticles(articles []*krautreporter.Article) map[string][]Article {
+	var as []Article
 
 	for _, a := range articles {
 		as = append(as, marshallArticle(a))
 	}
 
-	return map[string][]articleMarshaller{
+	return map[string][]Article{
 		"data": as,
 	}
 }
 
-func marshallArticle(a *entity.Article) articleMarshaller {
-	am := articleMarshaller{
+func marshallArticle(a *krautreporter.Article) Article {
+	am := Article{
 		ID:         a.ID,
 		Ordering:   a.Ordering,
 		Title:      a.Title,
@@ -60,7 +63,7 @@ func marshallArticle(a *entity.Article) articleMarshaller {
 		AuthorID: a.AuthorID,
 	}
 
-	am.Images = Images(a.Images)
+	am.Images = FromImages(a.Images)
 
 	return am
 }

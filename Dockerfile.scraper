@@ -5,6 +5,6 @@ WORKDIR /app
 RUN apk update
 RUN apk add bash ca-certificates
 
-ADD scraper .
+ADD krautreporter-scraper .
 
-ENTRYPOINT ["/app/scraper"]
+ENTRYPOINT ["/app/krautreporter-scraper"]

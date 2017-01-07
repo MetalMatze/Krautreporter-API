@@ -5,17 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/metalmatze/krautreporter-api/entity"
+	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
+// ErrAuthorNotFound is returned if an article is not found by id
 var ErrAuthorNotFound = errors.New("Author not found")
 
-func (r Repository) FindAuthors() ([]*entity.Author, error) {
+// FindAuthors returns a slice of all Authors
+func (r Repository) FindAuthors() ([]*krautreporter.Author, error) {
 	if cached, exists := r.Cache.Get("authors.list"); exists {
-		return cached.([]*entity.Author), nil
+		return cached.([]*krautreporter.Author), nil
 	}
 
-	var authors []*entity.Author
+	var authors []*krautreporter.Author
 
 	r.DB.Preload("Images").Order("ordering desc").Find(&authors)
 
@@ -24,12 +26,13 @@ func (r Repository) FindAuthors() ([]*entity.Author, error) {
 	return authors, nil
 }
 
-func (r Repository) FindAuthorByID(id int) (*entity.Author, error) {
+// FindAuthorByID returns an Author for the ID matching the parameter
+func (r Repository) FindAuthorByID(id int) (*krautreporter.Author, error) {
 	if cached, exists := r.Cache.Get(fmt.Sprintf("authors.%d", id)); exists {
-		return cached.(*entity.Author), nil
+		return cached.(*krautreporter.Author), nil
 	}
 
-	var author entity.Author
+	var author krautreporter.Author
 	r.DB.Preload("Images").Preload("Crawl").First(&author, "id = ?", id)
 
 	if author.ID == 0 {
@@ -41,10 +44,11 @@ func (r Repository) FindAuthorByID(id int) (*entity.Author, error) {
 	return &author, nil
 }
 
-func (r Repository) SaveAllAuthors(authors []*entity.Author) error {
+// SaveAllAuthors takes a slice of Author and saves them to the database
+func (r Repository) SaveAllAuthors(authors []*krautreporter.Author) error {
 	tx := r.DB.Begin()
 	for _, a := range authors {
-		author := entity.Author{ID: a.ID}
+		author := krautreporter.Author{ID: a.ID}
 		tx.Preload("Crawl").Preload("Images").FirstOrCreate(&author)
 
 		author.Ordering = a.Ordering
@@ -57,7 +61,7 @@ func (r Repository) SaveAllAuthors(authors []*entity.Author) error {
 		}
 
 		if author.Crawl.ID == 0 {
-			author.Crawl = entity.Crawl{Next: time.Now()}
+			author.Crawl = krautreporter.Crawl{Next: time.Now()}
 		}
 
 		tx.Save(&author)
@@ -67,7 +71,8 @@ func (r Repository) SaveAllAuthors(authors []*entity.Author) error {
 	return nil
 }
 
-func (r Repository) SaveAuthor(author *entity.Author) error {
+// SaveAuthor takes an Author and saves it to the database
+func (r Repository) SaveAuthor(author *krautreporter.Author) error {
 	if result := r.DB.Save(&author); result.Error != nil {
 		return result.Error
 	}

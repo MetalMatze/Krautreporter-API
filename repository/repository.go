@@ -6,6 +6,7 @@ import (
 	gocache "github.com/patrickmn/go-cache"
 )
 
+// Repository reads from the database or the cache if data is present
 type Repository struct {
 	Cache  *gocache.Cache
 	DB     *gorm.DB
