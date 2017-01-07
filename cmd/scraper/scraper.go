@@ -349,11 +349,7 @@ func (ta TeaserArticle) Parse() (*entity.Article, error) {
 	if imageNode.Length() > 0 { // preview available if img node exists
 		preview = true
 
-		srcset, exists := imageNode.Attr("srcset")
-		if !exists {
-			return nil, fmt.Errorf("article images has no srcset: %s", URL)
-		}
-
+		srcset, _ := imageNode.Attr("srcset")
 		images, err = ParseArticleImages(srcset)
 		if err != nil {
 			return nil, err
