@@ -13,13 +13,16 @@ import (
 	"github.com/urfave/cli"
 )
 
-// Config for the s binary
+// Config for the scraper binary
 type Config struct {
 	DSN  string
 	Host string
 }
 
 var (
+	// BuildCommit is the git commit the binary will be build upon
+	BuildCommit string
+
 	indexCounter = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "krautreporter_index_total",
@@ -86,12 +89,12 @@ func main() {
 		{
 			Name:   "index",
 			Usage:  "Index all articles to start crawling",
-			Action: c.indexCommand,
+			Action: c.ActionIndex,
 		},
 		{
 			Name:   "crawl",
 			Usage:  "Crawl to get all missing data",
-			Action: c.crawlCommand,
+			Action: c.ActionCrawl,
 		},
 	}
 

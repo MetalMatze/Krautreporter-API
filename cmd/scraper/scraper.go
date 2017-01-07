@@ -55,12 +55,18 @@ func (s Scraper) get(types, url string) (*http.Response, error) {
 	duration := time.Since(start).Seconds()
 	scrapeTimeHistogram.WithLabelValues(types).Observe(duration)
 
-	log.Println(resp.Status, duration, url)
+	log.Println(resp.Status, url)
 
 	return resp, err
 }
 
-func (s Scraper) indexCommand(c *cli.Context) error {
+func (s Scraper) ActionIndex(c *cli.Context) error {
+	log.Printf("starting, commit: %s\n", BuildCommit)
+
+	return s.runIndex()
+}
+
+func (s Scraper) runIndex() error {
 	for {
 		if err := s.index(); err != nil {
 			return err
@@ -70,7 +76,18 @@ func (s Scraper) indexCommand(c *cli.Context) error {
 	}
 }
 
-func (s Scraper) crawlCommand(c *cli.Context) error {
+func (s Scraper) ActionCrawl(c *cli.Context) error {
+	log.Printf("starting, commit: %s\n", BuildCommit)
+
+	go s.runCrawl()
+	go s.runIndex()
+
+	select {}
+
+	return nil
+}
+
+func (s Scraper) runCrawl() error {
 	articleChan := make(chan *krautreporter.Article, 1024)
 	for i := 0; i < 10; i++ {
 		go func() {
@@ -96,43 +113,39 @@ func (s Scraper) crawlCommand(c *cli.Context) error {
 		}()
 	}
 
-	go func() {
-		for {
-			// articles
-			var crawls []*krautreporter.Crawl
-			s.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
+	for {
+		// articles
+		var crawls []*krautreporter.Crawl
+		s.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
 
-			var IDs []int
-			for _, c := range crawls {
-				IDs = append(IDs, c.CrawlableID)
-			}
-
-			var articles []*krautreporter.Article
-			s.db.Preload("Crawl").Where(IDs).Find(&articles)
-
-			for _, a := range articles {
-				articleChan <- a
-			}
-
-			// authors
-			s.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
-
-			for _, c := range crawls {
-				IDs = append(IDs, c.CrawlableID)
-			}
-
-			var authors []*krautreporter.Author
-			s.db.Preload("Crawl").Where(IDs).Find(&authors)
-
-			for _, a := range authors {
-				authorChan <- a
-			}
-
-			time.Sleep(crawlInterval)
+		var IDs []int
+		for _, c := range crawls {
+			IDs = append(IDs, c.CrawlableID)
 		}
-	}()
 
-	s.indexCommand(c) // indexing blocks and crawling works in a goroutines
+		var articles []*krautreporter.Article
+		s.db.Preload("Crawl").Where(IDs).Find(&articles)
+
+		for _, a := range articles {
+			articleChan <- a
+		}
+
+		// authors
+		s.db.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
+
+		for _, c := range crawls {
+			IDs = append(IDs, c.CrawlableID)
+		}
+
+		var authors []*krautreporter.Author
+		s.db.Preload("Crawl").Where(IDs).Find(&authors)
+
+		for _, a := range authors {
+			authorChan <- a
+		}
+
+		time.Sleep(crawlInterval)
+	}
 
 	return nil
 }

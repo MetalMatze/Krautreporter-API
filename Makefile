@@ -1,5 +1,5 @@
 COMMIT ?= $(shell git rev-parse --short HEAD)
-LDFLAGS = -extldflags "-static" -X "main.buildCommit=$(COMMIT)"
+LDFLAGS = -extldflags "-static" -X "main.BuildCommit=$(COMMIT)"
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
 
 .PHONY: all
