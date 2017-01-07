@@ -60,6 +60,7 @@ func (s Scraper) get(types, url string) (*http.Response, error) {
 	return resp, err
 }
 
+// ActionIndex runs and endless loop of indexing in a certain interval
 func (s Scraper) ActionIndex(c *cli.Context) error {
 	log.Printf("starting, commit: %s\n", BuildCommit)
 
@@ -76,6 +77,7 @@ func (s Scraper) runIndex() error {
 	}
 }
 
+// ActionCrawl runs and endless loop of crawls and indexes in a certain interval
 func (s Scraper) ActionCrawl(c *cli.Context) error {
 	log.Printf("starting, commit: %s\n", BuildCommit)
 
