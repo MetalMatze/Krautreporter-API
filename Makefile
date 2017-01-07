@@ -1,5 +1,5 @@
 COMMIT ?= $(shell git rev-parse --short HEAD)
-LDFLAGS = -X "main.buildCommit=$(COMMIT)"
+LDFLAGS = -extldflags "-static" -X "main.buildCommit=$(COMMIT)"
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
 
 .PHONY: all
@@ -14,7 +14,7 @@ build: build-api build-scraper
 
 .PHONY: build-scraper
 build-scraper:
-	CGO_ENABLED=0 go build -ldflags '-w $(LDFLAGS)' -o krautreporter-scraper cmd/scraper/scraper.go
+	CGO_ENABLED=0 go build -ldflags '-w $(LDFLAGS)' -o krautreporter-scraper ./cmd/scraper/
 
 .PHONY: build-api
 build-api:
