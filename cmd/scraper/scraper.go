@@ -83,8 +83,6 @@ func (s Scraper) ActionCrawl(c *cli.Context) error {
 	go s.runIndex()
 
 	select {}
-
-	return nil
 }
 
 func (s Scraper) runCrawl() error {
@@ -146,8 +144,6 @@ func (s Scraper) runCrawl() error {
 
 		time.Sleep(crawlInterval)
 	}
-
-	return nil
 }
 
 func (s Scraper) index() error {
