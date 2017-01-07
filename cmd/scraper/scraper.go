@@ -76,7 +76,7 @@ func httpGet(url string) (*http.Response, error) {
 		log.Fatalln(err)
 	}
 
-	req.Header.Set("User-Agent", "Golang_Spider_Bot/3.0")
+	req.Header.Set("User-Agent", "github.com/metalmatze/krautreporter-api/1.0.0")
 
 	return client.Do(req)
 }
