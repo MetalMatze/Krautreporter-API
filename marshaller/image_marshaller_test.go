@@ -21,7 +21,7 @@ func TestImage(t *testing.T) {
 
 	b, err := json.Marshal(FromImages(i))
 	assert.Nil(t, err)
-	assert.JSONEq(t, `{"data":null}`, string(b))
+	assert.JSONEq(t, `{"data":[]}`, string(b))
 
 	i = append(i, krautreporter.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
 	b, err = json.Marshal(FromImages(i))

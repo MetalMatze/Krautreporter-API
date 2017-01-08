@@ -26,7 +26,7 @@ func TestMarshallAuthor(t *testing.T) {
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
-		`{"data":{"id":13,"order":65,"name":"Tilo Jung","title":"Politik","url":"https://krautreporter.de/13--tilo-jung","biography":"Tilo Jung","socialmedia":"TWITTER | FACEBOOK","created_at":"2016-06-05T22:32:00Z","updated_at":"2016-06-05T22:32:00Z","images":null}}`,
+		`{"data":{"id":13,"order":65,"name":"Tilo Jung","title":"Politik","url":"https://krautreporter.de/13--tilo-jung","biography":"Tilo Jung","socialmedia":"TWITTER | FACEBOOK","created_at":"2016-06-05T22:32:00Z","updated_at":"2016-06-05T22:32:00Z","images":{"data":[]}}}`,
 		string(b),
 	)
 
@@ -54,7 +54,7 @@ func TestMarshallAuthors(t *testing.T) {
 	assert.Nil(t, err)
 	assert.JSONEq(
 		t,
-		`{"data":[{"id":1,"order":1,"name":"","title":"","url":"https://krautreporter.de","biography":"","socialmedia":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","images":null},{"id":2,"order":0,"name":"","title":"","url":"https://krautreporter.de","biography":"","socialmedia":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","images":null}]}`,
+		`{"data":[{"id":1,"order":1,"name":"","title":"","url":"https://krautreporter.de","biography":"","socialmedia":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","images":{"data":[]}},{"id":2,"order":0,"name":"","title":"","url":"https://krautreporter.de","biography":"","socialmedia":"","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","images":{"data":[]}}]}`,
 		string(b),
 	)
 }
