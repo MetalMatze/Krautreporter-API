@@ -73,6 +73,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	c := Scraper{
 		host: config.Host,
 		db:   db,

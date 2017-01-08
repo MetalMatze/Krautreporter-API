@@ -25,9 +25,8 @@ const (
 )
 
 var (
-	idRegex            = regexp.MustCompile(`\/(\d*)`)
-	articleSrcsetRegex = regexp.MustCompile(`(.*) 300w, (.*) 600w, (.*) 1000w, (.*) 2000w`)
-	authorSrcsetRegex  = regexp.MustCompile(`(.*) 170w, (.*) 340w`)
+	idRegex           = regexp.MustCompile(`\/(\d*)`)
+	authorSrcsetRegex = regexp.MustCompile(`(.*) 170w, (.*) 340w`)
 )
 
 // Scraper knows the host to scrape and connects to the database

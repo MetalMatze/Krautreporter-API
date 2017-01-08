@@ -1,8 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -11,10 +11,14 @@ import (
 	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
+var (
+	ixSrcRegex = regexp.MustCompile(`.*\?`) // Match everything to the first ?
+)
+
 type (
 	// TeaserArticle is just the teaser part of an article
 	TeaserArticle struct {
-		TeaserHTML string `json:"teaser_html"`
+		HTML string `json:"teaser_html"`
 	}
 	// TeaserArticleResponse is a http json response with TeaserArticles
 	TeaserArticleResponse struct {
@@ -24,68 +28,65 @@ type (
 
 // Parse a TeaserArticle and return every data for an Article
 func (ta TeaserArticle) Parse() (*krautreporter.Article, error) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(ta.TeaserHTML))
+	article := &krautreporter.Article{}
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(ta.HTML))
 	if err != nil {
-		return nil, err
+		return article, err
 	}
 
 	cardNode := doc.Find("article a")
-	authorNode := cardNode.Find(".author__body")
-	imageNode := cardNode.Find("img.card__img")
 
 	// Title
-	title := strings.TrimSpace(cardNode.Find("h2").Text())
+	title := cardNode.Find("h2").Text()
+	title = strings.TrimPrefix(title, "\\n")
+	article.Title = strings.TrimSpace(title)
 
 	// URL
 	URL, exists := cardNode.Attr("href")
 	if !exists {
-		return nil, errors.New("URL attr doesn't exist")
+		return article, fmt.Errorf("card node has no href attr")
 	}
+	article.URL = URL
 
 	// ID
 	idMatches := idRegex.FindStringSubmatch(URL)
 	if len(idMatches) != 2 {
-		return nil, fmt.Errorf("couldn't find id in %s", URL)
+		return article, fmt.Errorf("couldn't find id in %s", URL)
 	}
 
 	id, err := strconv.Atoi(idMatches[1])
 	if err != nil {
-		return nil, fmt.Errorf("couldn't find id in %s", URL)
+		return article, fmt.Errorf("couldn't find id in %s", URL)
 	}
+	article.ID = id
 
 	// Date
-	dateString, exists := authorNode.Find("time").Attr("datetime")
+	dateString, exists := cardNode.Find("time").Attr("datetime")
 	if !exists {
-		return nil, fmt.Errorf("no date for %d found", id)
+		return article, fmt.Errorf("no date for %d found", id)
 	}
+	// TODO: Parse with Europe/Berlin location timezone
 	date, err := time.Parse("2006-01-02", dateString)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't parse date for %d: %s", id, err)
+		return article, fmt.Errorf("couldn't parse date for %d: %s", id, err)
 	}
+	article.Date = date
 
-	// Preview
-	var preview bool
-	var images []krautreporter.Image
+	imageNode := doc.Find("img")
 	if imageNode.Length() > 0 { // preview available if img node exists
-		preview = true
+		article.Preview = true
 
-		srcset, _ := imageNode.Attr("srcset")
-		images, err = ParseArticleImages(srcset)
-		if err != nil {
-			return nil, err
+		ixSrc, exists := imageNode.Attr("ix-src")
+		if !exists {
+			return article, fmt.Errorf("article img has no ix-src attr")
 		}
-	}
 
-	article := &krautreporter.Article{
-		ID:      id,
-		Title:   title,
-		Date:    date,
-		Preview: preview,
-		URL:     URL,
-	}
-
-	for _, i := range images {
-		article.AddImage(i)
+		src := ixSrcRegex.FindString(ixSrc)
+		article.AddImage(krautreporter.Image{
+			Width: 1600,
+			Src:   src + "w=1600",
+		})
 	}
 
 	return article, nil
