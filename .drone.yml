@@ -8,6 +8,7 @@ pipeline:
     commands:
       - apk add -U git make
       - make fmt vet lint
+      - make test
       - make build
     when:
       event: [ push, tag, pull_request ]
