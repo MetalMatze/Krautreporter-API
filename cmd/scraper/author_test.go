@@ -10,9 +10,9 @@ import (
 )
 
 func TestFetchParseAuthor(t *testing.T) {
-	s := Scraper{client: &http.Client{Timeout: 1 * time.Second}}
+	s := Scraper{client: &http.Client{Timeout: 10 * time.Second}}
 
-	authors := make(map[string]*krautreporter.Author, 1)
+	authors := make(map[string]*krautreporter.Author, 4)
 
 	authors["https://krautreporter.de/6-sebastian-esser"] = &krautreporter.Author{
 		Name:        "Sebastian Esser",
