@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	krautreporter "github.com/metalmatze/krautreporter-api"
@@ -24,6 +24,13 @@ var (
 	idRegex = regexp.MustCompile(`\/(\d*)`)
 )
 
+type Scrape interface {
+	Type() string
+	Fetch() (*goquery.Document, error)
+	Parse(*goquery.Document) error
+	Save() error
+}
+
 // Scraper knows the host to scrape and connects to the database
 type Scraper struct {
 	db *gorm.DB
@@ -32,7 +39,7 @@ type Scraper struct {
 	client *http.Client
 }
 
-func (s Scraper) get(types, url string) (*http.Response, error) {
+func (s *Scraper) get(types, url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -55,14 +62,14 @@ func (s Scraper) get(types, url string) (*http.Response, error) {
 }
 
 // ActionIndex runs and endless loop of indexing in a certain interval
-func (s Scraper) ActionIndex(c *cli.Context) error {
+func (s *Scraper) ActionIndex(c *cli.Context) error {
 	log.Printf("starting, commit: %s\n", BuildCommit)
 
 	return s.runIndex()
 }
 
 // ActionCrawl runs and endless loop of crawls and indexes in a certain interval
-func (s Scraper) ActionCrawl(c *cli.Context) error {
+func (s *Scraper) ActionCrawl(c *cli.Context) error {
 	log.Printf("starting, commit: %s\n", BuildCommit)
 
 	//go s.runIndex()
@@ -71,7 +78,7 @@ func (s Scraper) ActionCrawl(c *cli.Context) error {
 	select {}
 }
 
-func (s Scraper) runIndex() error {
+func (s *Scraper) runIndex() error {
 	for {
 		if err := s.index(); err != nil {
 			return err
@@ -81,46 +88,11 @@ func (s Scraper) runIndex() error {
 	}
 }
 
-func (s Scraper) runCrawl() error {
-	articleChan := make(chan *krautreporter.Article, 1024)
-	authorChan := make(chan *krautreporter.Author, 1024)
+func (s *Scraper) runCrawl() error {
+	scrapeChan := make(chan Scrape, 2000)
 
 	for i := 0; i < 10; i++ {
-		go func() {
-			for a := range articleChan {
-				if err := s.scrapeArticle(a); err != nil {
-					log.Println(err)
-					crawlCounter.WithLabelValues("articles", "error").Inc()
-				}
-				crawlCounter.WithLabelValues("articles", "success").Inc()
-			}
-		}()
-	}
-
-	for i := 0; i < 10; i++ {
-		go func() {
-			for a := range authorChan {
-				doc, err := s.fetchAuthor(s.host + a.URL)
-				if err != nil {
-					log.Println(err)
-					crawlCounter.WithLabelValues("authors", "error").Inc()
-					continue
-				}
-
-				author, err := s.parseAuthor(doc)
-				if err != nil {
-					log.Println(err)
-					crawlCounter.WithLabelValues("authors", "error").Inc()
-					continue
-				}
-
-				s.nextCrawlAuthor(author)
-
-				//TODO: Save the new author
-
-				crawlCounter.WithLabelValues("authors", "success").Inc()
-			}
-		}()
+		go s.Scrape(scrapeChan)
 	}
 
 	for {
@@ -142,33 +114,58 @@ func (s Scraper) runCrawl() error {
 			Find(&articles)
 
 		for _, a := range articles {
-			articleChan <- a
+			scrapeChan <- &ScrapeArticle{
+				Scraper: s,
+				Article: a,
+			}
 		}
 
-		// authors
-		s.db.Where("next < ?", time.Now()).
-			Where("crawlable_type = ?", "authors").
-			Order("next").
-			Find(&crawls)
-
-		for _, c := range crawls {
-			IDs = append(IDs, c.CrawlableID)
-		}
-
-		var authors []*krautreporter.Author
-		s.db.Preload("Crawl").
-			Where(IDs).
-			Find(&authors)
-
-		for _, a := range authors {
-			authorChan <- a
-		}
+		//// authors
+		//s.db.Where("next < ?", time.Now()).
+		//	Where("crawlable_type = ?", "authors").
+		//	Order("next").
+		//	Find(&crawls)
+		//
+		//for _, c := range crawls {
+		//	IDs = append(IDs, c.CrawlableID)
+		//}
+		//
+		//var authors []*krautreporter.Author
+		//s.db.Preload("Crawl").
+		//	Where(IDs).
+		//	Find(&authors)
+		//
+		//for _, a := range authors {
+		//	authorChan <- a
+		//}
 
 		time.Sleep(crawlInterval)
 	}
 }
 
-func (s Scraper) index() error {
+func (s *Scraper) Scrape(scrapeChan <-chan Scrape) {
+	for scrape := range scrapeChan {
+		doc, err := scrape.Fetch()
+		if err != nil {
+			crawlCounter.WithLabelValues(scrape.Type(), "error").Inc()
+			log.Println(err)
+		}
+
+		if err := scrape.Parse(doc); err != nil {
+			crawlCounter.WithLabelValues(scrape.Type(), "error").Inc()
+			log.Println(err)
+		}
+
+		if err := scrape.Save(); err != nil {
+			crawlCounter.WithLabelValues(scrape.Type(), "error").Inc()
+			log.Println(err)
+		}
+
+		crawlCounter.WithLabelValues(scrape.Type(), "success").Inc()
+	}
+}
+
+func (s *Scraper) index() error {
 	var articles []TeaserArticle
 
 	page := 1
@@ -181,18 +178,6 @@ func (s Scraper) index() error {
 		resp, err := s.get("teaser_articles", url)
 		if err != nil {
 			return err
-		}
-
-		if resp.StatusCode != 200 {
-			log.Printf("request for %s returned %d", url, resp.StatusCode)
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				log.Println(err)
-			}
-			log.Println(string(body))
-			resp.Body.Close()
-
-			continue
 		}
 
 		var articleResp TeaserArticleResponse
@@ -211,9 +196,9 @@ func (s Scraper) index() error {
 		page++
 	}
 
-	if err := s.SaveArticles(articles); err != nil {
-		log.Println(err)
-	}
+	//if err := s.SaveArticles(articles); err != nil {
+	//	log.Println(err)
+	//}
 
 	return nil
 }
