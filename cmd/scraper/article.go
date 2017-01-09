@@ -12,104 +12,80 @@ import (
 	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
-func (s Scraper) scrapeArticle(a *krautreporter.Article) error {
-	resp, err := s.get("articles", s.host+a.URL)
+func (s Scraper) fetchArticle(url string) (*goquery.Document, error) {
+	resp, err := s.get("articles", url)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("scraping %s returned %d", a.URL, resp.StatusCode)
+		return nil, fmt.Errorf("scraping %s returned %d", url, resp.StatusCode)
 	}
 
-	doc, err := goquery.NewDocumentFromResponse(resp)
-	if err != nil {
-		return err
-	}
+	return goquery.NewDocumentFromResponse(resp)
+}
+
+func (s Scraper) parseArticle(doc *goquery.Document) (*krautreporter.Article, error) {
+	article := &krautreporter.Article{}
 
 	articleNode := doc.Find("main article.article")
 	contentNode := articleNode.Find(".article-content")
 
 	if articleNode.Length() == 0 {
-		log.Printf("article %s has no content", a.URL)
+		log.Printf("article %s has no content") // TODO log with ID
 	}
 
-	contentHTML, err := contentNode.Html()
+	content, err := contentNode.Html()
 	if err != nil {
-		return err
+		return article, err
 	}
+	article.Content = strings.TrimSpace(content)
 
-	a.Headline = strings.TrimSpace(articleNode.Find(".article--title").Text())
-	a.Excerpt = strings.TrimSpace(contentNode.Find(".article--teaser").Text())
-	a.Content = strings.TrimSpace(contentHTML)
+	article.Headline = strings.TrimSpace(articleNode.Find("h1.article--title").Text())
+	article.Excerpt = strings.TrimSpace(contentNode.Find(".article--teaser").Text())
 
-	authorNode := articleNode.Find(".author .author--link")
-	authorURL, exists := authorNode.Attr("href")
-	authorName := strings.TrimSpace(authorNode.Text())
-
-	if !exists {
-		return fmt.Errorf("author link doesn't exist for %s", a.URL)
-	}
-
-	idMatches := idRegex.FindStringSubmatch(authorURL)
-	if len(idMatches) != 2 {
-		return fmt.Errorf("couldn't parse article's author id, article: %s, author: %s", a.URL, authorURL)
-	}
-
-	// ID
-	authorID, err := strconv.Atoi(idMatches[1])
+	// Author
+	author, err := s.parseArticleAuthor(articleNode.Find(".author .author--link"))
 	if err != nil {
-		return fmt.Errorf("couldn't parse article's author id, article: %s, author: %s", a.URL, authorURL)
+		return article, err
 	}
+	article.Author = author
+	article.AuthorID = author.ID
 
-	author := krautreporter.Author{
-		ID:   authorID,
-		Name: authorName,
-		URL:  authorURL,
-	}
-	s.db.Preload("Images").Preload("Crawl").FirstOrCreate(&author)
-
-	if author.Crawl.ID == 0 {
-		author.Crawl = krautreporter.Crawl{Next: time.Now()}
-	}
-
-	s.db.Save(&author)
-
-	a.Crawl.Next = time.Now().Add(time.Duration(float64(rand.Intn(18000))+30*time.Minute.Seconds()) * time.Second)
-	a.AuthorID = author.ID
-	s.db.Save(&a)
-
-	fmt.Printf("%+v\n", a.Images)
-
-	return nil
+	return article, nil
 }
 
-// SaveArticles takes a slice of TeaserArticles and saves them to the db
-func (s Scraper) SaveArticles(articles []TeaserArticle) error {
-	var successCount, errorCount float64
-	tx := s.db.Begin()
-	for i, a := range articles {
-		article, err := a.Parse()
-		if err != nil {
-			log.Println(err)
-			errorCount++
-			continue
-		}
+func (s Scraper) parseArticleAuthor(node *goquery.Selection) (*krautreporter.Author, error) {
+	author := &krautreporter.Author{}
 
-		article.Ordering = len(articles) - i - 1
+	author.Name = strings.TrimSpace(node.Text())
 
-		if article.Crawl.ID == 0 {
-			article.Crawl = krautreporter.Crawl{Next: time.Now()}
-		}
-
-		tx.Preload("Images").Preload("Crawl").FirstOrCreate(&article)
-		tx.Save(&article)
-		successCount++
+	// URL
+	authorURL, exists := node.Attr("href")
+	if !exists {
+		return author, fmt.Errorf("author link doesn't exist for %s") // TODO log with ID
 	}
-	tx.Commit()
+	author.URL = authorURL
 
-	indexArticleGauge.WithLabelValues("success").Set(successCount)
-	indexArticleGauge.WithLabelValues("error").Set(errorCount)
+	// ID
+	idMatches := idRegex.FindStringSubmatch(authorURL)
+	if len(idMatches) != 2 {
+		return author, fmt.Errorf("couldn't parse article's author id, article: %s, author: %s", "", authorURL)
+	}
 
-	return nil
+	authorID, err := strconv.Atoi(idMatches[1])
+	if err != nil {
+		return author, fmt.Errorf("couldn't parse article's author id, article: %s, author: %s", "", authorURL)
+	}
+	author.ID = authorID
+
+	return author, nil
+}
+
+func (s Scraper) nextCrawlArticle(a *krautreporter.Article) {
+	constant := 5 * time.Hour
+	variable := 30 * time.Minute
+	random := rand.Intn(int(variable.Seconds()))
+
+	a.Crawl.Next = time.Now().Add(time.Duration(constant.Seconds() + float64(random)))
 }
