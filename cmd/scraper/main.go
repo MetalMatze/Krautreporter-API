@@ -7,8 +7,10 @@ import (
 	"os"
 	"time"
 
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
+	"github.com/metalmatze/krautreporter-api/repository"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli"
 )
@@ -74,12 +76,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	repo := &repository.Repository{
+		DB:     db,
+		Logger: kitlog.NewNopLogger(),
+	}
+
 	c := Scraper{
 		host: config.Host,
-		db:   db,
 		client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
+		Repository: repo,
 	}
 
 	app := cli.NewApp()
