@@ -10,12 +10,13 @@ import (
 )
 
 func TestFetchParseAuthor(t *testing.T) {
-	s := Scraper{client: &http.Client{Timeout: 10 * time.Second}}
+	s := &Scraper{client: &http.Client{Timeout: 10 * time.Second}}
 
 	authors := make(map[string]*krautreporter.Author, 4)
 
 	authors["https://krautreporter.de/6-sebastian-esser"] = &krautreporter.Author{
 		Name:        "Sebastian Esser",
+		URL:         "https://krautreporter.de/6-sebastian-esser",
 		Biography:   "Sebastian Esser, Jahrgang 1976, arbeitete als Politik- und Medienredakteur und gründete zwei Journalismus-Startups. Er lebt in Berlin.",
 		SocialMedia: "Sebastian Esser\nauf\n<a class=\"link link--camoflaged text-bold twitter--link\" target=\"_blank\" href=\"https://twitter.com/@sebastianesser\">TWITTER</a> | <a class=\"link link--camoflaged text-bold facebook--link\" target=\"_blank\" href=\"https://www.facebook.com/https://www.facebook.com/sebastian.esser\">FACEBOOK</a> | <a class=\"link link--camoflaged text-bold xing--link\" target=\"_blank\" href=\"https://www.xing.com/profile/\">XING</a> | <a class=\"link link--camoflaged text-bold linkedin--link\" target=\"_blank\" href=\"https://www.linkedin.com/in/\">LINKEDIN</a> | <a class=\"link link--camoflaged text-bold homepage--link\" target=\"_blank\" href=\"http://sebastian-esser.de\">HOMEPAGE</a>",
 		Images: []krautreporter.Image{{
@@ -29,6 +30,7 @@ func TestFetchParseAuthor(t *testing.T) {
 
 	authors["https://krautreporter.de/13-tilo-jung"] = &krautreporter.Author{
 		Name:        "Tilo Jung",
+		URL:         "https://krautreporter.de/13-tilo-jung",
 		Biography:   "Tilo Jung",
 		SocialMedia: "Tilo Jung\nauf\n<a class=\"link link--camoflaged text-bold twitter--link\" target=\"_blank\" href=\"https://twitter.com/@TiloJung\">TWITTER</a> | <a class=\"link link--camoflaged text-bold facebook--link\" target=\"_blank\" href=\"https://www.facebook.com/tilo.jung\">FACEBOOK</a> | <a class=\"link link--camoflaged text-bold xing--link\" target=\"_blank\" href=\"https://www.xing.com/profile/\">XING</a> | <a class=\"link link--camoflaged text-bold linkedin--link\" target=\"_blank\" href=\"https://www.linkedin.com/in/\">LINKEDIN</a> | <a class=\"link link--camoflaged text-bold homepage--link\" target=\"_blank\" href=\"http://www.jungundnaiv.de\">HOMEPAGE</a>",
 		Images: []krautreporter.Image{{
@@ -42,6 +44,7 @@ func TestFetchParseAuthor(t *testing.T) {
 
 	authors["https://krautreporter.de/175-juliane-wiedemeier"] = &krautreporter.Author{
 		Name:        "Juliane Wiedemeier",
+		URL:         "https://krautreporter.de/175-juliane-wiedemeier",
 		Biography:   "Juliane Wiedemeier ist freie Journalistin in Berlin und Gründungsredakteurin der Prenzlauer Berg Nachrichten.",
 		SocialMedia: "Juliane Wiedemeier\nauf\n<a class=\"link link--camoflaged text-bold twitter--link\" target=\"_blank\" href=\"https://twitter.com/\">TWITTER</a> | <a class=\"link link--camoflaged text-bold facebook--link\" target=\"_blank\" href=\"https://www.facebook.com/\">FACEBOOK</a> | <a class=\"link link--camoflaged text-bold xing--link\" target=\"_blank\" href=\"https://www.xing.com/profile/\">XING</a> | <a class=\"link link--camoflaged text-bold linkedin--link\" target=\"_blank\" href=\"https://www.linkedin.com/in/\">LINKEDIN</a> | <a class=\"link link--camoflaged text-bold homepage--link\" target=\"_blank\" href=\"\">HOMEPAGE</a>",
 		Images: []krautreporter.Image{{
@@ -55,6 +58,7 @@ func TestFetchParseAuthor(t *testing.T) {
 
 	authors["https://krautreporter.de/24012-elisabeth-dietz"] = &krautreporter.Author{
 		Name:        "Elisabeth Dietz",
+		URL:         "https://krautreporter.de/24012-elisabeth-dietz",
 		Biography:   "",
 		SocialMedia: "",
 		Images: []krautreporter.Image{{
@@ -67,11 +71,18 @@ func TestFetchParseAuthor(t *testing.T) {
 	}
 
 	for url, expected := range authors {
-		doc, err := s.fetchAuthor(url)
+		sa := ScrapeAuthor{
+			Scraper: s,
+			Author: &krautreporter.Author{
+				URL: url,
+			},
+		}
+
+		doc, err := sa.Fetch()
 		assert.NoError(t, err)
 
-		actual, err := s.parseAuthor(doc)
+		err = sa.Parse(doc)
 		assert.NoError(t, err)
-		assert.Equal(t, expected, actual)
+		assert.Equal(t, expected, sa.Author)
 	}
 }
