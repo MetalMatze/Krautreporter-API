@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	krautreporter "github.com/metalmatze/krautreporter-api"
+	"github.com/metalmatze/krautreporter-api/repository"
 	"github.com/urfave/cli"
 )
 
@@ -33,10 +33,9 @@ type Scrape interface {
 
 // Scraper knows the host to scrape and connects to the database
 type Scraper struct {
-	db *gorm.DB
-
-	host   string
-	client *http.Client
+	host       string
+	client     *http.Client
+	Repository *repository.Repository
 }
 
 func (s *Scraper) get(types, url string) (*http.Response, error) {
@@ -120,24 +119,27 @@ func (s *Scraper) runCrawl() error {
 			}
 		}
 
-		//// authors
-		//s.db.Where("next < ?", time.Now()).
-		//	Where("crawlable_type = ?", "authors").
-		//	Order("next").
-		//	Find(&crawls)
-		//
-		//for _, c := range crawls {
-		//	IDs = append(IDs, c.CrawlableID)
-		//}
-		//
-		//var authors []*krautreporter.Author
-		//s.db.Preload("Crawl").
-		//	Where(IDs).
-		//	Find(&authors)
-		//
-		//for _, a := range authors {
-		//	authorChan <- a
-		//}
+		// authors
+		s.db.Where("next < ?", time.Now()).
+			Where("crawlable_type = ?", "authors").
+			Order("next").
+			Find(&crawls)
+
+		for _, c := range crawls {
+			IDs = append(IDs, c.CrawlableID)
+		}
+
+		var authors []*krautreporter.Author
+		s.db.Preload("Crawl").
+			Where(IDs).
+			Find(&authors)
+
+		for _, a := range authors {
+			scrapeChan <- &ScrapeAuthor{
+				Scraper: s,
+				Author:  a,
+			}
+		}
 
 		time.Sleep(crawlInterval)
 	}
@@ -166,7 +168,7 @@ func (s *Scraper) Scrape(scrapeChan <-chan Scrape) {
 }
 
 func (s *Scraper) index() error {
-	var articles []TeaserArticle
+	var teaserArticles []TeaserArticle
 
 	page := 1
 	for {
@@ -192,12 +194,40 @@ func (s *Scraper) index() error {
 			break
 		}
 
-		articles = append(articles, articleResp.Articles...)
+		teaserArticles = append(teaserArticles, articleResp.Articles...)
 		page++
 	}
 
-	//if err := s.SaveArticles(articles); err != nil {
-	//	log.Println(err)
+	articles := make([]*krautreporter.Article, len(teaserArticles))
+	var successCount, errorCount float64
+	for i, ta := range teaserArticles {
+		if len(ta.HTML) == 0 {
+			errorCount++
+			continue
+		}
+
+		article, err := ta.Parse()
+		if err != nil {
+			log.Println(err)
+			errorCount++
+			continue
+		}
+
+		article.Ordering = len(teaserArticles) - i - 1
+
+		if article.Crawl.ID == 0 {
+			article.Crawl = krautreporter.Crawl{Next: time.Now()}
+		}
+
+		articles = append(articles, article)
+		successCount++
+	}
+
+	indexArticleGauge.WithLabelValues("success").Set(successCount)
+	indexArticleGauge.WithLabelValues("error").Set(errorCount)
+
+	//if err := s.Repository.SaveAllArticles(articles); err != nil {
+	//	return err
 	//}
 
 	return nil
