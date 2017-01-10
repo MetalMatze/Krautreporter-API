@@ -45,7 +45,7 @@ func (ta TeaserArticle) Parse() (*krautreporter.Article, error) {
 	// URL
 	URL, exists := cardNode.Attr("href")
 	if !exists {
-		return article, fmt.Errorf("card node has no href attr")
+		return article, fmt.Errorf("card node has no href attr: %s", article.Title)
 	}
 	article.URL = URL
 

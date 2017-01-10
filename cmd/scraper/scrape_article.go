@@ -88,14 +88,17 @@ func (sa *ScrapeArticle) parseAuthor(node *goquery.Selection) error {
 	return nil
 }
 
+func (sa *ScrapeArticle) Save() error {
+	sa.nextCrawl()
+
+	return nil
+}
+
 func (sa *ScrapeArticle) nextCrawl() {
 	constant := 5 * time.Hour
 	variable := 30 * time.Minute
 	random := rand.Intn(int(variable.Seconds()))
 
-	sa.Article.Crawl.Next = time.Now().Add(time.Duration(constant.Seconds() + float64(random)))
-}
-
-func (sa *ScrapeArticle) Save() error {
-	return nil
+	dur := time.Duration(constant.Seconds() + float64(random))
+	sa.Article.Crawl.Next = time.Now().Add(dur)
 }
