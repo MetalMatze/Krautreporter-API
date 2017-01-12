@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -11,9 +10,7 @@ import (
 	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
-var (
-	ixSrcRegex = regexp.MustCompile(`.*\?`) // Match everything to the first ?
-)
+const imgixURL = "https://krautreporter.imgix.net"
 
 type (
 	// TeaserArticle is just the teaser part of an article
@@ -77,15 +74,14 @@ func (ta TeaserArticle) Parse() (*krautreporter.Article, error) {
 	if imageNode.Length() > 0 { // preview available if img node exists
 		article.Preview = true
 
-		ixSrc, exists := imageNode.Attr("ix-src")
+		src, exists := imageNode.Attr("ix-path")
 		if !exists {
-			return article, fmt.Errorf("article img has no ix-src attr")
+			return article, fmt.Errorf("article img has no ix-path attr")
 		}
 
-		src := ixSrcRegex.FindString(ixSrc)
 		article.AddImage(krautreporter.Image{
 			Width: 1600,
-			Src:   src + "w=1600",
+			Src:   imgixURL + src + "?w=1600",
 		})
 	}
 
