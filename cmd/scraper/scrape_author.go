@@ -65,8 +65,8 @@ func (sa *ScrapeAuthor) Parse(doc *goquery.Document) error {
 			return fmt.Errorf("author has img with srcset, but more than 2: %s", sa.Author.Name)
 		}
 
-		sa.Author.AddImage(krautreporter.Image{Width: 170, Src: matches[1]})
-		sa.Author.AddImage(krautreporter.Image{Width: 340, Src: matches[2]})
+		sa.Author.AddImage(&krautreporter.Image{Width: 170, Src: matches[1]})
+		sa.Author.AddImage(&krautreporter.Image{Width: 340, Src: matches[2]})
 	}
 
 	return nil

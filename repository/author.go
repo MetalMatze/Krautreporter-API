@@ -61,7 +61,7 @@ func (r Repository) SaveAllAuthors(authors []*krautreporter.Author) error {
 		}
 
 		if author.Crawl.ID == 0 {
-			author.Crawl = krautreporter.Crawl{Next: time.Now()}
+			author.Crawl = &krautreporter.Crawl{Next: time.Now()}
 		}
 
 		tx.Save(&author)

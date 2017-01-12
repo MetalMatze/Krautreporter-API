@@ -79,7 +79,7 @@ func (ta TeaserArticle) Parse() (*krautreporter.Article, error) {
 			return article, fmt.Errorf("article img has no ix-path attr")
 		}
 
-		article.AddImage(krautreporter.Image{
+		article.AddImage(&krautreporter.Image{
 			Width: 1600,
 			Src:   imgixURL + src + "?w=1600",
 		})

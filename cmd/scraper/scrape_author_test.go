@@ -19,7 +19,7 @@ func TestFetchParseAuthor(t *testing.T) {
 		URL:         "https://krautreporter.de/6-sebastian-esser",
 		Biography:   "Sebastian Esser, Jahrgang 1976, arbeitete als Politik- und Medienredakteur und gründete zwei Journalismus-Startups. Er lebt in Berlin.",
 		SocialMedia: "Sebastian Esser\nauf\n<a class=\"link link--camoflaged text-bold twitter--link\" target=\"_blank\" href=\"https://twitter.com/@sebastianesser\">TWITTER</a> | <a class=\"link link--camoflaged text-bold facebook--link\" target=\"_blank\" href=\"https://www.facebook.com/https://www.facebook.com/sebastian.esser\">FACEBOOK</a> | <a class=\"link link--camoflaged text-bold xing--link\" target=\"_blank\" href=\"https://www.xing.com/profile/\">XING</a> | <a class=\"link link--camoflaged text-bold linkedin--link\" target=\"_blank\" href=\"https://www.linkedin.com/in/\">LINKEDIN</a> | <a class=\"link link--camoflaged text-bold homepage--link\" target=\"_blank\" href=\"http://sebastian-esser.de\">HOMEPAGE</a>",
-		Images: []krautreporter.Image{{
+		Images: []*krautreporter.Image{{
 			Width: 170,
 			Src:   "/system/user/profile_image/6/title_26Voo_0sItW8-BkHh872x9wzbJIJh5WN1SwBroOcBS4.png",
 		}, {
@@ -33,7 +33,7 @@ func TestFetchParseAuthor(t *testing.T) {
 		URL:         "https://krautreporter.de/13-tilo-jung",
 		Biography:   "Tilo Jung",
 		SocialMedia: "Tilo Jung\nauf\n<a class=\"link link--camoflaged text-bold twitter--link\" target=\"_blank\" href=\"https://twitter.com/@TiloJung\">TWITTER</a> | <a class=\"link link--camoflaged text-bold facebook--link\" target=\"_blank\" href=\"https://www.facebook.com/tilo.jung\">FACEBOOK</a> | <a class=\"link link--camoflaged text-bold xing--link\" target=\"_blank\" href=\"https://www.xing.com/profile/\">XING</a> | <a class=\"link link--camoflaged text-bold linkedin--link\" target=\"_blank\" href=\"https://www.linkedin.com/in/\">LINKEDIN</a> | <a class=\"link link--camoflaged text-bold homepage--link\" target=\"_blank\" href=\"http://www.jungundnaiv.de\">HOMEPAGE</a>",
-		Images: []krautreporter.Image{{
+		Images: []*krautreporter.Image{{
 			Width: 170,
 			Src:   "/system/user/profile_image/13/title_KUcC_EJQiDrfoGvsdsSz0SjfNhTEouNaONYGGC1vaMw.png",
 		}, {
@@ -47,7 +47,7 @@ func TestFetchParseAuthor(t *testing.T) {
 		URL:         "https://krautreporter.de/175-juliane-wiedemeier",
 		Biography:   "Juliane Wiedemeier ist freie Journalistin in Berlin und Gründungsredakteurin der Prenzlauer Berg Nachrichten.",
 		SocialMedia: "Juliane Wiedemeier\nauf\n<a class=\"link link--camoflaged text-bold twitter--link\" target=\"_blank\" href=\"https://twitter.com/\">TWITTER</a> | <a class=\"link link--camoflaged text-bold facebook--link\" target=\"_blank\" href=\"https://www.facebook.com/\">FACEBOOK</a> | <a class=\"link link--camoflaged text-bold xing--link\" target=\"_blank\" href=\"https://www.xing.com/profile/\">XING</a> | <a class=\"link link--camoflaged text-bold linkedin--link\" target=\"_blank\" href=\"https://www.linkedin.com/in/\">LINKEDIN</a> | <a class=\"link link--camoflaged text-bold homepage--link\" target=\"_blank\" href=\"\">HOMEPAGE</a>",
-		Images: []krautreporter.Image{{
+		Images: []*krautreporter.Image{{
 			Width: 170,
 			Src:   "/system/user/profile_image/175/title_pfd5hoLcRM6j_VXzfbugAudHJHvT1xVaJEceuWjT0DI.png",
 		}, {
@@ -61,7 +61,7 @@ func TestFetchParseAuthor(t *testing.T) {
 		URL:         "https://krautreporter.de/24012-elisabeth-dietz",
 		Biography:   "",
 		SocialMedia: "",
-		Images: []krautreporter.Image{{
+		Images: []*krautreporter.Image{{
 			Width: 170,
 			Src:   "/system/user/profile_image/24012/title_GE1OGrRtJPg2AXjf8eiwFDDpEk8bVW8yip6wl9333zA.jpg",
 		}, {

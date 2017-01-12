@@ -218,7 +218,7 @@ func (s *Scraper) index() error {
 		article.Ordering = len(teaserArticles) - i - 1
 
 		if article.Crawl.ID == 0 {
-			article.Crawl = krautreporter.Crawl{Next: time.Now()}
+			article.Crawl = &krautreporter.Crawl{Next: time.Now()}
 		}
 
 		articles = append(articles, article)

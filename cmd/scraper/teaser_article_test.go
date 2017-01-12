@@ -37,7 +37,7 @@ var (
 		Date:     time.Date(2015, 6, 15, 0, 0, 0, 0, time.UTC),
 		Preview:  true,
 		URL:      "/737-ich-fuhle-manchmal-diese-ohnmachtige-wut-wenn-ich-zu-den-gefangnissen-fahre",
-		Images: []krautreporter.Image{
+		Images: []*krautreporter.Image{
 			{
 				Width: 1600,
 				Src:   "https://krautreporter.imgix.net/system/article/teaser_image/737/gOORuiMBRVZyFLi21t8nBzpLG0mrKckVA_38jwW8v1Y.jpg?w=1600",
@@ -51,7 +51,7 @@ var (
 		Date:     time.Date(2015, 2, 16, 0, 0, 0, 0, time.UTC),
 		Preview:  true,
 		URL:      "/316-gesucht-das-nachste-aids-virus",
-		Images: []krautreporter.Image{
+		Images: []*krautreporter.Image{
 			{
 				Width: 1600,
 				Src:   "https://krautreporter.imgix.net/system/article/teaser_image/316/NsO27uKXZ_tQSbNaq3Y_BL3iw5MkvgVn-wGqFO35TJ0.jpg?w=1600",
@@ -65,7 +65,7 @@ var (
 		Date:     time.Date(2015, 4, 24, 0, 0, 0, 0, time.UTC),
 		Preview:  true,
 		URL:      "/635-ja-wir-haben-abgeklebt",
-		Images: []krautreporter.Image{
+		Images: []*krautreporter.Image{
 			{
 				Width: 1600,
 				Src:   "https://krautreporter.imgix.net/system/article/teaser_image/635/LaVKNOaomzorM6oS8mn1GhPGQXOhrD2ok45em6V34QE.jpg?w=1600",
@@ -79,7 +79,7 @@ var (
 		Date:     time.Date(2017, 1, 6, 0, 0, 0, 0, time.UTC),
 		Preview:  true,
 		URL:      "/1702-was-ist-krautreporter",
-		Images: []krautreporter.Image{
+		Images: []*krautreporter.Image{
 			{
 				Width: 1600,
 				Src:   "https://krautreporter.imgix.net/system/article/teaser_image/1702/iBs2eREsrYKRRtBKgW7Lud1DSsmewYWCUbJK9SxWrmA.jpg?w=1600",
@@ -93,7 +93,7 @@ var (
 		Date:     time.Date(2015, 7, 6, 0, 0, 0, 0, time.UTC),
 		Preview:  true,
 		URL:      "/796-wie-aus-einem-volksbefreiungsarmee-oberst-die-wahrscheinlich-einflussreichste-frau-chinas-wurde",
-		Images: []krautreporter.Image{
+		Images: []*krautreporter.Image{
 			{
 				Width: 1600,
 				Src:   "https://krautreporter.imgix.net/system/article/teaser_image/796/y3e_KCNAmHolgZ0fgiSyj9lZOtfRj8H0VO6OXBTx2OA.jpg?w=1600",

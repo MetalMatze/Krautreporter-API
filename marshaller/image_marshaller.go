@@ -11,7 +11,7 @@ type Image struct {
 	Src   string `json:"src"`
 }
 
-func marshallImage(i krautreporter.Image) Image {
+func marshallImage(i *krautreporter.Image) Image {
 	return Image{
 		ID:    i.ID,
 		Width: i.Width,
@@ -20,7 +20,7 @@ func marshallImage(i krautreporter.Image) Image {
 }
 
 // FromImages turns a slice of Images into a marshalled data structure
-func FromImages(images []krautreporter.Image) map[string][]Image {
+func FromImages(images []*krautreporter.Image) map[string][]Image {
 	im := []Image{}
 
 	for _, i := range images {

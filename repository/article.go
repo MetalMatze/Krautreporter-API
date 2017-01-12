@@ -83,7 +83,7 @@ func (r Repository) SaveAllArticles(articles []*krautreporter.Article) error {
 		}
 
 		if article.Crawl.ID == 0 {
-			article.Crawl = krautreporter.Crawl{Next: time.Now()}
+			article.Crawl = &krautreporter.Crawl{Next: time.Now()}
 		}
 
 		tx.Save(&article)

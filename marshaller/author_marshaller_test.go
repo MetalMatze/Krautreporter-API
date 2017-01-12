@@ -30,7 +30,7 @@ func TestMarshallAuthor(t *testing.T) {
 		string(b),
 	)
 
-	a.Images = append(a.Images, krautreporter.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
+	a.Images = append(a.Images, &krautreporter.Image{ID: 123, Width: 256, Src: "/foo.jpg"})
 
 	b, err = json.Marshal(FromAuthor(a))
 	assert.Nil(t, err)
