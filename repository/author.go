@@ -13,23 +13,29 @@ var ErrAuthorNotFound = errors.New("Author not found")
 
 // FindAuthors returns a slice of all Authors
 func (r Repository) FindAuthors() ([]*krautreporter.Author, error) {
-	if cached, exists := r.Cache.Get("authors.list"); exists {
-		return cached.([]*krautreporter.Author), nil
+	if r.Cache != nil {
+		if cached, exists := r.Cache.Get("authors.list"); exists {
+			return cached.([]*krautreporter.Author), nil
+		}
 	}
 
 	var authors []*krautreporter.Author
 
 	r.DB.Preload("Images").Order("ordering desc").Find(&authors)
 
-	r.Cache.Set("authors.list", authors, time.Minute)
+	if r.Cache != nil {
+		r.Cache.Set("authors.list", authors, time.Minute)
+	}
 
 	return authors, nil
 }
 
 // FindAuthorByID returns an Author for the ID matching the parameter
 func (r Repository) FindAuthorByID(id int) (*krautreporter.Author, error) {
-	if cached, exists := r.Cache.Get(fmt.Sprintf("authors.%d", id)); exists {
-		return cached.(*krautreporter.Author), nil
+	if r.Cache != nil {
+		if cached, exists := r.Cache.Get(fmt.Sprintf("authors.%d", id)); exists {
+			return cached.(*krautreporter.Author), nil
+		}
 	}
 
 	var author krautreporter.Author
@@ -39,7 +45,9 @@ func (r Repository) FindAuthorByID(id int) (*krautreporter.Author, error) {
 		return nil, ErrAuthorNotFound
 	}
 
-	r.Cache.Set(fmt.Sprintf("authors.%d", author.ID), &author, time.Minute)
+	if r.Cache != nil {
+		r.Cache.Set(fmt.Sprintf("authors.%d", author.ID), &author, time.Minute)
+	}
 
 	return &author, nil
 }
@@ -60,9 +68,7 @@ func (r Repository) SaveAllAuthors(authors []*krautreporter.Author) error {
 			author.AddImage(i)
 		}
 
-		if author.Crawl.ID == 0 {
-			author.Crawl = &krautreporter.Crawl{Next: time.Now()}
-		}
+		author.NextCrawl(&krautreporter.Crawl{Next: time.Now()})
 
 		tx.Save(&author)
 	}

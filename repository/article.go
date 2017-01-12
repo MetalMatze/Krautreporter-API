@@ -3,7 +3,6 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	krautreporter "github.com/metalmatze/krautreporter-api"
@@ -42,8 +41,10 @@ func (r Repository) FindArticlesOlderThan(id int, number int) ([]*krautreporter.
 
 // FindArticleByID returns an Article for the ID matching the parameter
 func (r Repository) FindArticleByID(id int) (*krautreporter.Article, error) {
-	if cached, exists := r.Cache.Get(fmt.Sprintf("articles.%d", id)); exists {
-		return cached.(*krautreporter.Article), nil
+	if r.Cache != nil {
+		if cached, exists := r.Cache.Get(fmt.Sprintf("articles.%d", id)); exists {
+			return cached.(*krautreporter.Article), nil
+		}
 	}
 
 	var a krautreporter.Article
@@ -53,7 +54,9 @@ func (r Repository) FindArticleByID(id int) (*krautreporter.Article, error) {
 		return nil, ErrArticleNotFound
 	}
 
-	r.Cache.Set(fmt.Sprintf("authors.%d", a.ID), &a, 5*time.Second)
+	if r.Cache != nil {
+		r.Cache.Set(fmt.Sprintf("authors.%d", a.ID), &a, 5*time.Second)
+	}
 
 	return &a, nil
 }
@@ -63,28 +66,25 @@ func (r Repository) SaveAllArticles(articles []*krautreporter.Article) error {
 	tx := r.DB.Begin()
 	for i, a := range articles {
 		article := krautreporter.Article{ID: a.ID}
-		tx.Preload("Images").Preload("Crawl").FirstOrCreate(&article)
+		tx.Preload("Images").
+			Preload("Crawl").
+			Preload("Author").
+			FirstOrCreate(&article)
 
 		article.Ordering = len(articles) - 1 - i
 		article.Title = a.Title
 		article.URL = a.URL
 		article.Preview = a.Preview
 
-		author := krautreporter.Author{}
-		tx.First(&author, "name = ?", strings.TrimSpace(a.Author.Name))
-		if author.ID == 0 {
-			r.Logger.Log("msg", "Can't find author for article ", "author", a.Author.Name, "article", a.URL)
-			continue
+		if article.Author == nil {
+			article.Author = a.Author
 		}
-		article.AuthorID = author.ID
 
 		for _, i := range a.Images {
 			article.AddImage(i)
 		}
 
-		if article.Crawl.ID == 0 {
-			article.Crawl = &krautreporter.Crawl{Next: time.Now()}
-		}
+		article.NextCrawl(a.Crawl)
 
 		tx.Save(&article)
 	}
