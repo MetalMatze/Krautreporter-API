@@ -96,51 +96,52 @@ func (s *Scraper) runCrawl() error {
 	}
 
 	for {
-		// articles
-		var crawls []*krautreporter.Crawl
-		s.db.Where("next < ?", time.Now()).
-			Where("crawlable_type = ?", "articles").
-			Order("next").
-			Find(&crawls)
-
-		var IDs []int
-		for _, c := range crawls {
-			IDs = append(IDs, c.CrawlableID)
-		}
-
-		var articles []*krautreporter.Article
-		s.db.Preload("Crawl").
-			Where(IDs).
-			Find(&articles)
-
-		for _, a := range articles {
-			scrapeChan <- &ScrapeArticle{
-				Scraper: s,
-				Article: a,
-			}
-		}
-
-		// authors
-		s.db.Where("next < ?", time.Now()).
-			Where("crawlable_type = ?", "authors").
-			Order("next").
-			Find(&crawls)
-
-		for _, c := range crawls {
-			IDs = append(IDs, c.CrawlableID)
-		}
-
-		var authors []*krautreporter.Author
-		s.db.Preload("Crawl").
-			Where(IDs).
-			Find(&authors)
-
-		for _, a := range authors {
-			scrapeChan <- &ScrapeAuthor{
-				Scraper: s,
-				Author:  a,
-			}
-		}
+		// TODO
+		//// articles
+		//var crawls []*krautreporter.Crawl
+		//s.db.Where("next < ?", time.Now()).
+		//	Where("crawlable_type = ?", "articles").
+		//	Order("next").
+		//	Find(&crawls)
+		//
+		//var IDs []int
+		//for _, c := range crawls {
+		//	IDs = append(IDs, c.CrawlableID)
+		//}
+		//
+		//var articles []*krautreporter.Article
+		//s.db.Preload("Crawl").
+		//	Where(IDs).
+		//	Find(&articles)
+		//
+		//for _, a := range articles {
+		//	scrapeChan <- &ScrapeArticle{
+		//		Scraper: s,
+		//		Article: a,
+		//	}
+		//}
+		//
+		//// authors
+		//s.db.Where("next < ?", time.Now()).
+		//	Where("crawlable_type = ?", "authors").
+		//	Order("next").
+		//	Find(&crawls)
+		//
+		//for _, c := range crawls {
+		//	IDs = append(IDs, c.CrawlableID)
+		//}
+		//
+		//var authors []*krautreporter.Author
+		//s.db.Preload("Crawl").
+		//	Where(IDs).
+		//	Find(&authors)
+		//
+		//for _, a := range authors {
+		//	scrapeChan <- &ScrapeAuthor{
+		//		Scraper: s,
+		//		Author:  a,
+		//	}
+		//}
 
 		time.Sleep(crawlInterval)
 	}
