@@ -8,6 +8,8 @@ all: build
 .PHONY: clean
 clean:
 	go clean -i ./...
+	rm -f krautreporter-api
+	rm -f krautreporter-scraper
 
 .PHONY: build
 build: build-api build-scraper
