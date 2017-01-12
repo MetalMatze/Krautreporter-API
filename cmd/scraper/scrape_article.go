@@ -94,16 +94,24 @@ func (sa *ScrapeArticle) parseAuthor(node *goquery.Selection) error {
 
 // Save the updated article after fetching & parsing
 func (sa *ScrapeArticle) Save() error {
-	sa.nextCrawl()
+	crawl := &krautreporter.Crawl{}
+	crawl.NextRandom()
+	sa.Article.NextCrawl(crawl)
+	fmt.Printf("Article's next crawl: %+v\n", sa.Article.Crawl.Next)
 
-	return nil
-}
+	author, err := sa.Scraper.Repository.FindAuthorByID(sa.Article.AuthorID)
+	if err != nil && err != repository.ErrAuthorNotFound {
+		return err
+	}
+	if err == repository.ErrAuthorNotFound {
+		author = sa.Article.Author
+	}
 
-func (sa *ScrapeArticle) nextCrawl() {
-	constant := 5 * time.Hour
-	variable := 30 * time.Minute
-	random := rand.Intn(int(variable.Seconds()))
+	crawl = &krautreporter.Crawl{}
+	crawl.NextRandom()
+	author.NextCrawl(crawl)
 
-	dur := time.Duration(constant.Seconds() + float64(random))
-	sa.Article.Crawl.Next = time.Now().Add(dur)
+	sa.Article.Author = author
+
+	return sa.Scraper.Repository.SaveArticle(sa.Article)
 }

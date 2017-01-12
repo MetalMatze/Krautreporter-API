@@ -74,16 +74,7 @@ func (sa *ScrapeAuthor) Parse(doc *goquery.Document) error {
 
 // Save the updated author after fetching & parsing
 func (sa *ScrapeAuthor) Save() error {
-	sa.nextCrawl()
+	sa.Author.Crawl.NextRandom()
 
-	return nil
-}
-
-func (sa *ScrapeAuthor) nextCrawl() {
-	constant := 5 * time.Hour
-	variable := 30 * time.Minute
-	random := rand.Intn(int(variable.Seconds()))
-
-	dur := time.Duration(constant.Seconds() + float64(random))
-	sa.Author.Crawl.Next = time.Now().Add(dur)
+	return sa.Scraper.Repository.SaveAuthor(sa.Author)
 }
