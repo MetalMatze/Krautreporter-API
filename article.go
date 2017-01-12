@@ -33,3 +33,17 @@ func (a *Article) AddImage(i *Image) {
 
 	a.Images = append(a.Images, i)
 }
+
+func (a *Article) NextCrawl(c *Crawl) {
+	if a.Crawl == nil || a.Crawl.ID == 0 {
+		a.Crawl = c
+		return
+	}
+
+	if a.Crawl.ID != 0 && c.ID == 0 {
+		a.Crawl.Next = c.Next
+		return
+	}
+
+	a.Crawl = c
+}
