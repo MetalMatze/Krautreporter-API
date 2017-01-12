@@ -12,15 +12,18 @@ import (
 	krautreporter "github.com/metalmatze/krautreporter-api"
 )
 
+// ScrapeArticle implementes the Scrape interface to scrape one specific article
 type ScrapeArticle struct {
 	Scraper *Scraper
 	Article *krautreporter.Article
 }
 
+// Type returns a string representing the type of the Scrape interface implementation
 func (sa *ScrapeArticle) Type() string {
 	return "articles"
 }
 
+// Fetch an article and return a goquery.Document with its content
 func (sa *ScrapeArticle) Fetch() (*goquery.Document, error) {
 	resp, err := sa.Scraper.get("articles", sa.Scraper.host+sa.Article.URL)
 	if err != nil {
@@ -34,12 +37,13 @@ func (sa *ScrapeArticle) Fetch() (*goquery.Document, error) {
 	return goquery.NewDocumentFromResponse(resp)
 }
 
+// Parse a goquery.Document into the given article
 func (sa *ScrapeArticle) Parse(doc *goquery.Document) error {
 	articleNode := doc.Find("main article.article")
 	contentNode := articleNode.Find(".article-content")
 
 	if articleNode.Length() == 0 {
-		log.Printf("article %s has no content") // TODO log with ID
+		log.Printf("article %s has no content", sa.Article.URL)
 	}
 
 	content, err := contentNode.Html()
@@ -68,7 +72,7 @@ func (sa *ScrapeArticle) parseAuthor(node *goquery.Selection) error {
 	// URL
 	authorURL, exists := node.Attr("href")
 	if !exists {
-		return fmt.Errorf("author link doesn't exist for %s", sa.Article.Author.ID) // TODO log with ID
+		return fmt.Errorf("author link doesn't exist for %s", sa.Article.Author.ID)
 	}
 	sa.Article.Author.URL = authorURL
 
@@ -88,6 +92,7 @@ func (sa *ScrapeArticle) parseAuthor(node *goquery.Selection) error {
 	return nil
 }
 
+// Save the updated article after fetching & parsing
 func (sa *ScrapeArticle) Save() error {
 	sa.nextCrawl()
 

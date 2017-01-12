@@ -15,15 +15,18 @@ var (
 	srcsetRegex = regexp.MustCompile(`(.*) 170w, (.*) 340w`)
 )
 
+// ScrapeAuthor implementes the Scrape interface to scrape one specific author
 type ScrapeAuthor struct {
 	Scraper *Scraper
 	Author  *krautreporter.Author
 }
 
+// Type returns a string representing the type of the Scrape interface implementation
 func (sa *ScrapeAuthor) Type() string {
 	return "authors"
 }
 
+// Fetch an author and return a goquery.Document with its content
 func (sa *ScrapeAuthor) Fetch() (*goquery.Document, error) {
 	resp, err := sa.Scraper.get("authors", sa.Author.URL)
 	if err != nil {
@@ -37,6 +40,7 @@ func (sa *ScrapeAuthor) Fetch() (*goquery.Document, error) {
 	return goquery.NewDocumentFromResponse(resp)
 }
 
+// Parse a goquery.Document into the given author
 func (sa *ScrapeAuthor) Parse(doc *goquery.Document) error {
 	authorNode := doc.Find("main .island .author")
 
@@ -68,6 +72,7 @@ func (sa *ScrapeAuthor) Parse(doc *goquery.Document) error {
 	return nil
 }
 
+// Save the updated author after fetching & parsing
 func (sa *ScrapeAuthor) Save() error {
 	sa.nextCrawl()
 

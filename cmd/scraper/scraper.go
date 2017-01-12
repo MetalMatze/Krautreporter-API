@@ -24,6 +24,7 @@ var (
 	idRegex = regexp.MustCompile(`\/(\d*)`)
 )
 
+// Scrape interface makes sure implementations are usable by the pipeline
 type Scrape interface {
 	Type() string
 	Fetch() (*goquery.Document, error)
@@ -91,7 +92,7 @@ func (s *Scraper) runCrawl() error {
 	scrapeChan := make(chan Scrape, 2000)
 
 	for i := 0; i < 10; i++ {
-		go s.Scrape(scrapeChan)
+		go s.scrape(scrapeChan)
 	}
 
 	for {
@@ -145,7 +146,7 @@ func (s *Scraper) runCrawl() error {
 	}
 }
 
-func (s *Scraper) Scrape(scrapeChan <-chan Scrape) {
+func (s *Scraper) scrape(scrapeChan <-chan Scrape) {
 	for scrape := range scrapeChan {
 		doc, err := scrape.Fetch()
 		if err != nil {
