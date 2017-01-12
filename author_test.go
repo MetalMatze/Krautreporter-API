@@ -2,6 +2,7 @@ package krautreporter
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -25,4 +26,28 @@ func TestAuthor_AddImage(t *testing.T) {
 	a.AddImage(i3)
 	assert.Len(t, a.Images, 2)
 	assert.Equal(t, i3, a.Images[0])
+}
+
+func TestAuthor_NextCrawl(t *testing.T) {
+	now := time.Now()
+
+	a := Author{}
+	assert.Nil(t, a.Crawl)
+
+	a.NextCrawl(&Crawl{Next: now})
+	assert.Equal(t, 0, a.Crawl.ID)
+	assert.Equal(t, now, a.Crawl.Next)
+
+	a.NextCrawl(&Crawl{ID: 1234, Next: now})
+	assert.Equal(t, 1234, a.Crawl.ID)
+	assert.Equal(t, now, a.Crawl.Next)
+
+	now = time.Now()
+	a.NextCrawl(&Crawl{Next: now})
+	assert.Equal(t, 1234, a.Crawl.ID)
+	assert.Equal(t, now, a.Crawl.Next)
+
+	a.NextCrawl(&Crawl{ID: 12345, Next: now})
+	assert.Equal(t, 12345, a.Crawl.ID)
+	assert.Equal(t, now, a.Crawl.Next)
 }

@@ -29,3 +29,19 @@ func (a *Author) AddImage(i *Image) {
 
 	a.Images = append(a.Images, i)
 }
+
+// NextCrawl merges the current crawl and a new one's timestamp
+// If no crawl exists for the author yet, the passed one is taken
+func (a *Author) NextCrawl(c *Crawl) {
+	if a.Crawl == nil || a.Crawl.ID == 0 {
+		a.Crawl = c
+		return
+	}
+
+	if a.Crawl.ID != 0 && c.ID == 0 {
+		a.Crawl.Next = c.Next
+		return
+	}
+
+	a.Crawl = c
+}

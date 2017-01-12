@@ -34,6 +34,8 @@ func (a *Article) AddImage(i *Image) {
 	a.Images = append(a.Images, i)
 }
 
+// NextCrawl merges the current crawl and a new one's timestamp
+// If no crawl exists for the article yet, the passed one is taken
 func (a *Article) NextCrawl(c *Crawl) {
 	if a.Crawl == nil || a.Crawl.ID == 0 {
 		a.Crawl = c
