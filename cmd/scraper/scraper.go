@@ -72,10 +72,7 @@ func (s *Scraper) ActionIndex(c *cli.Context) error {
 func (s *Scraper) ActionCrawl(c *cli.Context) error {
 	log.Printf("starting, commit: %s\n", BuildCommit)
 
-	//go s.runIndex()
-	go s.runCrawl()
-
-	select {}
+	return s.runCrawl()
 }
 
 func (s *Scraper) runIndex() error {
@@ -96,52 +93,33 @@ func (s *Scraper) runCrawl() error {
 	}
 
 	for {
-		// TODO
-		//// articles
-		//var crawls []*krautreporter.Crawl
-		//s.db.Where("next < ?", time.Now()).
-		//	Where("crawlable_type = ?", "articles").
-		//	Order("next").
-		//	Find(&crawls)
-		//
-		//var IDs []int
-		//for _, c := range crawls {
-		//	IDs = append(IDs, c.CrawlableID)
-		//}
-		//
-		//var articles []*krautreporter.Article
-		//s.db.Preload("Crawl").
-		//	Where(IDs).
-		//	Find(&articles)
-		//
-		//for _, a := range articles {
-		//	scrapeChan <- &ScrapeArticle{
-		//		Scraper: s,
-		//		Article: a,
-		//	}
-		//}
-		//
-		//// authors
-		//s.db.Where("next < ?", time.Now()).
-		//	Where("crawlable_type = ?", "authors").
-		//	Order("next").
-		//	Find(&crawls)
-		//
-		//for _, c := range crawls {
-		//	IDs = append(IDs, c.CrawlableID)
-		//}
-		//
-		//var authors []*krautreporter.Author
-		//s.db.Preload("Crawl").
-		//	Where(IDs).
-		//	Find(&authors)
-		//
-		//for _, a := range authors {
-		//	scrapeChan <- &ScrapeAuthor{
-		//		Scraper: s,
-		//		Author:  a,
-		//	}
-		//}
+		if err := s.index(); err != nil {
+			return err
+		}
+
+		authors, err := s.Repository.FindOutdatedAuthors()
+		if err != nil {
+			return err
+		}
+
+		for _, a := range authors {
+			scrapeChan <- &ScrapeAuthor{
+				Scraper: s,
+				Author:  a,
+			}
+		}
+
+		articles, err := s.Repository.FindOutdatedArticles()
+		if err != nil {
+			return err
+		}
+
+		for _, a := range articles {
+			scrapeChan <- &ScrapeArticle{
+				Scraper: s,
+				Article: a,
+			}
+		}
 
 		time.Sleep(crawlInterval)
 	}
@@ -200,7 +178,7 @@ func (s *Scraper) index() error {
 		page++
 	}
 
-	articles := make([]*krautreporter.Article, len(teaserArticles))
+	articles := []*krautreporter.Article{}
 	var successCount, errorCount float64
 	for i, ta := range teaserArticles {
 		if len(ta.HTML) == 0 {
@@ -217,7 +195,7 @@ func (s *Scraper) index() error {
 
 		article.Ordering = len(teaserArticles) - i - 1
 
-		if article.Crawl.ID == 0 {
+		if article.Crawl == nil {
 			article.Crawl = &krautreporter.Crawl{Next: time.Now()}
 		}
 
@@ -228,9 +206,10 @@ func (s *Scraper) index() error {
 	indexArticleGauge.WithLabelValues("success").Set(successCount)
 	indexArticleGauge.WithLabelValues("error").Set(errorCount)
 
-	//if err := s.Repository.SaveAllArticles(articles); err != nil {
-	//	return err
-	//}
+	if err := s.Repository.SaveAllArticles(articles); err != nil {
+		return err
+	}
+	log.Printf("Saved %d indexed articles", len(articles))
 
 	return nil
 }

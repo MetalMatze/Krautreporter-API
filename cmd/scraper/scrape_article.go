@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	krautreporter "github.com/metalmatze/krautreporter-api"
+	"github.com/metalmatze/krautreporter-api/repository"
 )
 
 // ScrapeArticle implementes the Scrape interface to scrape one specific article

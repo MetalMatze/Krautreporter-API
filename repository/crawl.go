@@ -9,7 +9,10 @@ import (
 // FindOutdatedAuthors returns a slice of Authors that need to be scraped
 func (r Repository) FindOutdatedAuthors() ([]*krautreporter.Author, error) {
 	var crawls []*krautreporter.Crawl
-	r.DB.Where("next < ?", time.Now()).Where("crawlable_type = ?", "authors").Order("next").Find(&crawls)
+	r.DB.Where("next < ?", time.Now()).
+		Where("crawlable_type = ?", "authors").
+		Order("next").
+		Find(&crawls)
 
 	var IDs []int
 	for _, c := range crawls {
@@ -25,7 +28,10 @@ func (r Repository) FindOutdatedAuthors() ([]*krautreporter.Author, error) {
 // FindOutdatedArticles returns a slice of Articles that need to be scraped
 func (r Repository) FindOutdatedArticles() ([]*krautreporter.Article, error) {
 	var crawls []*krautreporter.Crawl
-	r.DB.Where("next < ?", time.Now()).Where("crawlable_type = ?", "articles").Order("next").Find(&crawls)
+	r.DB.Where("next < ?", time.Now()).
+		Where("crawlable_type = ?", "articles").
+		Order("next").
+		Find(&crawls)
 
 	var IDs []int
 	for _, c := range crawls {
@@ -33,7 +39,7 @@ func (r Repository) FindOutdatedArticles() ([]*krautreporter.Article, error) {
 	}
 
 	var articles []*krautreporter.Article
-	r.DB.Preload("Crawl").Where(IDs).Find(&articles)
+	r.DB.Preload("Crawl").Preload("Author").Where(IDs).Find(&articles)
 
 	return articles, nil
 }
@@ -42,7 +48,9 @@ func (r Repository) FindOutdatedArticles() ([]*krautreporter.Article, error) {
 func (r Repository) NextCrawls(limit int) ([]*krautreporter.Crawl, error) {
 	var crawls []*krautreporter.Crawl
 
-	if result := r.DB.Limit(limit).Order("next").Find(&crawls); result.Error != nil {
+	result := r.DB.Limit(limit).Order("next").Find(&crawls)
+
+	if result.Error != nil {
 		return nil, result.Error
 	}
 

@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	krautreporter "github.com/metalmatze/krautreporter-api"
@@ -28,7 +26,7 @@ func (sa *ScrapeAuthor) Type() string {
 
 // Fetch an author and return a goquery.Document with its content
 func (sa *ScrapeAuthor) Fetch() (*goquery.Document, error) {
-	resp, err := sa.Scraper.get("authors", sa.Author.URL)
+	resp, err := sa.Scraper.get("authors", sa.Scraper.host+sa.Author.URL)
 	if err != nil {
 		return nil, err
 	}
