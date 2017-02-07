@@ -1,3 +1,5 @@
+# Warning: This project as been deprecated
+
 # Krautreporter API
 
 ### Getting started
